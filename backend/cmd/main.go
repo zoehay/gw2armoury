@@ -24,7 +24,7 @@ func main() {
     router.GET("/items", getItems)
     router.GET("/items/:id", getItemByID)
 
-    router.Run("localhost:8000")
+    router.Run("127.0.0.1:8000")
 }
 
 func getItems(c *gin.Context) {
