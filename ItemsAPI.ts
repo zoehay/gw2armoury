@@ -49,13 +49,13 @@ interface Item {
   id: number;
   chat_link: string;
   name: string;
-  icon: string;
+  icon?: string;
   description?: string;
   type: ItemType;
   rarity: Rarity;
   level: number;
   vendor_value: number;
-  default_skin?: string;
+  default_skin?: number;
   flags?: string[];
   game_types?: string[];
   restrictions?: string[];

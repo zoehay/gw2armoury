@@ -14,17 +14,16 @@ RUN go mod download
 COPY ./cmd/main.go ./cmd/main.go
 
 # Build
-RUN go build -o backend ./cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o /backend ./cmd/main.go
 
-RUN chmod +rx backend
-
+# Use light weight image for prod later 
 FROM golang:1.21
 
-WORKDIR /src
+WORKDIR /
 
-COPY --from=build /src/backend backend
-RUN ls -la
+COPY --from=build /backend /backend
+
 EXPOSE 8000
 
 # Run
-CMD ["./backend"]
+CMD ["/backend"]
