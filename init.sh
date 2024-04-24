@@ -7,11 +7,6 @@ else
     echo "network already created"
 fi
 
-docker inspect "db" > /dev/null
-if [ $? -ne 0 ]; then
-    sh db/init-db.sh
-else 
-    echo "db already created"
-fi
+sh db/init-db.sh && \
 
 sh backend/init-backend.sh
