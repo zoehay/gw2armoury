@@ -1,1 +1,1 @@
-docker run -p 8000:8000 -d --network armoury-network armoury-backend
+docker run -d --network armoury-network -p 8000:8000 armoury-backend\

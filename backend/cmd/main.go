@@ -14,31 +14,13 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	"github.com/zoehay/gw2armoury/backend/internal/models"
 )
 
 var db *gorm.DB
 var err error
 
-type Item struct {
-    ID uint `gorm:"primaryKey"`
-    ChatLink string
-    Name string
-    Icon string
-    Description string
-    Type string
-    Rarity string
-    Level uint
-    VendorValue uint
-    DefaultSkin uint
-    Flags []string `gorm:"type:text"`
-    GameTypes []string `gorm:"type:text"`
-    Restrictions []string `gorm:"type:text"`
-    UpgradesInto []string `gorm:"type:text"`
-    UpgradesFrom []string `gorm:"type:text"`
-    Details string;
-  }
-
-var seedItems = []*Item{
+var seedItems = []*models.Item{
     {
         ID: 28445, 
         Name: "Strong Soft Wood Longbow of Fire", 
@@ -69,26 +51,41 @@ func main() {
 
     router := gin.Default()
     router.GET("/items", getItems) 
-    // router.GET("/items/:id", getItemByID)
+    router.GET("/items/:id", getItemByID)
 
     // router.Run("127.0.0.1:8000")
-    router.Run("0.0.0.0:8000")
+    router.Run(":8000")
 }
 
 func getItems(c *gin.Context) {
-    var allItems []Item
-    result := db.Find(&allItems)
+    var allItems []models.Item
 
-    if result.Error != nil {
-        c.AbortWithStatus(404)
-        fmt.Println(result.Error)
+    err = db.Find(&allItems).Error
+    if err != nil {
+        c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Record not found"})
+        fmt.Println(err)
+        return
     } 
     c.IndentedJSON(http.StatusOK, allItems)
 }
 
+func getItemByID(c *gin.Context) {
+    var item models.Item
+    itemID := c.Params.ByName("id")
+
+    err = db.First(&item, itemID).Error
+    if err!= nil {
+        c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Record not found"})
+        fmt.Println(err)
+        return
+    } 
+    c.IndentedJSON(http.StatusOK, item)
+}
+
 func postgresInit() (*gorm.DB, error) {
 
-    time.Sleep(30 * time.Second)
+    // Add logic to ping db 
+    time.Sleep(30 * time.Second) 
 
     dsn := os.Getenv("DB_DSN")
     db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -98,13 +95,13 @@ func postgresInit() (*gorm.DB, error) {
     }
 
     log.Print("Run db migrate")
-	err = db.AutoMigrate(&Item{})
+	err = db.AutoMigrate(&models.Item{})
     if err != nil {
         return nil, err
     }
 
     // seed db 
-    err = db.First(&Item{}).Error
+    err = db.First(&models.Item{}).Error
     if errors.Is(err, gorm.ErrRecordNotFound) {
         log.Print("Seeding db")
         result := db.Create(&seedItems)

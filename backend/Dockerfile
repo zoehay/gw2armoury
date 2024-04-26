@@ -11,7 +11,11 @@ RUN go mod download
 
 # Copy the source code. Note the slash at the end, as explained in
 # https://docs.docker.com/reference/dockerfile/#copy
-COPY ./cmd/main.go ./cmd/main.go
+COPY . .
+
+# Use env until find way to mount /run/secrets
+# COPY .env .env
+
 
 # Build
 RUN CGO_ENABLED=0 GOOS=linux go build -o /backend ./cmd/main.go
@@ -22,6 +26,7 @@ FROM golang:1.21
 WORKDIR /
 
 COPY --from=build /backend /backend
+COPY --from=build /src/.env .
 
 EXPOSE 8000
 

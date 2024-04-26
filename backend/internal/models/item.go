@@ -1,7 +1,7 @@
 package models
 
 type Item struct {
-  ID uint
+  ID int 
   ChatLink string
   Name string
   Icon string
@@ -11,10 +11,10 @@ type Item struct {
   Level uint
   VendorValue uint
   DefaultSkin uint
-  Flags []string
-  GameTypes []string
-  Restrictions []string
-  UpgradesInto []string
-  UpgradesFrom []string
-  Details string;
+  Flags []string 
+  GameTypes []string 
+  Restrictions []string 
+  UpgradesInto []string 
+  UpgradesFrom []string 
+  Details string
 }
