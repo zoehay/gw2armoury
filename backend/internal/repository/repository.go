@@ -19,3 +19,4 @@ func NewGormRepository(db *gorm.DB) *GormRepository {
 		db:db,
 	}
 }
+

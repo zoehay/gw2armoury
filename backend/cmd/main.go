@@ -1,10 +1,6 @@
 package main
 
 import (
-	"errors"
-	"fmt"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -14,7 +10,9 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	"github.com/zoehay/gw2armoury/backend/internal/handlers"
 	"github.com/zoehay/gw2armoury/backend/internal/models"
+	"github.com/zoehay/gw2armoury/backend/internal/repository"
 )
 
 var db *gorm.DB
@@ -49,37 +47,15 @@ func main() {
 		log.Fatal("Error initializing database connection", err)
 	}
 
+    itemRepository := repository.NewGormItemRepository(db)
+    itemHandler := handlers.NewItemHandler(itemRepository)
+
     router := gin.Default()
-    router.GET("/items", getItems) 
-    router.GET("/items/:id", getItemByID)
+    router.GET("/items", itemHandler.GetAllItems) 
+    router.GET("/items/:id", itemHandler.GetItemByID)
 
     // router.Run("127.0.0.1:8000")
     router.Run(":8000")
-}
-
-func getItems(c *gin.Context) {
-    var allItems []models.Item
-
-    err = db.Find(&allItems).Error
-    if err != nil {
-        c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Record not found"})
-        fmt.Println(err)
-        return
-    } 
-    c.IndentedJSON(http.StatusOK, allItems)
-}
-
-func getItemByID(c *gin.Context) {
-    var item models.Item
-    itemID := c.Params.ByName("id")
-
-    err = db.First(&item, itemID).Error
-    if err!= nil {
-        c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Record not found"})
-        fmt.Println(err)
-        return
-    } 
-    c.IndentedJSON(http.StatusOK, item)
 }
 
 func postgresInit() (*gorm.DB, error) {
@@ -94,21 +70,28 @@ func postgresInit() (*gorm.DB, error) {
         return nil, err
     }
 
-    log.Print("Run db migrate")
-	err = db.AutoMigrate(&models.Item{})
-    if err != nil {
-        return nil, err
-    }
+    // itemRepository := &repository.GormItemRepository{DB: db}
+
+    // log.Print("Run db migrate")
+	// err = db.AutoMigrate(&models.Item{})
+    // if err != nil {
+    //     return nil, err
+    // }
 
     // seed db 
-    err = db.First(&models.Item{}).Error
-    if errors.Is(err, gorm.ErrRecordNotFound) {
-        log.Print("Seeding db")
-        result := db.Create(&seedItems)
-        log.Print(result.Error, result.RowsAffected)
-    } else {
-        log.Print("db already seeded")
-    }
+
+    // _ , err = itemRepository.GetFirst()
+    // if errors.Is(err, gorm.ErrRecordNotFound) {
+    //     log.Print("Seeding db")
+    //     for _, seedItem := range seedItems {
+    //         if _, err := itemRepository.Create(seedItem); err != nil {
+    //             return db, err
+    //         }
+    //     }
+    
+    // } else {
+    //     log.Print("db already seeded")
+    // }
 
     return db, nil
 }

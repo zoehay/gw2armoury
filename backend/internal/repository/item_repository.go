@@ -2,75 +2,68 @@ package repository
 
 import (
 	"github.com/zoehay/gw2armoury/backend/internal/models"
+	"gorm.io/gorm"
 )
 
-type ItemRepository struct {
-	GormRepository
+type ItemRepository interface {
+	Create(item *models.Item) error
+	GetAll() ([]models.Item, error) 
+	GetFirst() (models.Item, error)
 }
 
-type gormItem struct {
-	ID int `gorm:"primaryKey"`
-	ChatLink string
-	Name string
-	Icon string
-	Description string
-	Type string
-	Rarity string
-	Level uint
-	VendorValue uint
-	DefaultSkin uint
-	Flags []string `gorm:"type:text"`
-	GameTypes []string `gorm:"type:text"`
-	Restrictions []string `gorm:"type:text"`
-	UpgradesInto []string `gorm:"type:text"`
-	UpgradesFrom []string `gorm:"type:text"`
-	Details string
-  }
+type GormItemRepository struct {
+	DB *gorm.DB
+}
 
-
-func (repository *ItemRepository) Create(item models.Item) (*models.Item, error) {
-	gormItem := gormItem{
-		ID: item.ID,
-		ChatLink: item.ChatLink, 
-		Name: item.Name,
-		Icon: item.Icon,
-		Description: item.Description,
-		Type: item.Type,
-		Rarity: item.Rarity,
-		Level: item.Level,
-		VendorValue: item.VendorValue,
-		DefaultSkin: item.DefaultSkin,
-		Flags: item.Flags,
-		GameTypes: item.GameTypes,
-		Restrictions: item.Restrictions,
-		UpgradesInto: item.UpgradesInto,
-		UpgradesFrom: item.UpgradesFrom,
-		Details: item.Details,
+func NewGormItemRepository(db *gorm.DB) GormItemRepository{
+	return GormItemRepository{
+		DB: db,
 	}
+}
 
-	err := repository.db.Create(&gormItem).Error
+func (repository *GormItemRepository) Create(item *models.Item) (*models.Item, error) {
+
+	err := repository.DB.Create(item).Error
 	if err != nil {
 		return nil, err
 	}
 
-	result := models.Item(gormItem)
-	return &result, nil
+	return item, nil
 	
 }
 
-func (repository *ItemRepository) GetAll() ([]models.Item, error) {
-	var gormItems []models.Item
+func (repository *GormItemRepository) GetAll() ([]models.Item, error) {
+	var items []models.Item
 
-	err := repository.db.Find(&gormItems).Error
+	err := repository.DB.Find(&items).Error
 	if err != nil {
 		return nil, err
 	}
 
-	var result []models.Item
-	for _, gormItem := range gormItems {
-		result = append(result, models.Item(gormItem))
+	return items, nil
+
+}
+
+func (repository *GormItemRepository) GetFirst() (*models.Item, error) {
+	var item models.Item
+
+	err := repository.DB.First(&models.Item{}).Error
+	if err != nil {
+		return nil, err
 	}
 
-	return result, nil
+	return &item, nil
+
+}
+
+func (repository *GormItemRepository) GetById(id string) (*models.Item, error) {
+	var item models.Item
+
+	err := repository.DB.First(&models.Item{}, id).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &item, nil
 
 }
