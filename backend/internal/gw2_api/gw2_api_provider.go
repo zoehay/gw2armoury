@@ -1,23 +1,20 @@
-package gw2apiprovider
+package gw2api
 
 import (
 	"fmt"
 	"io/ioutil"
 
-	gw2apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/models"
-
 	"encoding/json"
 	"net/http"
+
+	apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/api_models"
 )
 
 // getAllItems - on server init
 
 // getCharacterInventory bags: Bag[]
 
-
-
-
-func GetSomeItems() (*[]gw2apimodels.Gw2Item, error) {
+func GetSomeItems() (*[]apimodels.ApiItem, error) {
 	url := "https://api.guildwars2.com/v2/items?ids=24,68"
 
 	// headers := http.Header{}
@@ -44,7 +41,7 @@ func GetSomeItems() (*[]gw2apimodels.Gw2Item, error) {
 		return nil, err
 	}
 
-	var result []gw2apimodels.Gw2Item
+	var result []apimodels.ApiItem
 
 	if err = json.Unmarshal(bodyRaw, &result); err != nil {
 		fmt.Print(err)
@@ -53,7 +50,3 @@ func GetSomeItems() (*[]gw2apimodels.Gw2Item, error) {
 
 	return &result, nil
 }
-
-// func (gw2apimodels.Gw2Item) ApiItemToItem() (models.Item) {
-// 	return 
-// }

@@ -14,31 +14,31 @@ import (
 
 func main() {
 
-    // replace env with docker secrets? 
-    err := godotenv.Load()
+	// replace env with docker secrets?
+	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file:", err)
 	}
 
-    dsn := os.Getenv("DB_DSN")
-    db, err := database.PostgresInit(dsn)
-    if err != nil {
+	dsn := os.Getenv("DB_DSN")
+	db, err := database.PostgresInit(dsn)
+	if err != nil {
 		log.Fatal("Error initializing database connection", err)
 	}
 
-    itemRepository := repository.NewGormItemRepository(db)
-    itemHandler := handlers.NewItemHandler(itemRepository)
+	itemRepository := repository.NewGormItemRepository(db)
+	itemHandler := handlers.NewItemHandler(itemRepository)
 
-    err = database.CheckAndSeedDatabase(itemRepository)
-    if err != nil {
+	err = database.CheckAndSeedDatabase(itemRepository)
+	if err != nil {
 		log.Fatal("Error seeding database", err)
 	}
 
-    router := gin.Default()
-    router.GET("/items", itemHandler.GetAllItems) 
-    router.GET("/items/:id", itemHandler.GetItemByID)
+	router := gin.Default()
+	router.GET("/items", itemHandler.GetAllItems)
+	router.GET("/items/:id", itemHandler.GetItemByID)
 	router.GET("/api", itemHandler.Api)
 
-    // router.Run("127.0.0.1:8000")
-    router.Run(":8000")
+	// router.Run("127.0.0.1:8000")
+	router.Run(":8000")
 }
