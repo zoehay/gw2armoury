@@ -1,7 +1,7 @@
 package models
 
 type Item struct {
-	ID int `gorm:"primaryKey"`
+	ID int 
 	ChatLink string
 	Name string
 	Icon string
@@ -11,10 +11,10 @@ type Item struct {
 	Level uint
 	VendorValue uint
 	DefaultSkin uint
-	Flags []string `gorm:"type:text"`
-	GameTypes []string `gorm:"type:text"`
-	Restrictions []string `gorm:"type:text"`
-	UpgradesInto []string `gorm:"type:text"`
-	UpgradesFrom []string `gorm:"type:text"`
-	Details string
+	Flags []string 
+	GameTypes []string 
+	Restrictions []string 
+	UpgradesInto []string 
+	UpgradesFrom []string 
+	// Details map[string]string
   }

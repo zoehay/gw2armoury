@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	gw2apiprovider "github.com/zoehay/gw2armoury/backend/internal/gw2_api/provider"
 	"github.com/zoehay/gw2armoury/backend/internal/repository"
 )
 
@@ -30,6 +31,15 @@ func (itemHandler ItemHandler) GetItemByID(c *gin.Context) {
 	itemId := c.Params.ByName("id")
 
 	item, err := itemHandler.ItemRepository.GetById(itemId)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, item)
+}
+
+func (itemHandler ItemHandler) Api(c *gin.Context) {
+	item, err := gw2apiprovider.GetSomeItems()
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
