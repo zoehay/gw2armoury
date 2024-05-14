@@ -11,10 +11,12 @@ import (
 )
 
 // getAllItems - on server init
+// 		getAllItemIds
+//		getItems?ids={batch of item ids} load items into db in batches
 
 // getCharacterInventory bags: Bag[]
 
-func GetSomeItems() (*[]apimodels.ApiItem, error) {
+func GetSomeItems() ([]apimodels.ApiItem, error) {
 	url := "https://api.guildwars2.com/v2/items?ids=24,68"
 
 	// headers := http.Header{}
@@ -36,17 +38,21 @@ func GetSomeItems() (*[]apimodels.ApiItem, error) {
 		_ = res.Body.Close()
 	}()
 
-	bodyRaw, err := ioutil.ReadAll(res.Body)
+	//#TODO: escape "&" character in chatlink field
+
+	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
 	}
 
 	var result []apimodels.ApiItem
 
-	if err = json.Unmarshal(bodyRaw, &result); err != nil {
+	if err = json.Unmarshal(body, &result); err != nil {
 		fmt.Print(err)
 		return nil, err
 	}
 
-	return &result, nil
+	fmt.Println("provider get items", result)
+
+	return result, nil
 }

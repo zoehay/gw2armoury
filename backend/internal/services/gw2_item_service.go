@@ -1,22 +1,25 @@
 package services
 
 import (
+	"fmt"
+
 	gw2api "github.com/zoehay/gw2armoury/backend/internal/gw2_api"
 	apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/api_models"
 	"github.com/zoehay/gw2armoury/backend/internal/repository"
-	repositorymodels "github.com/zoehay/gw2armoury/backend/internal/repository/repository_models"
 )
 
 type ItemServiceInterface interface {
-	GetAndStoreSomeDbItems() (repositorymodels.GormItem, error)
+	GetAndStoreSomeDbItems() error
 }
 
 type ItemService struct {
 	gormItemRepository *repository.GormItemRepository
 }
 
-func NewItemService() *ItemService {
-	return &ItemService{}
+func NewItemService(itemRepository *repository.GormItemRepository) *ItemService {
+	return &ItemService{
+		gormItemRepository: itemRepository,
+	}
 }
 
 func (service *ItemService) GetAndStoreSomeDbItems() error {
@@ -25,17 +28,22 @@ func (service *ItemService) GetAndStoreSomeDbItems() error {
 		return err
 	}
 
-	var gormItems []*repositorymodels.GormItem
-	for _, item := range *apiItems {
+	// var gormItems []*repositorymodels.GormItem
+	for _, item := range apiItems {
+		fmt.Println("service", item.Name, item.ChatLink, item.Description)
 		gormItem := apimodels.ApiItemToGormItem(item)
-		gormItems = append(gormItems, &gormItem)
+		fmt.Println("service convert", item.Name, item.ChatLink, item.Description)
+		_, err := service.gormItemRepository.Create(&gormItem)
+		if err != nil {
+			return err
+		}
+		// gormItems = append(gormItems, &gormItem)
 	}
+	// err = service.gormItemRepository.CreateMany(gormItems)
 
-	err = service.gormItemRepository.CreateMany(gormItems)
-
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 
 	return nil
 

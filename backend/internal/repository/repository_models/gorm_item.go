@@ -14,12 +14,12 @@ type GormItem struct {
 	Rarity       string
 	Level        int
 	VendorValue  int
-	DefaultSkin  int
-	Flags        []string `gorm:"type:text"`
-	GameTypes    []string `gorm:"type:text"`
-	Restrictions []string `gorm:"type:text"`
-	UpgradesInto []string `gorm:"type:text"`
-	UpgradesFrom []string `gorm:"type:text"`
+	DefaultSkin  *int
+	Flags        []string  `gorm:"type:text"`
+	GameTypes    []string  `gorm:"type:text"`
+	Restrictions []string  `gorm:"type:text"`
+	UpgradesInto *[]string `gorm:"type:text"`
+	UpgradesFrom *[]string `gorm:"type:text"`
 	// Details map[string]string
 }
 
@@ -34,12 +34,12 @@ func GormItemToItem(gormItem GormItem) models.Item {
 		Rarity:       gormItem.Icon,
 		Level:        gormItem.Level,
 		VendorValue:  gormItem.VendorValue,
-		DefaultSkin:  gormItem.DefaultSkin,
+		DefaultSkin:  *gormItem.DefaultSkin,
 		Flags:        gormItem.Flags,
 		GameTypes:    gormItem.GameTypes,
 		Restrictions: gormItem.Restrictions,
-		UpgradesInto: gormItem.UpgradesInto,
-		UpgradesFrom: gormItem.UpgradesFrom,
+		UpgradesInto: *gormItem.UpgradesInto,
+		UpgradesFrom: *gormItem.UpgradesFrom,
 		// Details : gormItem.Details,
 	}
 }
@@ -55,12 +55,12 @@ func ItemToGormItem(item models.Item) GormItem {
 		Rarity:       item.Icon,
 		Level:        item.Level,
 		VendorValue:  item.VendorValue,
-		DefaultSkin:  item.DefaultSkin,
+		DefaultSkin:  &item.DefaultSkin,
 		Flags:        item.Flags,
 		GameTypes:    item.GameTypes,
 		Restrictions: item.Restrictions,
-		UpgradesInto: item.UpgradesInto,
-		UpgradesFrom: item.UpgradesFrom,
+		UpgradesInto: &item.UpgradesInto,
+		UpgradesFrom: &item.UpgradesFrom,
 		// Details : item.Details,
 	}
 }

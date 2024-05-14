@@ -34,7 +34,7 @@ func (repository *GormItemRepository) Create(item *repositorymodels.GormItem) (*
 
 func (repository *GormItemRepository) CreateMany(items []*repositorymodels.GormItem) error {
 
-	err := repository.DB.Create(items).Error
+	err := repository.DB.Create(&items).Error
 	if err != nil {
 		return err
 	}

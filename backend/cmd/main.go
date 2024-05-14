@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 
 	"log"
@@ -10,6 +12,7 @@ import (
 	"github.com/zoehay/gw2armoury/backend/internal/database"
 	"github.com/zoehay/gw2armoury/backend/internal/handlers"
 	"github.com/zoehay/gw2armoury/backend/internal/repository"
+	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
 
 func main() {
@@ -32,6 +35,12 @@ func main() {
 	err = database.CheckAndSeedDatabase(itemRepository)
 	if err != nil {
 		log.Fatal("Error seeding database", err)
+	}
+
+	itemService := services.NewItemService(&itemRepository)
+	err = itemService.GetAndStoreSomeDbItems()
+	if err != nil {
+		fmt.Print(err)
 	}
 
 	router := gin.Default()
