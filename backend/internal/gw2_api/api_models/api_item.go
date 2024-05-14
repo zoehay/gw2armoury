@@ -1,6 +1,7 @@
 package apimodels
 
 import (
+	"github.com/lib/pq"
 	"github.com/zoehay/gw2armoury/backend/internal/models"
 	repositorymodels "github.com/zoehay/gw2armoury/backend/internal/repository/repository_models"
 )
@@ -69,11 +70,11 @@ func ApiItemToGormItem(apiItem ApiItem) repositorymodels.GormItem {
 		Level:        apiItem.Level,
 		VendorValue:  apiItem.VendorValue,
 		DefaultSkin:  apiItem.DefaultSkin,
-		Flags:        apiItem.Flags,
-		GameTypes:    apiItem.GameTypes,
-		Restrictions: apiItem.Restrictions,
-		UpgradesInto: apiItem.UpgradesInto,
-		UpgradesFrom: apiItem.UpgradesFrom,
+		Flags:        (pq.StringArray)(apiItem.Flags),
+		GameTypes:    (pq.StringArray)(apiItem.GameTypes),
+		Restrictions: (pq.StringArray)(apiItem.Restrictions),
+		UpgradesInto: (*pq.StringArray)(apiItem.UpgradesInto),
+		UpgradesFrom: (*pq.StringArray)(apiItem.UpgradesFrom),
 		// Details : apiItem.Details,
 	}
 }

@@ -67,10 +67,10 @@ func (repository *GormItemRepository) GetFirst() (*repositorymodels.GormItem, er
 
 }
 
-func (repository *GormItemRepository) GetById(id string) (*repositorymodels.GormItem, error) {
+func (repository *GormItemRepository) GetById(id int) (*repositorymodels.GormItem, error) {
 	var item repositorymodels.GormItem
 
-	err := repository.DB.First(&repositorymodels.GormItem{}, id).Error
+	err := repository.DB.First(&item, id).Error
 	if err != nil {
 		return nil, err
 	}

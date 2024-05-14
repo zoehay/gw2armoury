@@ -1,8 +1,6 @@
 package services
 
 import (
-	"fmt"
-
 	gw2api "github.com/zoehay/gw2armoury/backend/internal/gw2_api"
 	apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/api_models"
 	"github.com/zoehay/gw2armoury/backend/internal/repository"
@@ -30,9 +28,7 @@ func (service *ItemService) GetAndStoreSomeDbItems() error {
 
 	// var gormItems []*repositorymodels.GormItem
 	for _, item := range apiItems {
-		fmt.Println("service", item.Name, item.ChatLink, item.Description)
 		gormItem := apimodels.ApiItemToGormItem(item)
-		fmt.Println("service convert", item.Name, item.ChatLink, item.Description)
 		_, err := service.gormItemRepository.Create(&gormItem)
 		if err != nil {
 			return err

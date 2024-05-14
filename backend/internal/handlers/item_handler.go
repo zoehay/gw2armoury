@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	gw2api "github.com/zoehay/gw2armoury/backend/internal/gw2_api"
@@ -28,7 +29,12 @@ func (itemHandler ItemHandler) GetAllItems(c *gin.Context) {
 }
 
 func (itemHandler ItemHandler) GetItemByID(c *gin.Context) {
-	itemId := c.Params.ByName("id")
+	stringId := c.Params.ByName("id")
+	itemId, err := strconv.Atoi(stringId)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
 	item, err := itemHandler.ItemRepository.GetById(itemId)
 	if err != nil {

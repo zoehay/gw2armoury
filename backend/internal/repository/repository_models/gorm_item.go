@@ -1,7 +1,7 @@
 package repositorymodels
 
 import (
-	"github.com/zoehay/gw2armoury/backend/internal/models"
+	"github.com/lib/pq"
 )
 
 type GormItem struct {
@@ -15,52 +15,92 @@ type GormItem struct {
 	Level        int
 	VendorValue  int
 	DefaultSkin  *int
-	Flags        []string  `gorm:"type:text"`
-	GameTypes    []string  `gorm:"type:text"`
-	Restrictions []string  `gorm:"type:text"`
-	UpgradesInto *[]string `gorm:"type:text"`
-	UpgradesFrom *[]string `gorm:"type:text"`
-	// Details map[string]string
+	Flags        pq.StringArray  `gorm:"type:text[]"`
+	GameTypes    pq.StringArray  `gorm:"type:text[]"`
+	Restrictions pq.StringArray  `gorm:"type:text[]"`
+	UpgradesInto *pq.StringArray `gorm:"type:text[]"`
+	UpgradesFrom *pq.StringArray `gorm:"type:text[]"`
+	// Details Details
 }
 
-func GormItemToItem(gormItem GormItem) models.Item {
-	return models.Item{
-		ID:           gormItem.ID,
-		ChatLink:     gormItem.Icon,
-		Name:         gormItem.Icon,
-		Icon:         gormItem.Icon,
-		Description:  gormItem.Icon,
-		Type:         gormItem.Icon,
-		Rarity:       gormItem.Icon,
-		Level:        gormItem.Level,
-		VendorValue:  gormItem.VendorValue,
-		DefaultSkin:  *gormItem.DefaultSkin,
-		Flags:        gormItem.Flags,
-		GameTypes:    gormItem.GameTypes,
-		Restrictions: gormItem.Restrictions,
-		UpgradesInto: *gormItem.UpgradesInto,
-		UpgradesFrom: *gormItem.UpgradesFrom,
-		// Details : gormItem.Details,
-	}
-}
+// type GameType string
 
-func ItemToGormItem(item models.Item) GormItem {
-	return GormItem{
-		ID:           item.ID,
-		ChatLink:     item.Icon,
-		Name:         item.Icon,
-		Icon:         item.Icon,
-		Description:  item.Icon,
-		Type:         item.Icon,
-		Rarity:       item.Icon,
-		Level:        item.Level,
-		VendorValue:  item.VendorValue,
-		DefaultSkin:  &item.DefaultSkin,
-		Flags:        item.Flags,
-		GameTypes:    item.GameTypes,
-		Restrictions: item.Restrictions,
-		UpgradesInto: &item.UpgradesInto,
-		UpgradesFrom: &item.UpgradesFrom,
-		// Details : item.Details,
-	}
-}
+// type Flag string
+
+// const (
+// 	AccountBindOnUse
+//     AccountBound
+//     Attuned
+//     BulkConsume
+//     DeleteWarning
+//     HideSuffix
+//     Infused
+//     MonsterOnly
+//     NoMysticForge
+//     NoSalvage
+//     NoSell
+//     NotUpgradeable
+//     NoUnderwater
+//     SoulbindOnAcquire
+//     SoulBindOnUse
+//     Tonic
+//     Unique
+// )
+
+// type Details interface {
+
+// }
+
+// type ArmorDetails struct {
+// 	Type: string
+// 	WeightClass: string
+// 	Defense: int
+// 	InfusionSlots: InfusionSlot
+// 	AttributeAdjustment: int
+// 	InfixUpgrade: InfixUpgrade
+// 	SuffixItemId: int
+// 	SecondarySuffixItemId: string
+// 	StatChoices: []int
+// }
+
+// func GormItemToItem(gormItem GormItem) models.Item {
+// 	return models.Item{
+// 		ID:           gormItem.ID,
+// 		ChatLink:     gormItem.Icon,
+// 		Name:         gormItem.Icon,
+// 		Icon:         gormItem.Icon,
+// 		Description:  gormItem.Icon,
+// 		Type:         gormItem.Icon,
+// 		Rarity:       gormItem.Icon,
+// 		Level:        gormItem.Level,
+// 		VendorValue:  gormItem.VendorValue,
+// 		DefaultSkin:  *gormItem.DefaultSkin,
+// 		Flags:        gormItem.Flags,
+// 		GameTypes:    gormItem.GameTypes,
+// 		Restrictions: gormItem.Restrictions,
+// 		UpgradesInto: *gormItem.UpgradesInto,
+// 		UpgradesFrom: *gormItem.UpgradesFrom,
+// 		// Details : gormItem.Details,
+// 	}
+// }
+
+// func ItemToGormItem(item models.Item) GormItem {
+// 	return GormItem{
+// 		ID:           item.ID,
+// 		ChatLink:     item.Icon,
+// 		Name:         item.Icon,
+// 		Icon:         item.Icon,
+// 		Description:  item.Icon,
+// 		Type:         item.Icon,
+// 		Rarity:       item.Icon,
+// 		Level:        item.Level,
+// 		VendorValue:  item.VendorValue,
+// 		DefaultSkin:  &item.DefaultSkin,
+// 		Flags:        item.Flags,
+// 		GameTypes:    item.GameTypes,
+// 		Restrictions: item.Restrictions,
+// 		UpgradesInto: &item.UpgradesInto,
+// 		UpgradesFrom: &item.UpgradesFrom,
+// 		// Details : item.Details,
+// 	}
+// }

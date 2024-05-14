@@ -26,7 +26,6 @@ func GetSomeItems() ([]apimodels.ApiItem, error) {
 	// params["ids"] = request.Ids
 
 	// res, err := clients.Get(url, params, headers)
-	// fmt.Print(res)
 
 	res, err := http.Get(url)
 
@@ -37,8 +36,6 @@ func GetSomeItems() ([]apimodels.ApiItem, error) {
 	defer func() {
 		_ = res.Body.Close()
 	}()
-
-	//#TODO: escape "&" character in chatlink field
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
@@ -51,8 +48,6 @@ func GetSomeItems() ([]apimodels.ApiItem, error) {
 		fmt.Print(err)
 		return nil, err
 	}
-
-	fmt.Println("provider get items", result)
 
 	return result, nil
 }
