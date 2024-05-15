@@ -46,7 +46,6 @@ func main() {
 	router := gin.Default()
 	router.GET("/items", itemHandler.GetAllItems)
 	router.GET("/items/:id", itemHandler.GetItemByID)
-	router.GET("/api", itemHandler.Api)
 
 	// router.Run("127.0.0.1:8000")
 	router.Run(":8000")

@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	gw2api "github.com/zoehay/gw2armoury/backend/internal/gw2_api"
 	apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/api_models"
 	"github.com/zoehay/gw2armoury/backend/internal/repository"
@@ -21,26 +23,47 @@ func NewItemService(itemRepository *repository.GormItemRepository) *ItemService 
 }
 
 func (service *ItemService) GetAndStoreSomeDbItems() error {
-	apiItems, err := gw2api.GetSomeItems()
+	apiItems, err := gw2api.GetSomeItems("24,68")
 	if err != nil {
-		return err
+		return fmt.Errorf("service error using provider: %s", err)
 	}
 
-	// var gormItems []*repositorymodels.GormItem
 	for _, item := range apiItems {
 		gormItem := apimodels.ApiItemToGormItem(item)
 		_, err := service.gormItemRepository.Create(&gormItem)
 		if err != nil {
-			return err
+			return fmt.Errorf("service error using gorm create: %s", err)
 		}
-		// gormItems = append(gormItems, &gormItem)
 	}
-	// err = service.gormItemRepository.CreateMany(gormItems)
-
-	// if err != nil {
-	// 	return err
-	// }
-
 	return nil
 
+}
+
+var allItemIds = []int{
+	24,
+	33,
+	46,
+	56,
+	57,
+	58,
+	59,
+	60,
+	61,
+	62,
+	63,
+	64,
+	65,
+	68,
+	69,
+	70,
+	71,
+	72,
+	73,
+	74,
+	75,
+	76,
+	77,
+	78,
+	79,
+	80,
 }
