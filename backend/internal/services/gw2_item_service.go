@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"strings"
 
 	gw2api "github.com/zoehay/gw2armoury/backend/internal/gw2_api"
 	apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/api_models"
@@ -9,7 +10,8 @@ import (
 )
 
 type ItemServiceInterface interface {
-	GetAndStoreSomeDbItems() error
+	GetAndStoreItemsById(stringOfIds string) error
+	GetAndStoreAllItems() error
 }
 
 type ItemService struct {
@@ -22,8 +24,8 @@ func NewItemService(itemRepository *repository.GormItemRepository) *ItemService 
 	}
 }
 
-func (service *ItemService) GetAndStoreSomeDbItems() error {
-	apiItems, err := gw2api.GetSomeItems("24,68")
+func (service *ItemService) GetAndStoreItemsById(idsString string) error {
+	apiItems, err := gw2api.GetItemsById(idsString)
 	if err != nil {
 		return fmt.Errorf("service error using provider: %s", err)
 	}
@@ -39,31 +41,38 @@ func (service *ItemService) GetAndStoreSomeDbItems() error {
 
 }
 
-var allItemIds = []int{
-	24,
-	33,
-	46,
-	56,
-	57,
-	58,
-	59,
-	60,
-	61,
-	62,
-	63,
-	64,
-	65,
-	68,
-	69,
-	70,
-	71,
-	72,
-	73,
-	74,
-	75,
-	76,
-	77,
-	78,
-	79,
-	80,
+func (service *ItemService) GetAndStoreAllItems() error {
+	allItemIds, err := gw2api.GetAllItemIds()
+
+	if err != nil {
+		return fmt.Errorf("service error getting all itemIds: %s", err)
+	}
+
+	itemIdChunks := SplitArray(allItemIds, 3)
+
+	for _, idChunk := range itemIdChunks {
+		idString := strings.Join(idChunk, ",")
+		fmt.Println("get and store items", idString)
+		err = service.GetAndStoreItemsById(idString)
+		if err != nil {
+			return fmt.Errorf("service error getting itemId chunk %s: %s", idString, err)
+		}
+	}
+
+	return nil
+}
+
+func SplitArray(arr []string, chunkSize int) [][]string {
+	var result [][]string
+
+	for i := 0; i < len(arr); i += chunkSize {
+		end := i + chunkSize
+		if end > len(arr) {
+			end = len(arr)
+		}
+		result = append(result, arr[i:end])
+	}
+
+	return result
+
 }

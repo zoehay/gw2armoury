@@ -5,6 +5,27 @@ import (
 	"net/http"
 )
 
+const baseUrl = "https://api.guildwars2.com/v2/"
+
+func GetItemsById(ids string) (*http.Response, error) {
+	url := baseUrl + "items?ids=" + ids
+	res, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	return res, err
+
+}
+
+func GetItemIds() (*http.Response, error) {
+	url := baseUrl + "items"
+	res, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	return res, err
+}
+
 func Get(baseUrl string, params map[string]string, headers http.Header) (*http.Response, error) {
 	// req, err := http.NewRequest(http.MethodGet, baseUrl, nil)
 	// if err != nil {

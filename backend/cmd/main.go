@@ -38,7 +38,8 @@ func main() {
 	}
 
 	itemService := services.NewItemService(&itemRepository)
-	err = itemService.GetAndStoreSomeDbItems()
+
+	itemService.GetAndStoreAllItems()
 	if err != nil {
 		fmt.Print(err)
 	}
