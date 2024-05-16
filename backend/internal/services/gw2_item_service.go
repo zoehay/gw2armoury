@@ -49,6 +49,7 @@ func (service *ItemService) GetAndStoreAllItems() error {
 	}
 
 	itemIdChunks := SplitArray(allItemIds, 3)
+	fmt.Println(itemIdChunks)
 
 	for _, idChunk := range itemIdChunks {
 		idString := strings.Join(idChunk, ",")

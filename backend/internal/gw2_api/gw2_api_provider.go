@@ -39,10 +39,32 @@ func GetItemsById(ids string) ([]apimodels.ApiItem, error) {
 }
 
 func GetAllItemIds() ([]string, error) {
-	//res, err := clients.GetItemIds()
+	// res, err := clients.GetItemIds()
 
-	ArrOfStringIds := IntArrToStringArr(allItemIds)
-	return ArrOfStringIds, nil
+	// if err != nil {
+	// 	return nil, fmt.Errorf("provider get error: %s", err)
+	// }
+
+	// defer func() {
+	// 	_ = res.Body.Close()
+	// }()
+
+	// body, err := io.ReadAll(res.Body)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("provider io.ReadAll error: %s", err)
+	// }
+
+	// var result []int
+
+	// if err = json.Unmarshal(body, &result); err != nil {
+	// 	return nil, fmt.Errorf("provider json.Unmarshal error: %s", err)
+	// }
+
+	// ArrOfStringIds := IntArrToStringArr(result)
+	// return ArrOfStringIds, nil
+
+	arrOfStringIds := IntArrToStringArr(mockAllItemIds)
+	return arrOfStringIds, nil
 }
 
 func IntArrToStringArr(intArr []int) []string {
@@ -53,7 +75,7 @@ func IntArrToStringArr(intArr []int) []string {
 	return stringArr
 }
 
-var allItemIds = []int{
+var mockAllItemIds = []int{
 	24,
 	33,
 	46,
