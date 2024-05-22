@@ -1,11 +1,10 @@
 package gw2api
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"strconv"
-
-	"encoding/json"
 
 	"github.com/zoehay/gw2armoury/backend/internal/clients"
 	apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/api_models"

@@ -1,27 +1,67 @@
 package repositorymodels
 
 import (
+	"database/sql/driver"
+	"encoding/json"
+	"errors"
+	"fmt"
+
 	"github.com/lib/pq"
 )
 
 type GormItem struct {
-	ID           int `gorm:"primaryKey"`
-	ChatLink     string
 	Name         string
-	Icon         string
 	Description  string
 	Type         string
-	Rarity       string
 	Level        int
+	Rarity       string
 	VendorValue  int
 	DefaultSkin  *int
-	Flags        pq.StringArray  `gorm:"type:text[]"`
-	GameTypes    pq.StringArray  `gorm:"type:text[]"`
-	Restrictions pq.StringArray  `gorm:"type:text[]"`
+	GameTypes    pq.StringArray `gorm:"type:text[]"`
+	Flags        pq.StringArray `gorm:"type:text[]"`
+	Restrictions pq.StringArray `gorm:"type:text[]"`
+	ID           int            `gorm:"primaryKey"`
+	ChatLink     string
+	Icon         string
 	UpgradesInto *pq.StringArray `gorm:"type:text[]"`
 	UpgradesFrom *pq.StringArray `gorm:"type:text[]"`
-	// Details Details
+	Details      *DetailsMap     `gorm:"type:json"`
 }
+
+type DetailsMap map[string]interface{}
+
+func (detailsMap *DetailsMap) Scan(value interface{}) error {
+	if value == nil {
+		*detailsMap = nil
+		return nil
+	}
+	bytes, ok := value.([]byte)
+	if !ok {
+		return errors.New(fmt.Sprint("Failed to unmarshal JSONB value:", value))
+	}
+	err := json.Unmarshal(bytes, detailsMap)
+	return err
+
+}
+
+func (detailsMap DetailsMap) Value() (driver.Value, error) {
+	if len(detailsMap) == 0 {
+		return nil, nil
+	}
+	return json.Marshal(detailsMap)
+}
+
+// type GormArmorDetails struct {
+// 	Type        string
+// 	WeightClass string
+// 	Defense     int
+// 	// InfusionSlots       *[]InfusionSlotType `json:"infusion_slots"`
+// 	AttributeAdjustment float32 `sql:"type:decimal(10,2);"`
+// 	// InfixUpgrade        *ApiInfixUpgrade `json:"infix_upgrade"`
+// 	SuffixItemId          *int
+// 	SecondarySuffixItemId string
+// 	// StatChoices *[]int `json:"stat_choices"`
+// }
 
 // type GameType string
 
@@ -46,10 +86,6 @@ type GormItem struct {
 //     Tonic
 //     Unique
 // )
-
-// type Details interface {
-
-// }
 
 // type ArmorDetails struct {
 // 	Type: string
