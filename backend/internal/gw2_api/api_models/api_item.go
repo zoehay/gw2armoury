@@ -14,19 +14,19 @@ type ItemResponse struct {
 }
 
 type ApiItem struct {
-	ID           int                     `json:"id"`
-	ChatLink     string                  `json:"chat_link"`
 	Name         string                  `json:"name"`
-	Icon         string                  `json:"icon"`
-	Description  string                  `json:"description"`
 	Type         string                  `json:"type"`
-	Rarity       string                  `json:"rarity"`
 	Level        int                     `json:"level"`
+	Rarity       string                  `json:"rarity"`
 	VendorValue  int                     `json:"vendor_value"`
 	DefaultSkin  *int                    `json:"default_skin,omitempty"`
-	Flags        []string                `json:"flags"`
 	GameTypes    []string                `json:"game_types"`
+	Flags        []string                `json:"flags"`
 	Restrictions []string                `json:"restrictions"`
+	ID           int                     `json:"id"`
+	ChatLink     string                  `json:"chat_link"`
+	Icon         string                  `json:"icon"`
+	Description  string                  `json:"description"`
 	UpgradesInto *[]string               `json:"upgrades_into,omitempty"`
 	UpgradesFrom *[]string               `json:"upgrades_from,omitempty"`
 	Details      *map[string]interface{} `json:"details,omitempty"`

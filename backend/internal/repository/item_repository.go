@@ -7,8 +7,10 @@ import (
 
 type ItemRepository interface {
 	Create(item *repositorymodels.GormItem) error
+	CreateMany(items []*repositorymodels.GormItem) error
 	GetAll() ([]repositorymodels.GormItem, error)
 	GetFirst() (repositorymodels.GormItem, error)
+	GetById(id int) (repositorymodels.GormItem, error)
 }
 
 type GormItemRepository struct {

@@ -39,8 +39,8 @@ func main() {
 
 	itemService := services.NewItemService(&itemRepository)
 
-	// itemService.GetAndStoreAllItems()
-	itemService.GetAndStoreItemsById("57,58,59,60")
+	itemService.GetAndStoreAllItems()
+	// itemService.GetAndStoreItemsById("57,58,59,60")
 	if err != nil {
 		fmt.Print(err)
 	}
