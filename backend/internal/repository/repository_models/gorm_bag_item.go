@@ -5,7 +5,7 @@ import "github.com/lib/pq"
 // MVP do not care about which bag an item is in
 type GormBagItem struct {
 	CharacterName string
-	Id            int
+	BagItemId     int
 	Count         int
 	Charges       *int
 	Infusions     *pq.Int64Array `gorm:"type:integer[]"`

@@ -40,7 +40,7 @@ func PostgresInit(dsn string) (*gorm.DB, error) {
 	}
 
 	log.Print("Run db migrate")
-	err = db.AutoMigrate(&repositorymodels.GormItem{})
+	err = db.AutoMigrate(&repositorymodels.GormItem{}, &repositorymodels.GormBagItem{})
 	if err != nil {
 		return nil, err
 	}

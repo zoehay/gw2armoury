@@ -6,8 +6,8 @@ import (
 )
 
 type ApiBag struct {
-	Id        string        `json:"id"`
-	Size      string        `json:"size"`
+	Id        int           `json:"id"`
+	Size      int           `json:"size"`
 	Inventory []*ApiBagItem `json:"inventory"`
 }
 
@@ -28,7 +28,7 @@ func ApiBagToGormBagItem(apiCharacterName string, apiBagItem ApiBagItem) reposit
 	var stats = (*repositorymodels.DetailsMap)(apiBagItem.Stats)
 	return repositorymodels.GormBagItem{
 		CharacterName: apiCharacterName,
-		Id:            apiBagItem.Id,
+		BagItemId:     apiBagItem.Id,
 		Count:         apiBagItem.Count,
 		Charges:       apiBagItem.Charges,
 		Infusions:     (*pq.Int64Array)(apiBagItem.Infusions),

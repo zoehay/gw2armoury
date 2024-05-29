@@ -60,5 +60,56 @@ func GetAllCharacters(apiKey string) ([]apimodels.ApiCharacter, error) {
 		return nil, fmt.Errorf("provider json.Unmarshal error: %s", err)
 	}
 
+	// result := character
 	return result, nil
 }
+
+// var bindingType = "Character"
+// var boundTo = "Laura Lesdottir"
+
+// var bagItems = []*apimodels.ApiBagItem{
+// 	{
+// 		Id:      32130,
+// 		Count:   1,
+// 		Binding: &bindingType,
+// 		BoundTo: &boundTo,
+// 	},
+// 	{
+// 		Id:    32130,
+// 		Count: 1,
+// 	},
+// 	{
+// 		Id:    32130,
+// 		Count: 1,
+// 	},
+// 	{
+// 		Id:      32130,
+// 		Count:   1,
+// 		Binding: &bindingType,
+// 		BoundTo: &boundTo,
+// 	},
+// }
+
+// var apiBags = []apimodels.ApiBag{
+// 	{
+// 		Id:        8932,
+// 		Size:      20,
+// 		Inventory: bagItems,
+// 	},
+// 	{
+// 		Id:        8936,
+// 		Size:      15,
+// 		Inventory: bagItems,
+// 	},
+// }
+
+// var character = []apimodels.ApiCharacter{
+// 	{
+// 		Name: "Laura Lesdottir",
+// 		Bags: &apiBags,
+// 	},
+// 	{
+// 		Name: "Other Name",
+// 		Bags: &apiBags,
+// 	},
+// }

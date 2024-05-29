@@ -51,11 +51,17 @@ func (service *CharacterService) GetAndStoreAllCharacters() error {
 	////////////
 
 	characters, err := gw2api.GetAllCharacters(apiKey)
+	fmt.Println("got characters", characters)
 	if err != nil {
 		return fmt.Errorf("service error using provider: %s", err)
 	}
 
 	for _, character := range characters {
+		fmt.Println(character.Name)
+		err = service.ClearCharacterInventory(character)
+		if err != nil {
+			return err
+		}
 		err = service.StoreCharacterInventory(character)
 		if err != nil {
 			return err
@@ -70,10 +76,12 @@ func (service *CharacterService) StoreCharacterInventory(character apimodels.Api
 	if apiBags != nil {
 		for _, bag := range *apiBags {
 			for _, bagItem := range bag.Inventory {
-				gormBagItem := apimodels.ApiBagToGormBagItem(character.Name, *bagItem)
-				_, err := service.gormBagItemRepository.Create(&gormBagItem)
-				if err != nil {
-					return fmt.Errorf("service error using gorm create bagitem %d for character %s: %s", bagItem.Id, character.Name, err)
+				if bagItem != nil {
+					gormBagItem := apimodels.ApiBagToGormBagItem(character.Name, *bagItem)
+					_, err := service.gormBagItemRepository.Create(&gormBagItem)
+					if err != nil {
+						return fmt.Errorf("service error using gorm create bagitem %d for character %s: %s", bagItem.Id, character.Name, err)
+					}
 				}
 			}
 		}
@@ -82,7 +90,7 @@ func (service *CharacterService) StoreCharacterInventory(character apimodels.Api
 }
 
 func (service *CharacterService) ClearCharacterInventory(character apimodels.ApiCharacter) error {
-	err := service.gormBagItemRepository.DeleteBagItemsByCharacterName(character.Name)
+	err := service.gormBagItemRepository.DeleteByCharacterName(character.Name)
 	if err != nil {
 		return fmt.Errorf("service error using gorm delete bagitems for character %s: %s", character.Name, err)
 	}

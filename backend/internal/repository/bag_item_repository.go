@@ -6,8 +6,9 @@ import (
 )
 
 type BagItemRepository interface {
-	DeleteBagItemsByCharacter()
-	CreateCharacterBagItems()
+	Create()
+	DeleteByCharacterName()
+	GetByCharacterName()
 }
 
 type GormBagItemRepository struct {
@@ -31,19 +32,19 @@ func (repository *GormBagItemRepository) Create(BagItem *repositorymodels.GormBa
 
 }
 
-func (repostiory *GormBagItemRepository) DeleteBagItemsByCharacterName(characterName string) error {
+func (repostiory *GormBagItemRepository) DeleteByCharacterName(characterName string) error {
 	err := repostiory.DB.Where("character_name = ?", characterName).Delete(&repositorymodels.GormBagItem{}).Error
 	return err
 }
 
-// func (repository *GormBagItemRepository) GetBagItemsByCharacterName(characterName string) (*repositorymodels.GormBagItem, error) {
-// 	var BagItem repositorymodels.GormBagItem
+func (repository *GormBagItemRepository) GetByCharacterName(characterName string) ([]repositorymodels.GormBagItem, error) {
+	var bagItems []repositorymodels.GormBagItem
 
-// 	err := repository.DB.First(&BagItem, id).Error
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	err := repository.DB.Where("character_name = ?", characterName).Find(&bagItems).Error
+	if err != nil {
+		return nil, err
+	}
 
-// 	return &BagItem, nil
+	return bagItems, nil
 
-// }
+}

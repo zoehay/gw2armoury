@@ -28,6 +28,7 @@ func GetItemIds() (*http.Response, error) {
 
 func GetAllCharacters(apiKey string) (*http.Response, error) {
 	url := baseUrl + "characters?ids=all&access_token=" + apiKey
+	fmt.Println("get url", url)
 	res, err := http.Get(url)
 	if err != nil {
 		return nil, err

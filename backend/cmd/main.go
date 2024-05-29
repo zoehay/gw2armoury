@@ -31,19 +31,28 @@ func main() {
 
 	itemRepository := repository.NewGormItemRepository(db)
 	itemHandler := handlers.NewItemHandler(itemRepository)
+	bagItemRepository := repository.NewGormBagItemRepository(db)
 
 	err = database.CheckAndSeedDatabase(itemRepository)
 	if err != nil {
 		log.Fatal("Error seeding database", err)
 	}
 
-	itemService := services.NewItemService(&itemRepository)
+	// itemService := services.NewItemService(&itemRepository)
+	characterService := services.NewCharacterService(&bagItemRepository)
 
-	itemService.GetAndStoreAllItems()
-	// itemService.GetAndStoreItemsById("57,58,59,60")
+	// itemService.GetAndStoreAllItems()
+	// if err != nil {
+	// 	fmt.Print(err)
+	// }
+
+	fmt.Println("get and store")
+
+	err = characterService.GetAndStoreAllCharacters()
 	if err != nil {
 		fmt.Print(err)
 	}
+	// itemService.GetAndStoreItemsById("57,58,59,60")
 
 	router := gin.Default()
 	router.GET("/items", itemHandler.GetAllItems)
