@@ -11,17 +11,17 @@ type BagItemRepository interface {
 	GetByCharacterName()
 }
 
-type GormBagItemRepository struct {
+type GORMBagItemRepository struct {
 	DB *gorm.DB
 }
 
-func NewGormBagItemRepository(db *gorm.DB) GormBagItemRepository {
-	return GormBagItemRepository{
+func NewGORMBagItemRepository(db *gorm.DB) GORMBagItemRepository {
+	return GORMBagItemRepository{
 		DB: db,
 	}
 }
 
-func (repository *GormBagItemRepository) Create(BagItem *repositorymodels.GormBagItem) (*repositorymodels.GormBagItem, error) {
+func (repository *GORMBagItemRepository) Create(BagItem *repositorymodels.GORMBagItem) (*repositorymodels.GORMBagItem, error) {
 
 	err := repository.DB.Create(&BagItem).Error
 	if err != nil {
@@ -32,13 +32,13 @@ func (repository *GormBagItemRepository) Create(BagItem *repositorymodels.GormBa
 
 }
 
-func (repostiory *GormBagItemRepository) DeleteByCharacterName(characterName string) error {
-	err := repostiory.DB.Where("character_name = ?", characterName).Delete(&repositorymodels.GormBagItem{}).Error
+func (repostiory *GORMBagItemRepository) DeleteByCharacterName(characterName string) error {
+	err := repostiory.DB.Where("character_name = ?", characterName).Delete(&repositorymodels.GORMBagItem{}).Error
 	return err
 }
 
-func (repository *GormBagItemRepository) GetByCharacterName(characterName string) ([]repositorymodels.GormBagItem, error) {
-	var bagItems []repositorymodels.GormBagItem
+func (repository *GORMBagItemRepository) GetByCharacterName(characterName string) ([]repositorymodels.GORMBagItem, error) {
+	var bagItems []repositorymodels.GORMBagItem
 
 	err := repository.DB.Where("character_name = ?", characterName).Find(&bagItems).Error
 	if err != nil {

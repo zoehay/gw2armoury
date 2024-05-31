@@ -1,6 +1,6 @@
 package apimodels
 
-type ApiCharacter struct {
+type APICharacter struct {
 	Name string    `json:"name"`
-	Bags *[]ApiBag `json:"bags"`
+	Bags *[]APIBag `json:"bags"`
 }

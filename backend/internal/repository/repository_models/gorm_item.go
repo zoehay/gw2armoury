@@ -9,7 +9,7 @@ import (
 	"github.com/lib/pq"
 )
 
-type GormItem struct {
+type GORMItem struct {
 	Name         string
 	Description  string
 	Type         string

@@ -18,10 +18,10 @@ type CharacterServiceInterface interface {
 }
 
 type CharacterService struct {
-	gormBagItemRepository *repository.GormBagItemRepository
+	gormBagItemRepository *repository.GORMBagItemRepository
 }
 
-func NewCharacterService(bagItemRepository *repository.GormBagItemRepository) *CharacterService {
+func NewCharacterService(bagItemRepository *repository.GORMBagItemRepository) *CharacterService {
 	return &CharacterService{
 		gormBagItemRepository: bagItemRepository,
 	}
@@ -70,17 +70,17 @@ func (service *CharacterService) GetAndStoreAllCharacters() error {
 	return nil
 }
 
-func (service *CharacterService) StoreCharacterInventory(character apimodels.ApiCharacter) error {
+func (service *CharacterService) StoreCharacterInventory(character apimodels.APICharacter) error {
 	apiBags := character.Bags
 
 	if apiBags != nil {
 		for _, bag := range *apiBags {
 			for _, bagItem := range bag.Inventory {
 				if bagItem != nil {
-					gormBagItem := apimodels.ApiBagToGormBagItem(character.Name, *bagItem)
+					gormBagItem := apimodels.APIBagToGORMBagItem(character.Name, *bagItem)
 					_, err := service.gormBagItemRepository.Create(&gormBagItem)
 					if err != nil {
-						return fmt.Errorf("service error using gorm create bagitem %d for character %s: %s", bagItem.Id, character.Name, err)
+						return fmt.Errorf("service error using gorm create bagitem %d for character %s: %s", bagItem.ID, character.Name, err)
 					}
 				}
 			}
@@ -89,7 +89,7 @@ func (service *CharacterService) StoreCharacterInventory(character apimodels.Api
 	return nil
 }
 
-func (service *CharacterService) ClearCharacterInventory(character apimodels.ApiCharacter) error {
+func (service *CharacterService) ClearCharacterInventory(character apimodels.APICharacter) error {
 	err := service.gormBagItemRepository.DeleteByCharacterName(character.Name)
 	if err != nil {
 		return fmt.Errorf("service error using gorm delete bagitems for character %s: %s", character.Name, err)

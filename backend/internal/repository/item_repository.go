@@ -6,24 +6,24 @@ import (
 )
 
 type ItemRepository interface {
-	Create(item *repositorymodels.GormItem) error
-	CreateMany(items []*repositorymodels.GormItem) error
-	GetAll() ([]repositorymodels.GormItem, error)
-	GetFirst() (repositorymodels.GormItem, error)
-	GetById(id int) (repositorymodels.GormItem, error)
+	Create(item *repositorymodels.GORMItem) error
+	CreateMany(items []*repositorymodels.GORMItem) error
+	GetAll() ([]repositorymodels.GORMItem, error)
+	GetFirst() (repositorymodels.GORMItem, error)
+	GetById(id int) (repositorymodels.GORMItem, error)
 }
 
-type GormItemRepository struct {
+type GORMItemRepository struct {
 	DB *gorm.DB
 }
 
-func NewGormItemRepository(db *gorm.DB) GormItemRepository {
-	return GormItemRepository{
+func NewGORMItemRepository(db *gorm.DB) GORMItemRepository {
+	return GORMItemRepository{
 		DB: db,
 	}
 }
 
-func (repository *GormItemRepository) Create(item *repositorymodels.GormItem) (*repositorymodels.GormItem, error) {
+func (repository *GORMItemRepository) Create(item *repositorymodels.GORMItem) (*repositorymodels.GORMItem, error) {
 
 	err := repository.DB.Create(&item).Error
 	if err != nil {
@@ -34,7 +34,7 @@ func (repository *GormItemRepository) Create(item *repositorymodels.GormItem) (*
 
 }
 
-func (repository *GormItemRepository) CreateMany(items []*repositorymodels.GormItem) error {
+func (repository *GORMItemRepository) CreateMany(items []*repositorymodels.GORMItem) error {
 
 	err := repository.DB.Create(&items).Error
 	if err != nil {
@@ -45,8 +45,8 @@ func (repository *GormItemRepository) CreateMany(items []*repositorymodels.GormI
 
 }
 
-func (repository *GormItemRepository) GetAll() ([]repositorymodels.GormItem, error) {
-	var items []repositorymodels.GormItem
+func (repository *GORMItemRepository) GetAll() ([]repositorymodels.GORMItem, error) {
+	var items []repositorymodels.GORMItem
 
 	err := repository.DB.Find(&items).Error
 	if err != nil {
@@ -57,10 +57,10 @@ func (repository *GormItemRepository) GetAll() ([]repositorymodels.GormItem, err
 
 }
 
-func (repository *GormItemRepository) GetFirst() (*repositorymodels.GormItem, error) {
-	var item repositorymodels.GormItem
+func (repository *GORMItemRepository) GetFirst() (*repositorymodels.GORMItem, error) {
+	var item repositorymodels.GORMItem
 
-	err := repository.DB.First(&repositorymodels.GormItem{}).Error
+	err := repository.DB.First(&repositorymodels.GORMItem{}).Error
 	if err != nil {
 		return nil, err
 	}
@@ -69,8 +69,8 @@ func (repository *GormItemRepository) GetFirst() (*repositorymodels.GormItem, er
 
 }
 
-func (repository *GormItemRepository) GetById(id int) (*repositorymodels.GormItem, error) {
-	var item repositorymodels.GormItem
+func (repository *GORMItemRepository) GetById(id int) (*repositorymodels.GORMItem, error) {
+	var item repositorymodels.GORMItem
 
 	err := repository.DB.First(&item, id).Error
 	if err != nil {

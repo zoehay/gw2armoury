@@ -38,7 +38,7 @@ import (
 // 	},
 // }
 
-func GetAllCharacters(apiKey string) ([]apimodels.ApiCharacter, error) {
+func GetAllCharacters(apiKey string) ([]apimodels.APICharacter, error) {
 	res, err := clients.GetAllCharacters(apiKey)
 
 	if err != nil {
@@ -54,7 +54,7 @@ func GetAllCharacters(apiKey string) ([]apimodels.ApiCharacter, error) {
 		return nil, fmt.Errorf("provider io.ReadAll error: %s", err)
 	}
 
-	var result []apimodels.ApiCharacter
+	var result []apimodels.APICharacter
 
 	if err = json.Unmarshal(body, &result); err != nil {
 		return nil, fmt.Errorf("provider json.Unmarshal error: %s", err)
@@ -103,7 +103,7 @@ func GetAllCharacters(apiKey string) ([]apimodels.ApiCharacter, error) {
 // 	},
 // }
 
-// var character = []apimodels.ApiCharacter{
+// var character = []apimodels.APICharacter{
 // 	{
 // 		Name: "Laura Lesdottir",
 // 		Bags: &apiBags,

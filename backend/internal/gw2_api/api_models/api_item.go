@@ -6,14 +6,14 @@ import (
 )
 
 type ItemRequest struct {
-	Ids string `json:"ids"`
+	IDs string `json:"ids"`
 }
 
 type ItemResponse struct {
-	Items []ApiItem
+	Items []APIItem
 }
 
-type ApiItem struct {
+type APIItem struct {
 	Name         string                  `json:"name"`
 	Type         string                  `json:"type"`
 	Level        uint                    `json:"level"`
@@ -53,9 +53,9 @@ type ApiItem struct {
 // 	}
 // }
 
-func ApiItemToGormItem(apiItem ApiItem) repositorymodels.GormItem {
+func APIItemToGORMItem(apiItem APIItem) repositorymodels.GORMItem {
 	var details = (*repositorymodels.DetailsMap)(apiItem.Details)
-	return repositorymodels.GormItem{
+	return repositorymodels.GORMItem{
 		ID:           apiItem.ID,
 		ChatLink:     apiItem.ChatLink,
 		Name:         apiItem.Name,

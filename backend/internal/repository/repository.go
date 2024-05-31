@@ -2,7 +2,6 @@ package repository
 
 import "gorm.io/gorm"
 
-
 type Repository interface {
 	Migrate() error
 	GetAll() (interface{}, error)
@@ -10,13 +9,12 @@ type Repository interface {
 	Create(entity interface{}) (interface{}, error)
 }
 
-type GormRepository struct {
+type GORMRepository struct {
 	db *gorm.DB
 }
 
-func NewGormRepository(db *gorm.DB) *GormRepository {
-	return &GormRepository{
-		db:db,
+func NewGORMRepository(db *gorm.DB) *GORMRepository {
+	return &GORMRepository{
+		db: db,
 	}
 }
-

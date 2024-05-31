@@ -29,9 +29,9 @@ func main() {
 		log.Fatal("Error initializing database connection", err)
 	}
 
-	itemRepository := repository.NewGormItemRepository(db)
+	itemRepository := repository.NewGORMItemRepository(db)
 	itemHandler := handlers.NewItemHandler(itemRepository)
-	bagItemRepository := repository.NewGormBagItemRepository(db)
+	bagItemRepository := repository.NewGORMBagItemRepository(db)
 	bagItemHandler := handlers.NewBagItemHandler(bagItemRepository)
 
 	err = database.CheckAndSeedDatabase(itemRepository)

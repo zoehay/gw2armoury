@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-var seedItems = []*repositorymodels.GormItem{
+var seedItems = []*repositorymodels.GORMItem{
 	{
 		ID:          28445,
 		Name:        "Strong Soft Wood Longbow of Fire",
@@ -40,7 +40,7 @@ func PostgresInit(dsn string) (*gorm.DB, error) {
 	}
 
 	log.Print("Run db migrate")
-	err = db.AutoMigrate(&repositorymodels.GormItem{}, &repositorymodels.GormBagItem{})
+	err = db.AutoMigrate(&repositorymodels.GORMItem{}, &repositorymodels.GORMBagItem{})
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func PostgresInit(dsn string) (*gorm.DB, error) {
 
 }
 
-func CheckAndSeedDatabase(itemRepository repository.GormItemRepository) error {
+func CheckAndSeedDatabase(itemRepository repository.GORMItemRepository) error {
 	_, err := itemRepository.GetFirst()
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		log.Print("Seeding database")

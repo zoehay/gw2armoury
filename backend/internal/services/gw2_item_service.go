@@ -15,10 +15,10 @@ type ItemServiceInterface interface {
 }
 
 type ItemService struct {
-	gormItemRepository *repository.GormItemRepository
+	gormItemRepository *repository.GORMItemRepository
 }
 
-func NewItemService(itemRepository *repository.GormItemRepository) *ItemService {
+func NewItemService(itemRepository *repository.GORMItemRepository) *ItemService {
 	return &ItemService{
 		gormItemRepository: itemRepository,
 	}
@@ -31,7 +31,7 @@ func (service *ItemService) GetAndStoreItemsById(idsString string) error {
 	}
 
 	for _, item := range apiItems {
-		gormItem := apimodels.ApiItemToGormItem(item)
+		gormItem := apimodels.APIItemToGORMItem(item)
 		_, err := service.gormItemRepository.Create(&gormItem)
 		if err != nil {
 			return fmt.Errorf("service error using gorm create: %s", err)

@@ -12,7 +12,7 @@ import (
 
 // getCharacterInventory bags: Bag[]
 
-func GetItemsById(ids string) ([]apimodels.ApiItem, error) {
+func GetItemsById(ids string) ([]apimodels.APIItem, error) {
 	res, err := clients.GetItemsById(ids)
 
 	if err != nil {
@@ -28,7 +28,7 @@ func GetItemsById(ids string) ([]apimodels.ApiItem, error) {
 		return nil, fmt.Errorf("provider io.ReadAll error: %s", err)
 	}
 
-	var result []apimodels.ApiItem
+	var result []apimodels.APIItem
 
 	if err = json.Unmarshal(body, &result); err != nil {
 		return nil, fmt.Errorf("provider json.Unmarshal error: %s", err)
