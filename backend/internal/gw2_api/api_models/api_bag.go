@@ -6,18 +6,18 @@ import (
 )
 
 type ApiBag struct {
-	Id        int           `json:"id"`
-	Size      int           `json:"size"`
+	Id        uint          `json:"id"`
+	Size      uint          `json:"size"`
 	Inventory []*ApiBagItem `json:"inventory"`
 }
 
 type ApiBagItem struct {
-	Id        int                     `json:"id"`
-	Count     int                     `json:"count"`
-	Charges   *int                    `json:"charges,omitempty"`
+	Id        uint                    `json:"id"`
+	Count     uint                    `json:"count"`
+	Charges   *uint                   `json:"charges,omitempty"`
 	Infusions *[]int64                `json:"infusions,omitempty"`
 	Upgrades  *[]int64                `json:"upgrades,omitempty"`
-	Skin      *int                    `json:"skin,omitempty"`
+	Skin      *uint                   `json:"skin,omitempty"`
 	Stats     *map[string]interface{} `json:"stats,omitempty"`
 	Dyes      *[]int64                `json:"dyes,omitempty"`
 	Binding   *string                 `json:"binding,omitempty"`

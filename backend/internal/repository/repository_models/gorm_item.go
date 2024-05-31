@@ -13,14 +13,14 @@ type GormItem struct {
 	Name         string
 	Description  string
 	Type         string
-	Level        int
+	Level        uint
 	Rarity       string
-	VendorValue  int
-	DefaultSkin  *int
+	VendorValue  uint
+	DefaultSkin  *uint
 	GameTypes    pq.StringArray `gorm:"type:text[]"`
 	Flags        pq.StringArray `gorm:"type:text[]"`
 	Restrictions pq.StringArray `gorm:"type:text[]"`
-	ID           int            `gorm:"primaryKey"`
+	ID           uint           `gorm:"primaryKey"`
 	ChatLink     string
 	Icon         string
 	UpgradesInto *pq.StringArray `gorm:"type:text[]"`

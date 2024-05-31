@@ -32,13 +32,14 @@ func main() {
 	itemRepository := repository.NewGormItemRepository(db)
 	itemHandler := handlers.NewItemHandler(itemRepository)
 	bagItemRepository := repository.NewGormBagItemRepository(db)
+	bagItemHandler := handlers.NewBagItemHandler(bagItemRepository)
 
 	err = database.CheckAndSeedDatabase(itemRepository)
 	if err != nil {
 		log.Fatal("Error seeding database", err)
 	}
 
-	// itemService := services.NewItemService(&itemRepository)
+	itemService := services.NewItemService(&itemRepository)
 	characterService := services.NewCharacterService(&bagItemRepository)
 
 	// itemService.GetAndStoreAllItems()
@@ -46,17 +47,16 @@ func main() {
 	// 	fmt.Print(err)
 	// }
 
-	fmt.Println("get and store")
-
 	err = characterService.GetAndStoreAllCharacters()
 	if err != nil {
 		fmt.Print(err)
 	}
-	// itemService.GetAndStoreItemsById("57,58,59,60")
+	itemService.GetAndStoreItemsById("57,58,59,60")
 
 	router := gin.Default()
 	router.GET("/items", itemHandler.GetAllItems)
 	router.GET("/items/:id", itemHandler.GetItemByID)
+	router.GET("/characters/:charactername/inventory", bagItemHandler.GetBagItemsByCharacter)
 
 	// router.Run("127.0.0.1:8000")
 	router.Run(":8000")
