@@ -2,8 +2,10 @@ package services
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
+	"github.com/lib/pq"
 	gw2api "github.com/zoehay/gw2armoury/backend/internal/gw2_api"
 	apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/api_models"
 	"github.com/zoehay/gw2armoury/backend/internal/repository"
@@ -38,7 +40,6 @@ func (service *ItemService) GetAndStoreItemsById(idsString string) error {
 		}
 	}
 	return nil
-
 }
 
 func (service *ItemService) GetAndStoreAllItems() error {
@@ -75,5 +76,73 @@ func SplitArray(arr []string, chunkSize int) [][]string {
 	}
 
 	return result
+
+}
+
+func (service *ItemService) GetAndStoreByIds(itemIds []int) []error {
+	var errors []error
+
+	idString := strings.Join(IntArrToStringArr(itemIds), ",")
+
+	err := service.GetAndStoreEachByIdsString(idString)
+	if err != nil {
+
+		errors = append(errors, fmt.Errorf("service error getting itemId chunk %s: %s", idString, err))
+
+	}
+
+	if len(errors) != 0 {
+		return errors
+	}
+
+	return nil
+}
+
+func (service *ItemService) GetAndStoreEachByIdsString(idsString string) []error {
+	var errors []error
+	apiItems, err := gw2api.GetItemsById(idsString)
+	if err != nil {
+		errors = append(errors, fmt.Errorf("service error using provider: %s", err))
+		return errors
+	}
+
+	var duplicateKeyErrorIds []int
+
+	for _, item := range apiItems {
+		gormItem := apimodels.APIItemToGORMItem(item)
+		_, err := service.gormItemRepository.Create(&gormItem)
+		if err != nil {
+			if isDuplicateKeyError(err) {
+				duplicateKeyErrorIds = append(duplicateKeyErrorIds, int(item.ID))
+			} else {
+				errors = append(errors, fmt.Errorf("gorm error adding item id %d: %s", item.ID, err))
+			}
+		}
+	}
+
+	if len(duplicateKeyErrorIds) != 0 {
+		fmt.Printf("skipped adding duplicate values %#v\n", duplicateKeyErrorIds)
+	}
+
+	if len(errors) != 0 {
+		return errors
+	}
+
+	return nil
+}
+
+func isDuplicateKeyError(err error) bool {
+	if err, ok := err.(*pq.Error); ok {
+		return err.Code == "23505"
+	}
+	return false
+}
+
+func IntArrToStringArr(intArr []int) []string {
+	var stringArr []string
+	for _, num := range intArr {
+		stringArr = append(stringArr, strconv.Itoa(num))
+	}
+	return stringArr
 
 }

@@ -80,3 +80,15 @@ func (repository *GORMItemRepository) GetById(id int) (*repositorymodels.GORMIte
 	return &item, nil
 
 }
+
+func (repository *GORMItemRepository) GetByIds(ids []int) (*[]repositorymodels.GORMItem, error) {
+	var items []repositorymodels.GORMItem
+
+	err := repository.DB.Where(ids).Find(&items).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &items, nil
+
+}

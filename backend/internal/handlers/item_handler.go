@@ -24,6 +24,7 @@ func (itemHandler ItemHandler) GetAllItems(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	c.IndentedJSON(http.StatusOK, items)
 }
 
@@ -40,5 +41,6 @@ func (itemHandler ItemHandler) GetItemByID(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	c.IndentedJSON(http.StatusOK, item)
 }

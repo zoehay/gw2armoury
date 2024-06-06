@@ -2,19 +2,16 @@ package services
 
 import (
 	"fmt"
-	"log"
-	"os"
 
-	"github.com/joho/godotenv"
 	gw2api "github.com/zoehay/gw2armoury/backend/internal/gw2_api"
 	apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/api_models"
 	"github.com/zoehay/gw2armoury/backend/internal/repository"
 )
 
 type CharacterServiceInterface interface {
-	UpdateInventory() error
-	GetAllCharacterNames() ([]string, error)
-	UpdateCharacterInventory() error
+	GetAndStoreAllCharacters(apiKey string) error
+	storeCharacterInventory(character apimodels.APICharacter) error
+	clearCharacterInventory(character apimodels.APICharacter) error
 }
 
 type CharacterService struct {
@@ -27,50 +24,44 @@ func NewCharacterService(bagItemRepository *repository.GORMBagItemRepository) *C
 	}
 }
 
-// func UpdateInventory(apiKey)
-// 	getAllCharacterNames
-// 	for character of characters
-// 		UpdateCharacterInventory
-
-// func GetAllCharacterNames(apiKey)
-
-// func UpdateCharacterInventory(apiKey, characterName)
-// 	newBagItems = provider.GetCharacterInventory(apiKey, characterName)
-//
-// 	BagItemRepository.DeleteBagItemsByCharacter(characterName)
-// 	BagItemRespository.CreateCharacterBagItems()
-
-func (service *CharacterService) GetAndStoreAllCharacters() error {
-	////////////
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file:", err)
-	}
-
-	apiKey := os.Getenv("TEST_API_KEY")
-	////////////
-
+func (service *CharacterService) GetAndStoreAllCharacters(apiKey string) error {
 	characters, err := gw2api.GetAllCharacters(apiKey)
-	fmt.Println("got characters", characters)
 	if err != nil {
 		return fmt.Errorf("service error using provider: %s", err)
 	}
 
+	tx := service.gormBagItemRepository.DB.Begin()
+
+	defer func() {
+		r := recover()
+		if r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
 	for _, character := range characters {
 		fmt.Println(character.Name)
-		err = service.ClearCharacterInventory(character)
+
+		err = service.clearCharacterInventory(character)
 		if err != nil {
 			return err
 		}
-		err = service.StoreCharacterInventory(character)
+		err = service.storeCharacterInventory(character)
 		if err != nil {
+			tx.Rollback()
 			return err
 		}
 	}
-	return nil
+
+	return tx.Commit().Error
+
 }
 
-func (service *CharacterService) StoreCharacterInventory(character apimodels.APICharacter) error {
+func (service *CharacterService) storeCharacterInventory(character apimodels.APICharacter) error {
 	apiBags := character.Bags
 
 	if apiBags != nil {
@@ -89,7 +80,7 @@ func (service *CharacterService) StoreCharacterInventory(character apimodels.API
 	return nil
 }
 
-func (service *CharacterService) ClearCharacterInventory(character apimodels.APICharacter) error {
+func (service *CharacterService) clearCharacterInventory(character apimodels.APICharacter) error {
 	err := service.gormBagItemRepository.DeleteByCharacterName(character.Name)
 	if err != nil {
 		return fmt.Errorf("service error using gorm delete bagitems for character %s: %s", character.Name, err)

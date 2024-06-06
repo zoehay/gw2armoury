@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 
 	"log"
@@ -40,18 +38,20 @@ func main() {
 	}
 
 	itemService := services.NewItemService(&itemRepository)
-	characterService := services.NewCharacterService(&bagItemRepository)
+	// characterService := services.NewCharacterService(&bagItemRepository)
 
 	// itemService.GetAndStoreAllItems()
 	// if err != nil {
 	// 	fmt.Print(err)
 	// }
 
-	err = characterService.GetAndStoreAllCharacters()
-	if err != nil {
-		fmt.Print(err)
-	}
-	itemService.GetAndStoreItemsById("57,58,59,60")
+	// err = characterService.GetAndStoreAllCharacters()
+	// if err != nil {
+	// 	fmt.Print(err)
+	// }
+	// itemService.GetAndStoreItemsById("61,62,63")
+
+	database.GetItemsInCharacterBags(itemService, bagItemRepository)
 
 	router := gin.Default()
 	router.GET("/items", itemHandler.GetAllItems)

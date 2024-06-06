@@ -9,35 +9,6 @@ import (
 	apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/api_models"
 )
 
-// func GetAllCharacterNames(apiKey string) ([]string, error) {
-
-// }
-
-// var mockAllCharacterNames = []string{}
-
-// func GetCharacterInventory(characterName string, apiKey string) ([]ApiBagItem, error) {
-// 	return mockBagItems, nil
-
-// }
-
-// var mockBagItems = []ApiBagItem{
-// 	{
-// 		"id":      69432,
-// 		"count":   62,
-// 		"binding": "Account",
-// 	},
-// 	{
-// 		"id":      92209,
-// 		"count":   1,
-// 		"binding": "Account",
-// 	},
-// 	{
-// 		"id":      92209,
-// 		"count":   1,
-// 		"binding": "Account",
-// 	},
-// }
-
 func GetAllCharacters(apiKey string) ([]apimodels.APICharacter, error) {
 	res, err := clients.GetAllCharacters(apiKey)
 
@@ -60,12 +31,29 @@ func GetAllCharacters(apiKey string) ([]apimodels.APICharacter, error) {
 		return nil, fmt.Errorf("provider json.Unmarshal error: %s", err)
 	}
 
-	// result := character
 	return result, nil
 }
 
+//	var mockBagItems = []ApiBagItem{
+//		{
+//			"id":      69432,
+//			"count":   62,
+//			"binding": "Account",
+//		},
+//		{
+//			"id":      92209,
+//			"count":   1,
+//			"binding": "Account",
+//		},
+//		{
+//			"id":      92209,
+//			"count":   1,
+//			"binding": "Account",
+//		},
+//	}
+
 // var bindingType = "Character"
-// var boundTo = "Laura Lesdottir"
+// var boundTo = "Character Name"
 
 // var bagItems = []*apimodels.ApiBagItem{
 // 	{
