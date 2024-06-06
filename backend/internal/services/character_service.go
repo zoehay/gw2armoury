@@ -48,6 +48,7 @@ func (service *CharacterService) GetAndStoreAllCharacters(apiKey string) error {
 
 		err = service.clearCharacterInventory(character)
 		if err != nil {
+			tx.Rollback()
 			return err
 		}
 		err = service.storeCharacterInventory(character)

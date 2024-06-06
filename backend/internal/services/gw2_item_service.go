@@ -3,7 +3,6 @@ package services
 import (
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/lib/pq"
 	gw2api "github.com/zoehay/gw2armoury/backend/internal/gw2_api"
@@ -26,8 +25,8 @@ func NewItemService(itemRepository *repository.GORMItemRepository) *ItemService 
 	}
 }
 
-func (service *ItemService) GetAndStoreItemsById(idsString string) error {
-	apiItems, err := gw2api.GetItemsById(idsString)
+func (service *ItemService) GetAndStoreItemsById(ids []int) error {
+	apiItems, err := gw2api.GetItemsByIds(ids)
 	if err != nil {
 		return fmt.Errorf("service error using provider: %s", err)
 	}
@@ -53,19 +52,17 @@ func (service *ItemService) GetAndStoreAllItems() error {
 	fmt.Println(itemIdChunks)
 
 	for _, idChunk := range itemIdChunks {
-		idString := strings.Join(idChunk, ",")
-		fmt.Println("get and store items", idString)
-		err = service.GetAndStoreItemsById(idString)
+		err = service.GetAndStoreItemsById(idChunk)
 		if err != nil {
-			return fmt.Errorf("service error getting itemId chunk %s: %s", idString, err)
+			return fmt.Errorf("service error getting itemId chunk %d: %s", idChunk, err)
 		}
 	}
 
 	return nil
 }
 
-func SplitArray(arr []string, chunkSize int) [][]string {
-	var result [][]string
+func SplitArray(arr []int, chunkSize int) [][]int {
+	var result [][]int
 
 	for i := 0; i < len(arr); i += chunkSize {
 		end := i + chunkSize
@@ -79,35 +76,13 @@ func SplitArray(arr []string, chunkSize int) [][]string {
 
 }
 
-func (service *ItemService) GetAndStoreByIds(itemIds []int) []error {
-	var errors []error
-
-	idString := strings.Join(IntArrToStringArr(itemIds), ",")
-
-	err := service.GetAndStoreEachByIdsString(idString)
+func (service *ItemService) GetAndStoreEachByIds(itemIds []int) error {
+	apiItems, err := gw2api.GetItemsByIds(itemIds)
 	if err != nil {
-
-		errors = append(errors, fmt.Errorf("service error getting itemId chunk %s: %s", idString, err))
-
-	}
-
-	if len(errors) != 0 {
-		return errors
-	}
-
-	return nil
-}
-
-func (service *ItemService) GetAndStoreEachByIdsString(idsString string) []error {
-	var errors []error
-	apiItems, err := gw2api.GetItemsById(idsString)
-	if err != nil {
-		errors = append(errors, fmt.Errorf("service error using provider: %s", err))
-		return errors
+		return fmt.Errorf("provider error requesting items: %s", err)
 	}
 
 	var duplicateKeyErrorIds []int
-
 	for _, item := range apiItems {
 		gormItem := apimodels.APIItemToGORMItem(item)
 		_, err := service.gormItemRepository.Create(&gormItem)
@@ -115,17 +90,13 @@ func (service *ItemService) GetAndStoreEachByIdsString(idsString string) []error
 			if isDuplicateKeyError(err) {
 				duplicateKeyErrorIds = append(duplicateKeyErrorIds, int(item.ID))
 			} else {
-				errors = append(errors, fmt.Errorf("gorm error adding item id %d: %s", item.ID, err))
+				return fmt.Errorf("gorm error adding item id %d: %s", item.ID, err)
 			}
 		}
 	}
 
 	if len(duplicateKeyErrorIds) != 0 {
 		fmt.Printf("skipped adding duplicate values %#v\n", duplicateKeyErrorIds)
-	}
-
-	if len(errors) != 0 {
-		return errors
 	}
 
 	return nil

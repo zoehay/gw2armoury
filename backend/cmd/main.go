@@ -10,7 +10,6 @@ import (
 	"github.com/zoehay/gw2armoury/backend/internal/database"
 	"github.com/zoehay/gw2armoury/backend/internal/handlers"
 	"github.com/zoehay/gw2armoury/backend/internal/repository"
-	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
 
 func main() {
@@ -29,15 +28,18 @@ func main() {
 
 	itemRepository := repository.NewGORMItemRepository(db)
 	itemHandler := handlers.NewItemHandler(itemRepository)
+
 	bagItemRepository := repository.NewGORMBagItemRepository(db)
 	bagItemHandler := handlers.NewBagItemHandler(bagItemRepository)
 
-	err = database.CheckAndSeedDatabase(itemRepository)
-	if err != nil {
-		log.Fatal("Error seeding database", err)
-	}
+	bagItemDetailsHandler := handlers.NewBagItemDetailsHandler(bagItemRepository)
 
-	itemService := services.NewItemService(&itemRepository)
+	// err = database.CheckAndSeedDatabase(itemRepository)
+	// if err != nil {
+	// 	log.Fatal("Error seeding database", err)
+	// }
+
+	// itemService := services.NewItemService(&itemRepository)
 	// characterService := services.NewCharacterService(&bagItemRepository)
 
 	// itemService.GetAndStoreAllItems()
@@ -51,12 +53,13 @@ func main() {
 	// }
 	// itemService.GetAndStoreItemsById("61,62,63")
 
-	database.GetItemsInCharacterBags(itemService, bagItemRepository)
+	// database.GetItemsInCharacterBags(itemService, bagItemRepository)
 
 	router := gin.Default()
 	router.GET("/items", itemHandler.GetAllItems)
 	router.GET("/items/:id", itemHandler.GetItemByID)
-	router.GET("/characters/:charactername/inventory", bagItemHandler.GetBagItemsByCharacter)
+	router.GET("/characters/:charactername/bagitems", bagItemHandler.GetBagItemsByCharacter)
+	router.GET("/characters/:charactername/inventory", bagItemDetailsHandler.GetByCharacter)
 
 	// router.Run("127.0.0.1:8000")
 	router.Run(":8000")

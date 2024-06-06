@@ -1,14 +1,11 @@
 package apimodels
 
 import (
-	"github.com/google/uuid"
 	"github.com/lib/pq"
 	repositorymodels "github.com/zoehay/gw2armoury/backend/internal/repository/repository_models"
-	"gorm.io/gorm"
 )
 
 type APIBagItem struct {
-	UUID      uuid.UUID               `gorm:"type:uuid;primary_key"`
 	ID        uint                    `json:"id"`
 	Count     uint                    `json:"count"`
 	Charges   *uint                   `json:"charges,omitempty"`
@@ -19,11 +16,6 @@ type APIBagItem struct {
 	Dyes      *[]int64                `json:"dyes,omitempty"`
 	Binding   *string                 `json:"binding,omitempty"`
 	BoundTo   *string                 `json:"bound_to,omitempty"`
-}
-
-func (apiBagItem *APIBagItem) BeforeCreate(tx *gorm.DB) (err error) {
-	apiBagItem.UUID = uuid.New()
-	return
 }
 
 func APIBagToGORMBagItem(apiCharacterName string, apiBagItem APIBagItem) repositorymodels.GORMBagItem {

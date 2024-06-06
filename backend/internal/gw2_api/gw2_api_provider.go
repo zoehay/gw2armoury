@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"strings"
 
 	"github.com/zoehay/gw2armoury/backend/internal/clients"
 	apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/api_models"
 )
 
-// getCharacterInventory bags: Bag[]
-
-func GetItemsById(ids string) ([]apimodels.APIItem, error) {
-	res, err := clients.GetItemsById(ids)
+func GetItemsByIds(intArrIds []int) ([]apimodels.APIItem, error) {
+	idString := strings.Join(IntArrToStringArr(intArrIds), ",")
+	res, err := clients.GetItemsById(idString)
 
 	if err != nil {
 		return nil, fmt.Errorf("provider get error: %s", err)
@@ -29,7 +29,6 @@ func GetItemsById(ids string) ([]apimodels.APIItem, error) {
 	}
 
 	var result []apimodels.APIItem
-
 	if err = json.Unmarshal(body, &result); err != nil {
 		return nil, fmt.Errorf("provider json.Unmarshal error: %s", err)
 	}
@@ -37,33 +36,31 @@ func GetItemsById(ids string) ([]apimodels.APIItem, error) {
 	return result, nil
 }
 
-func GetAllItemIds() ([]string, error) {
-	// res, err := clients.GetItemIds()
+func GetAllItemIds() ([]int, error) {
+	res, err := clients.GetItemIds()
 
-	// if err != nil {
-	// 	return nil, fmt.Errorf("provider get error: %s", err)
-	// }
+	if err != nil {
+		return nil, fmt.Errorf("provider get error: %s", err)
+	}
 
-	// defer func() {
-	// 	_ = res.Body.Close()
-	// }()
+	defer func() {
+		_ = res.Body.Close()
+	}()
 
-	// body, err := io.ReadAll(res.Body)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("provider io.ReadAll error: %s", err)
-	// }
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, fmt.Errorf("provider io.ReadAll error: %s", err)
+	}
 
-	// var result []int
+	var result []int
 
-	// if err = json.Unmarshal(body, &result); err != nil {
-	// 	return nil, fmt.Errorf("provider json.Unmarshal error: %s", err)
-	// }
+	if err = json.Unmarshal(body, &result); err != nil {
+		return nil, fmt.Errorf("provider json.Unmarshal error: %s", err)
+	}
 
-	// ArrOfStringIds := IntArrToStringArr(result)
-	// return ArrOfStringIds, nil
+	return result, nil
 
-	arrOfStringIds := IntArrToStringArr(mockAllItemIds)
-	return arrOfStringIds, nil
+	// return mockAllItemIds, nil
 }
 
 func IntArrToStringArr(intArr []int) []string {
@@ -74,19 +71,19 @@ func IntArrToStringArr(intArr []int) []string {
 	return stringArr
 }
 
-var mockAllItemIds = []int{
-	24,
-	33,
-	46,
-	56,
-	57,
-	58,
-	59,
-	60,
-	61,
-	62,
-	63,
-	64,
-	65,
-	68,
-}
+// var mockAllItemIds = []int{
+// 	24,
+// 	33,
+// 	46,
+// 	56,
+// 	57,
+// 	58,
+// 	59,
+// 	60,
+// 	61,
+// 	62,
+// 	63,
+// 	64,
+// 	65,
+// 	68,
+// }
