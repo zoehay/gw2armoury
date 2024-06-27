@@ -4,6 +4,7 @@ import "github.com/lib/pq"
 
 // MVP do not care about which bag an item is in
 type GORMBagItem struct {
+	AccountID     string
 	CharacterName string
 	BagItemID     uint
 	Count         uint

@@ -14,7 +14,6 @@ func GetItemsById(ids string) (*http.Response, error) {
 		return nil, err
 	}
 	return res, err
-
 }
 
 func GetItemIds() (*http.Response, error) {
@@ -28,7 +27,24 @@ func GetItemIds() (*http.Response, error) {
 
 func GetAllCharacters(apiKey string) (*http.Response, error) {
 	url := baseUrl + "characters?ids=all&access_token=" + apiKey
-	fmt.Println("get url", url)
+	res, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	return res, err
+}
+
+func GetCharacterNames(apiKey string) (*http.Response, error) {
+	url := baseUrl + "characters?access_token=" + apiKey
+	res, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	return res, err
+}
+
+func GetAccountID(apiKey string) (*http.Response, error) {
+	url := baseUrl + "account?access_token=" + apiKey
 	res, err := http.Get(url)
 	if err != nil {
 		return nil, err

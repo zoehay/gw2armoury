@@ -24,10 +24,10 @@ func NewCharacterService(bagItemRepository *repository.GORMBagItemRepository) *C
 	}
 }
 
-func (service *CharacterService) GetAndStoreAllCharacters(apiKey string) error {
+func (service *CharacterService) GetAndStoreAllCharacters(accountID string, apiKey string) error {
 	characters, err := gw2api.GetAllCharacters(apiKey)
 	if err != nil {
-		return fmt.Errorf("service error using provider: %s", err)
+		return fmt.Errorf("service error using provider could not get characters: %s", err)
 	}
 
 	tx := service.gormBagItemRepository.DB.Begin()
@@ -51,7 +51,7 @@ func (service *CharacterService) GetAndStoreAllCharacters(apiKey string) error {
 			tx.Rollback()
 			return err
 		}
-		err = service.storeCharacterInventory(character)
+		err = service.storeCharacterInventory(accountID, character)
 		if err != nil {
 			tx.Rollback()
 			return err
@@ -62,14 +62,14 @@ func (service *CharacterService) GetAndStoreAllCharacters(apiKey string) error {
 
 }
 
-func (service *CharacterService) storeCharacterInventory(character apimodels.APICharacter) error {
+func (service *CharacterService) storeCharacterInventory(accountID string, character apimodels.APICharacter) error {
 	apiBags := character.Bags
 
 	if apiBags != nil {
 		for _, bag := range *apiBags {
 			for _, bagItem := range bag.Inventory {
 				if bagItem != nil {
-					gormBagItem := apimodels.APIBagToGORMBagItem(character.Name, *bagItem)
+					gormBagItem := apimodels.APIBagToGORMBagItem(accountID, character.Name, *bagItem)
 					_, err := service.gormBagItemRepository.Create(&gormBagItem)
 					if err != nil {
 						return fmt.Errorf("service error using gorm create bagitem %d for character %s: %s", bagItem.ID, character.Name, err)

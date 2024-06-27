@@ -18,9 +18,10 @@ type APIBagItem struct {
 	BoundTo   *string                 `json:"bound_to,omitempty"`
 }
 
-func APIBagToGORMBagItem(apiCharacterName string, apiBagItem APIBagItem) repositorymodels.GORMBagItem {
+func APIBagToGORMBagItem(accountID string, apiCharacterName string, apiBagItem APIBagItem) repositorymodels.GORMBagItem {
 	var stats = (*repositorymodels.DetailsMap)(apiBagItem.Stats)
 	return repositorymodels.GORMBagItem{
+		AccountID:     accountID,
 		CharacterName: apiCharacterName,
 		BagItemID:     apiBagItem.ID,
 		Count:         apiBagItem.Count,

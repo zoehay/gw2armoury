@@ -75,3 +75,20 @@ func (repository *GORMBagItemRepository) GetDetailsByCharacterName(characterName
 	return bagItemDetails, nil
 
 }
+
+func (repository *GORMBagItemRepository) GetDetailsByAccountID(accountID string) ([]models.BagItem, error) {
+	var bagItemDetails []models.BagItem
+
+	err := repository.DB.Table("gorm_bag_items").
+		Select("gorm_bag_items.*, gorm_items.icon").
+		Joins("left join gorm_items on gorm_bag_items.bag_item_id = gorm_items.id").
+		Where("gorm_bag_items.account_id = ?", accountID).
+		Scan(&bagItemDetails).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return bagItemDetails, nil
+
+}

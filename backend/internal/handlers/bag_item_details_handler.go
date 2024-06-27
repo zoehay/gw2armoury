@@ -28,3 +28,14 @@ func (BagItemDetailsHandler BagItemDetailsHandler) GetByCharacter(c *gin.Context
 
 	c.IndentedJSON(http.StatusOK, items)
 }
+
+// func (BagItemDetailsHandler BagItemDetailsHandler) GetByAccount(c *gin.Context) {
+// 	accountId := c.Params.ByName("accountid")
+// 	items, err := BagItemDetailsHandler.BagItemRepository.GetDetailsByAccountID(accountID)
+// 	if err != nil {
+// 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+// 		return
+// 	}
+
+// 	c.IndentedJSON(http.StatusOK, items)
+// }
