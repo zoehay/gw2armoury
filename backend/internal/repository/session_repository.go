@@ -6,7 +6,10 @@ import (
 )
 
 type SessionRepository interface {
-	Create(Session *repositorymodels.Session) (*repositorymodels.Session, error)
+	Create(session *repositorymodels.Session) (*repositorymodels.Session, error)
+	Delete(session *repositorymodels.Session) error
+	Get(sessionID string) (*repositorymodels.Session, error)
+	Reset(session *repositorymodels.Session) (*repositorymodels.Session, error)
 }
 
 type GORMSessionRepository struct {
@@ -20,11 +23,24 @@ func NewGORMSessionRepository(db *gorm.DB) GORMSessionRepository {
 }
 
 func (repository *GORMSessionRepository) Create(session *repositorymodels.Session) (*repositorymodels.Session, error) {
-
 	err := repository.DB.Create(&session).Error
 	if err != nil {
 		return nil, err
 	}
 
 	return session, nil
+}
+
+func (repository *GORMSessionRepository) Delete(sessionID string) error {
+	var session *repositorymodels.Session
+	err := repository.DB.Where("session_id = ?", sessionID).Delete(&session).Error
+
+	return err
+}
+
+func (repository *GORMSessionRepository) Get(sessionID string) error {
+	var session *repositorymodels.Session
+	err := repository.DB.Where("session_id = ?", sessionID).Find(&session).Error
+
+	return err
 }

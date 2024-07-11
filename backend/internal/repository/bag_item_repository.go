@@ -32,8 +32,8 @@ func (repository *GORMBagItemRepository) Create(BagItem *repositorymodels.GORMBa
 	return BagItem, nil
 }
 
-func (repostiory *GORMBagItemRepository) DeleteByCharacterName(characterName string) error {
-	err := repostiory.DB.Where("character_name = ?", characterName).Delete(&repositorymodels.GORMBagItem{}).Error
+func (repository *GORMBagItemRepository) DeleteByCharacterName(characterName string) error {
+	err := repository.DB.Where("character_name = ?", characterName).Delete(&repositorymodels.GORMBagItem{}).Error
 
 	return err
 }
