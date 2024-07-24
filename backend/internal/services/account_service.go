@@ -7,6 +7,7 @@ import (
 )
 
 type AccountServiceInterface interface {
+	GetAccountID(apiKey string) (*string, error)
 }
 
 type AccountService struct {

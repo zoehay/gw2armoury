@@ -6,11 +6,11 @@ import (
 )
 
 type ItemRepository interface {
-	Create(item *repositorymodels.GORMItem) error
+	Create(item *repositorymodels.GORMItem) (*repositorymodels.GORMItem, error)
 	CreateMany(items []*repositorymodels.GORMItem) error
 	GetAll() ([]repositorymodels.GORMItem, error)
-	GetFirst() (repositorymodels.GORMItem, error)
-	GetById(id int) (repositorymodels.GORMItem, error)
+	GetFirst() (*repositorymodels.GORMItem, error)
+	GetById(id int) (*repositorymodels.GORMItem, error)
 }
 
 type GORMItemRepository struct {

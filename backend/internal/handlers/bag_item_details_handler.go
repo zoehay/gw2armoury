@@ -8,12 +8,12 @@ import (
 )
 
 type BagItemDetailsHandler struct {
-	BagItemRepository repository.GORMBagItemRepository
+	BagItemRepository repository.BagItemRepository
 }
 
 func NewBagItemDetailsHandler(bagItemRepository repository.GORMBagItemRepository) *BagItemDetailsHandler {
 	return &BagItemDetailsHandler{
-		BagItemRepository: bagItemRepository,
+		BagItemRepository: &bagItemRepository,
 	}
 }
 

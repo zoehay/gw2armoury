@@ -8,10 +8,10 @@ import (
 )
 
 type BagItemHandler struct {
-	BagItemRepository repository.GORMBagItemRepository
+	BagItemRepository repository.BagItemRepository
 }
 
-func NewBagItemHandler(bagItemRepository repository.GORMBagItemRepository) *BagItemHandler {
+func NewBagItemHandler(bagItemRepository repository.BagItemRepository) *BagItemHandler {
 	return &BagItemHandler{
 		BagItemRepository: bagItemRepository,
 	}

@@ -40,10 +40,10 @@ func main() {
 	accountService := services.NewAccountService()
 	characterService := services.NewCharacterService(&bagItemRepository)
 
-	itemHandler := handlers.NewItemHandler(itemRepository)
-	bagItemHandler := handlers.NewBagItemHandler(bagItemRepository)
+	itemHandler := handlers.NewItemHandler(&itemRepository)
+	bagItemHandler := handlers.NewBagItemHandler(&bagItemRepository)
 	bagItemDetailsHandler := handlers.NewBagItemDetailsHandler(bagItemRepository)
-	accountHandler := handlers.NewAccountHandler(accountRepository, sessionRepository, accountService)
+	accountHandler := handlers.NewAccountHandler(&accountRepository, &sessionRepository, accountService)
 
 	// err = database.CheckAndSeedDatabase(itemRepository)
 	// if err != nil {

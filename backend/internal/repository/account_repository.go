@@ -6,10 +6,10 @@ import (
 )
 
 type AccountRepository interface {
-	Create(Account *repositorymodels.Account) (*repositorymodels.Account, error)
-	DeleteByCharacterName(characterName string) error
-	GetByCharacterName(characterName string) ([]repositorymodels.Account, error)
-	GetIds() ([]int, error)
+	GetBySession(sessionID string) (*repositorymodels.Account, error)
+	GetByName(accountName string) (*repositorymodels.Account, error)
+	Create(account *repositorymodels.Account) (*repositorymodels.Account, error)
+	UpdateSession(accountID string, sessionID string) (*repositorymodels.Account, error)
 }
 
 type GORMAccountRepository struct {

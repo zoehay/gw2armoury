@@ -13,12 +13,12 @@ import (
 )
 
 type AccountHandler struct {
-	AccountRepository repository.GORMAccountRepository
-	SessionRepository repository.GORMSessionRepository
-	AccountService    *services.AccountService
+	AccountRepository repository.AccountRepository
+	SessionRepository repository.SessionRepository
+	AccountService    services.AccountServiceInterface
 }
 
-func NewAccountHandler(accountRepository repository.GORMAccountRepository, sessionRepository repository.GORMSessionRepository, accountService *services.AccountService) *AccountHandler {
+func NewAccountHandler(accountRepository repository.AccountRepository, sessionRepository repository.SessionRepository, accountService services.AccountServiceInterface) *AccountHandler {
 	return &AccountHandler{
 		AccountRepository: accountRepository,
 		SessionRepository: sessionRepository,

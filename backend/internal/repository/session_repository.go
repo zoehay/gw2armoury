@@ -7,9 +7,9 @@ import (
 
 type SessionRepository interface {
 	Create(session *repositorymodels.Session) (*repositorymodels.Session, error)
-	Delete(session *repositorymodels.Session) error
+	Delete(sessionID string) error
 	Get(sessionID string) (*repositorymodels.Session, error)
-	Reset(session *repositorymodels.Session) (*repositorymodels.Session, error)
+	// Reset(session *repositorymodels.Session) (*repositorymodels.Session, error)
 }
 
 type GORMSessionRepository struct {
@@ -38,9 +38,12 @@ func (repository *GORMSessionRepository) Delete(sessionID string) error {
 	return err
 }
 
-func (repository *GORMSessionRepository) Get(sessionID string) error {
+func (repository *GORMSessionRepository) Get(sessionID string) (*repositorymodels.Session, error) {
 	var session *repositorymodels.Session
 	err := repository.DB.Where("session_id = ?", sessionID).Find(&session).Error
+	if err != nil {
+		return nil, err
+	}
 
-	return err
+	return session, err
 }

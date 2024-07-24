@@ -11,6 +11,8 @@ type BagItemRepository interface {
 	DeleteByCharacterName(characterName string) error
 	GetByCharacterName(characterName string) ([]repositorymodels.GORMBagItem, error)
 	GetIds() ([]int, error)
+	GetDetailsByCharacterName(characterName string) ([]models.BagItem, error)
+	GetDetailsByAccountID(accountID string) ([]models.BagItem, error)
 }
 
 type GORMBagItemRepository struct {
