@@ -16,10 +16,14 @@ import (
 
 type ItemServiceTestSuite struct {
 	suite.Suite
-	itemService *servicemocks.ItemServiceMock
+	ItemService *servicemocks.ItemServiceMock
 }
 
-func (suite *ItemServiceTestSuite) SetupTest() {
+func TestItemServiceTestSuite(t *testing.T) {
+	suite.Run(t, new(ItemServiceTestSuite))
+}
+
+func (s *ItemServiceTestSuite) SetupSuite() {
 	envPath := filepath.Join("..", ".env")
 	err := godotenv.Load(envPath)
 	if err != nil {
@@ -33,14 +37,27 @@ func (suite *ItemServiceTestSuite) SetupTest() {
 	}
 
 	itemRepository := repository.NewGORMItemRepository(db)
-	suite.itemService = servicemocks.NewItemServiceMock(&itemRepository)
+	s.ItemService = servicemocks.NewItemServiceMock(&itemRepository)
 }
 
-func (suite *ItemServiceTestSuite) TestGetAndStoreAllItems() {
-	err := suite.itemService.GetAndStoreAllItems()
-	assert.NoError(suite.T(), err, "Failed to get and store items")
+func (s *ItemServiceTestSuite) TearDownSuite() {
+	err := s.ItemService.GormItemRepository.DB.Exec("DROP TABLE gorm_items;").Error
+	assert.NoError(s.T(), err, "Failed to clear database")
+
+	db, err := s.ItemService.GormItemRepository.DB.DB()
+	if err != nil {
+		s.T().Fatal(err)
+	}
+	db.Close()
 }
 
-func TestItemServiceTestSuite(t *testing.T) {
-	suite.Run(t, new(ItemServiceTestSuite))
+func (s *ItemServiceTestSuite) TestGetAndStoreAllItems() {
+	err := s.ItemService.GetAndStoreAllItems()
+	assert.NoError(s.T(), err, "Failed to get and store items")
+}
+
+func (s *ItemServiceTestSuite) TestGetItemById() {
+	item, err := s.ItemService.GormItemRepository.GetById(27952)
+	log.Println(item)
+	assert.NoError(s.T(), err, "Failed to get item by id")
 }

@@ -11,12 +11,12 @@ import (
 )
 
 type ItemServiceMock struct {
-	gormItemRepository *repository.GORMItemRepository
+	GormItemRepository *repository.GORMItemRepository
 }
 
 func NewItemServiceMock(itemRepository *repository.GORMItemRepository) *ItemServiceMock {
 	return &ItemServiceMock{
-		gormItemRepository: itemRepository,
+		GormItemRepository: itemRepository,
 	}
 }
 
@@ -30,7 +30,7 @@ func (service *ItemServiceMock) GetAndStoreAllItems() error {
 	var duplicateKeyErrorIds []int
 	for _, item := range apiItems {
 		gormItem := apimodels.APIItemToGORMItem(item)
-		_, err := service.gormItemRepository.Create(&gormItem)
+		_, err := service.GormItemRepository.Create(&gormItem)
 		if err != nil {
 			if isDuplicateKeyError(err) {
 				duplicateKeyErrorIds = append(duplicateKeyErrorIds, int(item.ID))

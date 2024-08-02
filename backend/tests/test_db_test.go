@@ -10,29 +10,39 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"github.com/zoehay/gw2armoury/backend/internal/database"
+	"gorm.io/gorm"
 )
 
 type DBTestSuite struct {
 	suite.Suite
 	dsn string
+	db  *gorm.DB
 }
 
-func (suite *DBTestSuite) SetupTest() {
+func TestDBTestSuite(t *testing.T) {
+	suite.Run(t, new(DBTestSuite))
+}
+
+func (s *DBTestSuite) SetupSuite() {
 	envPath := filepath.Join("..", ".env")
 	err := godotenv.Load(envPath)
 	if err != nil {
 		log.Fatal("Error loading .env file:", err)
 	}
 
-	suite.dsn = os.Getenv("TEST_DB_DSN")
+	s.dsn = os.Getenv("TEST_DB_DSN")
 }
 
-func (suite *DBTestSuite) TestPostgresInit() {
-
-	_, err := database.PostgresInit(suite.dsn)
-	assert.NoError(suite.T(), err, "Failed to connect to database")
-
+func (s *DBTestSuite) TearDownSuite() {
+	db, err := s.db.DB()
+	if err != nil {
+		s.T().Fatal(err)
+	}
+	db.Close()
 }
-func TestDBTestSuite(t *testing.T) {
-	suite.Run(t, new(DBTestSuite))
+
+func (s *DBTestSuite) TestPostgresInit() {
+	db, err := database.PostgresInit(s.dsn)
+	s.db = db
+	assert.NoError(s.T(), err, "Failed to connect to database")
 }
