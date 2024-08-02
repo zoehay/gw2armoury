@@ -10,6 +10,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/zoehay/gw2armoury/backend/internal/database"
+	gw2api "github.com/zoehay/gw2armoury/backend/internal/gw2_api"
 	"github.com/zoehay/gw2armoury/backend/internal/handlers"
 	"github.com/zoehay/gw2armoury/backend/internal/middleware"
 	"github.com/zoehay/gw2armoury/backend/internal/repository"
@@ -38,7 +39,8 @@ func main() {
 	apiKey := os.Getenv("TEST_API_KEY")
 	// itemService := services.NewItemService(&itemRepository)
 	accountService := services.NewAccountService()
-	characterService := services.NewCharacterService(&bagItemRepository)
+	characterProvider := &gw2api.CharacterProvider{}
+	characterService := services.NewCharacterService(&bagItemRepository, characterProvider)
 
 	itemHandler := handlers.NewItemHandler(&itemRepository)
 	bagItemHandler := handlers.NewBagItemHandler(&bagItemRepository)

@@ -11,7 +11,14 @@ import (
 	apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/api_models"
 )
 
-func GetItemsByIds(intArrIds []int) ([]apimodels.APIItem, error) {
+type ItemDataProvider interface {
+	GetItemsByIds(intArrIds []int) ([]apimodels.APIItem, error)
+	GetAllItemIds() ([]int, error)
+}
+
+type ItemProvider struct{}
+
+func (itemProvider *ItemProvider) GetItemsByIds(intArrIds []int) ([]apimodels.APIItem, error) {
 	idString := strings.Join(IntArrToStringArr(intArrIds), ",")
 	res, err := clients.GetItemsById(idString)
 
@@ -36,7 +43,7 @@ func GetItemsByIds(intArrIds []int) ([]apimodels.APIItem, error) {
 	return result, nil
 }
 
-func GetAllItemIds() ([]int, error) {
+func (itemProvider *ItemProvider) GetAllItemIds() ([]int, error) {
 	res, err := clients.GetItemIds()
 
 	if err != nil {

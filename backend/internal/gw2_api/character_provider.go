@@ -9,7 +9,13 @@ import (
 	apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/api_models"
 )
 
-func GetAllCharacters(apiKey string) ([]apimodels.APICharacter, error) {
+type CharacterDataProvider interface {
+	GetAllCharacters(apiKey string) ([]apimodels.APICharacter, error)
+}
+
+type CharacterProvider struct{}
+
+func (characterProvider *CharacterProvider) GetAllCharacters(apiKey string) ([]apimodels.APICharacter, error) {
 	res, err := clients.GetAllCharacters(apiKey)
 
 	if err != nil {
@@ -34,7 +40,7 @@ func GetAllCharacters(apiKey string) ([]apimodels.APICharacter, error) {
 	return result, nil
 }
 
-func GetAllCharacterNames(apiKey string) ([]string, error) {
+func (characterProvider *CharacterProvider) GetAllCharacterNames(apiKey string) ([]string, error) {
 	res, err := clients.GetCharacterNames(apiKey)
 
 	if err != nil {

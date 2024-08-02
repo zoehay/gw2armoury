@@ -15,22 +15,24 @@ type CharacterServiceInterface interface {
 }
 
 type CharacterService struct {
-	gormBagItemRepository *repository.GORMBagItemRepository
+	GORMBagItemRepository *repository.GORMBagItemRepository
+	CharacterProvider     gw2api.CharacterDataProvider
 }
 
-func NewCharacterService(bagItemRepository *repository.GORMBagItemRepository) *CharacterService {
+func NewCharacterService(bagItemRepository *repository.GORMBagItemRepository, characterProvider gw2api.CharacterDataProvider) *CharacterService {
 	return &CharacterService{
-		gormBagItemRepository: bagItemRepository,
+		GORMBagItemRepository: bagItemRepository,
+		CharacterProvider:     characterProvider,
 	}
 }
 
 func (service *CharacterService) GetAndStoreAllCharacters(accountID string, apiKey string) error {
-	characters, err := gw2api.GetAllCharacters(apiKey)
+	characters, err := service.CharacterProvider.GetAllCharacters(apiKey)
 	if err != nil {
 		return fmt.Errorf("service error using provider could not get characters: %s", err)
 	}
 
-	tx := service.gormBagItemRepository.DB.Begin()
+	tx := service.GORMBagItemRepository.DB.Begin()
 
 	defer func() {
 		r := recover()
@@ -70,7 +72,7 @@ func (service *CharacterService) storeCharacterInventory(accountID string, chara
 			for _, bagItem := range bag.Inventory {
 				if bagItem != nil {
 					gormBagItem := apimodels.APIBagToGORMBagItem(accountID, character.Name, *bagItem)
-					_, err := service.gormBagItemRepository.Create(&gormBagItem)
+					_, err := service.GORMBagItemRepository.Create(&gormBagItem)
 					if err != nil {
 						return fmt.Errorf("service error using gorm create bagitem %d for character %s: %s", bagItem.ID, character.Name, err)
 					}
@@ -82,7 +84,7 @@ func (service *CharacterService) storeCharacterInventory(accountID string, chara
 }
 
 func (service *CharacterService) clearCharacterInventory(character apimodels.APICharacter) error {
-	err := service.gormBagItemRepository.DeleteByCharacterName(character.Name)
+	err := service.GORMBagItemRepository.DeleteByCharacterName(character.Name)
 	if err != nil {
 		return fmt.Errorf("service error using gorm delete bagitems for character %s: %s", character.Name, err)
 	}

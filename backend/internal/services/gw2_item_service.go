@@ -16,24 +16,26 @@ type ItemServiceInterface interface {
 }
 
 type ItemService struct {
-	gormItemRepository *repository.GORMItemRepository
+	GORMItemRepository *repository.GORMItemRepository
+	ItemProvider       gw2api.ItemDataProvider
 }
 
-func NewItemService(itemRepository *repository.GORMItemRepository) *ItemService {
+func NewItemService(itemRepository *repository.GORMItemRepository, itemProvider gw2api.ItemDataProvider) *ItemService {
 	return &ItemService{
-		gormItemRepository: itemRepository,
+		GORMItemRepository: itemRepository,
+		ItemProvider:       itemProvider,
 	}
 }
 
 func (service *ItemService) GetAndStoreItemsById(ids []int) error {
-	apiItems, err := gw2api.GetItemsByIds(ids)
+	apiItems, err := service.ItemProvider.GetItemsByIds(ids)
 	if err != nil {
 		return fmt.Errorf("service error using provider: %s", err)
 	}
 
 	for _, item := range apiItems {
 		gormItem := apimodels.APIItemToGORMItem(item)
-		_, err := service.gormItemRepository.Create(&gormItem)
+		_, err := service.GORMItemRepository.Create(&gormItem)
 		if err != nil {
 			return fmt.Errorf("service error using gorm create: %s", err)
 		}
@@ -42,7 +44,7 @@ func (service *ItemService) GetAndStoreItemsById(ids []int) error {
 }
 
 func (service *ItemService) GetAndStoreAllItems() error {
-	allItemIds, err := gw2api.GetAllItemIds()
+	allItemIds, err := service.ItemProvider.GetAllItemIds()
 
 	if err != nil {
 		return fmt.Errorf("service error getting all itemIds: %s", err)
@@ -77,7 +79,7 @@ func SplitArray(arr []int, chunkSize int) [][]int {
 }
 
 func (service *ItemService) GetAndStoreEachByIds(itemIds []int) error {
-	apiItems, err := gw2api.GetItemsByIds(itemIds)
+	apiItems, err := service.ItemProvider.GetItemsByIds(itemIds)
 	if err != nil {
 		return fmt.Errorf("provider error requesting items: %s", err)
 	}
@@ -85,7 +87,7 @@ func (service *ItemService) GetAndStoreEachByIds(itemIds []int) error {
 	var duplicateKeyErrorIds []int
 	for _, item := range apiItems {
 		gormItem := apimodels.APIItemToGORMItem(item)
-		_, err := service.gormItemRepository.Create(&gormItem)
+		_, err := service.GORMItemRepository.Create(&gormItem)
 		if err != nil {
 			if isDuplicateKeyError(err) {
 				duplicateKeyErrorIds = append(duplicateKeyErrorIds, int(item.ID))

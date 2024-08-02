@@ -15,16 +15,16 @@ import (
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
 
-type ItemServiceTestSuite struct {
+type CharacterServiceTestSuite struct {
 	suite.Suite
-	ItemService services.ItemService
+	CharacterService services.CharacterService
 }
 
-func TestItemServiceTestSuite(t *testing.T) {
-	suite.Run(t, new(ItemServiceTestSuite))
+func TestCharacterServiceTestSuite(t *testing.T) {
+	suite.Run(t, new(CharacterServiceTestSuite))
 }
 
-func (s *ItemServiceTestSuite) SetupSuite() {
+func (s *CharacterServiceTestSuite) SetupSuite() {
 	envPath := filepath.Join("..", ".env")
 	err := godotenv.Load(envPath)
 	if err != nil {
@@ -37,29 +37,23 @@ func (s *ItemServiceTestSuite) SetupSuite() {
 		log.Fatal("Error connecting to postgres", err)
 	}
 
-	itemRepository := repository.NewGORMItemRepository(db)
-	itemProvider := &gw2api.ItemProviderMock{}
-	s.ItemService = *services.NewItemService(&itemRepository, itemProvider)
+	bagItemRepository := repository.NewGORMBagItemRepository(db)
+	characterProvider := &gw2api.CharacterProviderMock{}
+	s.CharacterService = *services.NewCharacterService(&bagItemRepository, characterProvider)
 }
 
-func (s *ItemServiceTestSuite) TearDownSuite() {
-	err := s.ItemService.GORMItemRepository.DB.Exec("DROP TABLE gorm_items;").Error
+func (s *CharacterServiceTestSuite) TearDownSuite() {
+	err := s.CharacterService.GORMBagItemRepository.DB.Exec("DROP TABLE gorm_bag_items;").Error
 	assert.NoError(s.T(), err, "Failed to clear database")
 
-	db, err := s.ItemService.GORMItemRepository.DB.DB()
+	db, err := s.CharacterService.GORMBagItemRepository.DB.DB()
 	if err != nil {
 		s.T().Fatal(err)
 	}
 	db.Close()
 }
 
-func (s *ItemServiceTestSuite) TestGetAndStoreAllItems() {
-	err := s.ItemService.GetAndStoreAllItems()
+func (s *CharacterServiceTestSuite) TestGetAndStoreAllCharacters() {
+	err := s.CharacterService.GetAndStoreAllCharacters("accountid", "apikeystring")
 	assert.NoError(s.T(), err, "Failed to get and store items")
-}
-
-func (s *ItemServiceTestSuite) TestGetItemById() {
-	item, err := s.ItemService.GORMItemRepository.GetById(27952)
-	log.Println(item)
-	assert.NoError(s.T(), err, "Failed to get item by id")
 }
