@@ -1,6 +1,8 @@
 package repositorymodels
 
-import "github.com/lib/pq"
+import (
+	"github.com/lib/pq"
+)
 
 // MVP do not care about which bag an item is in
 type GORMBagItem struct {
@@ -17,3 +19,7 @@ type GORMBagItem struct {
 	Binding       *string
 	BoundTo       *string
 }
+
+// func GORMBagItemToBagItem(gormBagItem GORMBagItem) models.BagItem {
+
+// }

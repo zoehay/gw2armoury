@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"github.com/zoehay/gw2armoury/backend/internal/models"
 	repositorymodels "github.com/zoehay/gw2armoury/backend/internal/repository/repository_models"
 	"gorm.io/gorm"
 )
@@ -11,8 +10,8 @@ type BagItemRepository interface {
 	DeleteByCharacterName(characterName string) error
 	GetByCharacterName(characterName string) ([]repositorymodels.GORMBagItem, error)
 	GetIds() ([]int, error)
-	GetDetailsByCharacterName(characterName string) ([]models.BagItem, error)
-	GetDetailsByAccountID(accountID string) ([]models.BagItem, error)
+	GetIconBagItemByCharacterName(characterName string) ([]repositorymodels.GORMIconBagItem, error)
+	GetIconBagItemByAccountID(accountID string) ([]repositorymodels.GORMIconBagItem, error)
 }
 
 type GORMBagItemRepository struct {
@@ -61,36 +60,36 @@ func (repository *GORMBagItemRepository) GetIds() ([]int, error) {
 
 }
 
-func (repository *GORMBagItemRepository) GetDetailsByCharacterName(characterName string) ([]models.BagItem, error) {
-	var bagItemDetails []models.BagItem
+func (repository *GORMBagItemRepository) GetIconBagItemByCharacterName(characterName string) ([]repositorymodels.GORMIconBagItem, error) {
+	var bagItemWithIcon []repositorymodels.GORMIconBagItem
 
 	err := repository.DB.Table("gorm_bag_items").
 		Select("gorm_bag_items.*, gorm_items.icon").
 		Joins("left join gorm_items on gorm_bag_items.bag_item_id = gorm_items.id").
 		Where("gorm_bag_items.character_name = ?", characterName).
-		Scan(&bagItemDetails).Error
+		Scan(&bagItemWithIcon).Error
 
 	if err != nil {
 		return nil, err
 	}
 
-	return bagItemDetails, nil
+	return bagItemWithIcon, nil
 
 }
 
-func (repository *GORMBagItemRepository) GetDetailsByAccountID(accountID string) ([]models.BagItem, error) {
-	var bagItemDetails []models.BagItem
+func (repository *GORMBagItemRepository) GetIconBagItemByAccountID(accountID string) ([]repositorymodels.GORMIconBagItem, error) {
+	var bagItemWithIcon []repositorymodels.GORMIconBagItem
 
 	err := repository.DB.Table("gorm_bag_items").
 		Select("gorm_bag_items.*, gorm_items.icon").
 		Joins("left join gorm_items on gorm_bag_items.bag_item_id = gorm_items.id").
 		Where("gorm_bag_items.account_id = ?", accountID).
-		Scan(&bagItemDetails).Error
+		Scan(&bagItemWithIcon).Error
 
 	if err != nil {
 		return nil, err
 	}
 
-	return bagItemDetails, nil
+	return bagItemWithIcon, nil
 
 }

@@ -45,7 +45,7 @@ func main() {
 
 	itemHandler := handlers.NewItemHandler(&itemRepository)
 	bagItemHandler := handlers.NewBagItemHandler(&bagItemRepository)
-	bagItemDetailsHandler := handlers.NewBagItemDetailsHandler(bagItemRepository)
+	// bagItemDetailsHandler := handlers.NewBagItemDetailsHandler(bagItemRepository)
 	accountHandler := handlers.NewAccountHandler(&accountRepository, &sessionRepository, accountService)
 
 	// err = database.CheckAndSeedDatabase(itemRepository)
