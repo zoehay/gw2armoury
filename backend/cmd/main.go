@@ -38,7 +38,8 @@ func main() {
 
 	apiKey := os.Getenv("TEST_API_KEY")
 	// itemService := services.NewItemService(&itemRepository)
-	accountService := services.NewAccountService()
+	accountProvider := &gw2api.AccountProvider{}
+	accountService := services.NewAccountService(&accountRepository, accountProvider)
 	characterProvider := &gw2api.CharacterProvider{}
 	characterService := services.NewCharacterService(&bagItemRepository, characterProvider)
 

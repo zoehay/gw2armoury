@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -60,6 +61,6 @@ func (s *ItemServiceTestSuite) TestGetAndStoreAllItems() {
 
 func (s *ItemServiceTestSuite) TestGetItemById() {
 	item, err := s.ItemService.GORMItemRepository.GetById(27952)
-	log.Println(item)
+	fmt.Println(PrintObject(item))
 	assert.NoError(s.T(), err, "Failed to get item by id")
 }

@@ -1,6 +1,8 @@
 package tests
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -56,4 +58,16 @@ func (s *CharacterServiceTestSuite) TearDownSuite() {
 func (s *CharacterServiceTestSuite) TestGetAndStoreAllCharacters() {
 	err := s.CharacterService.GetAndStoreAllCharacters("accountid", "apikeystring")
 	assert.NoError(s.T(), err, "Failed to get and store items")
+}
+
+func (s *CharacterServiceTestSuite) TestGetBagItemsByCharacterName() {
+	bagItems, err := s.CharacterService.GORMBagItemRepository.GetByCharacterName("Roman Meows")
+	fmt.Println(PrintObject(bagItems[0]))
+	assert.NoError(s.T(), err, "Failed to get item by id")
+
+}
+
+func PrintObject(i interface{}) string {
+	s, _ := json.MarshalIndent(i, "", "\t")
+	return string(s)
 }

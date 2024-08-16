@@ -3,7 +3,7 @@ package gw2api
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/api_models"
 )
@@ -11,27 +11,25 @@ import (
 type CharacterProviderMock struct{}
 
 func (characterProvider *CharacterProviderMock) GetAllCharacters(apiKey string) ([]apimodels.APICharacter, error) {
-	apiCharacters, err := characterProvider.ReadCharacterFromFile("/Users/zoehay/Projects/gw2armoury/backend/test_data/character_test_data.txt")
+	apiCharacters, err := characterProvider.ReadCharactersFromFile("../test_data/character_test_data.txt")
 
 	if err != nil {
 		return nil, fmt.Errorf("error reading from test data file: %s", err)
 	}
 
-	fmt.Println("PROVIDEER MOCK CHARADCTERS", apiCharacters[0].Name)
-
 	return apiCharacters, nil
 }
 
-func (characterProvider *CharacterProviderMock) ReadCharacterFromFile(filepath string) ([]apimodels.APICharacter, error) {
-	content, err := ioutil.ReadFile(filepath)
+func (characterProvider *CharacterProviderMock) ReadCharactersFromFile(filepath string) ([]apimodels.APICharacter, error) {
+	content, err := os.ReadFile(filepath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
 
 	var characters []apimodels.APICharacter
 	err = json.Unmarshal(content, &characters)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to unmarshal: %w", err)
 	}
 
 	return characters, nil

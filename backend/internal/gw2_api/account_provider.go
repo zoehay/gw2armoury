@@ -9,7 +9,13 @@ import (
 	apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/api_models"
 )
 
-func GetAccount(apiKey string) (*apimodels.APIAccount, error) {
+type AccountDataProvider interface {
+	GetAccount(apiKey string) (*apimodels.APIAccount, error)
+}
+
+type AccountProvider struct{}
+
+func (accountProvider *AccountProvider) GetAccount(apiKey string) (*apimodels.APIAccount, error) {
 	res, err := clients.GetAccountID(apiKey)
 
 	if err != nil {
