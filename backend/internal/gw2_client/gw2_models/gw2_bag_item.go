@@ -2,7 +2,7 @@ package gw2models
 
 import (
 	"github.com/lib/pq"
-	repositorymodels "github.com/zoehay/gw2armoury/backend/internal/repository/repository_models"
+	repositorymodels "github.com/zoehay/gw2armoury/backend/internal/database/repository_models"
 )
 
 type GW2BagItem struct {
@@ -18,9 +18,9 @@ type GW2BagItem struct {
 	BoundTo   *string                 `json:"bound_to,omitempty"`
 }
 
-func (gw2BagItem GW2BagItem) ToGORMBagItem(accountID string, apiCharacterName string) repositorymodels.GORMBagItem {
+func (gw2BagItem GW2BagItem) ToDBBagItem(accountID string, apiCharacterName string) repositorymodels.DBBagItem {
 	var stats = (*repositorymodels.DetailsMap)(gw2BagItem.Stats)
-	return repositorymodels.GORMBagItem{
+	return repositorymodels.DBBagItem{
 		AccountID:     accountID,
 		CharacterName: apiCharacterName,
 		BagItemID:     gw2BagItem.ID,
@@ -36,5 +36,3 @@ func (gw2BagItem GW2BagItem) ToGORMBagItem(accountID string, apiCharacterName st
 	}
 
 }
-
-// func ApiInfusionsToGormInfusions

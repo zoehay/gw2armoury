@@ -4,14 +4,14 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zoehay/gw2armoury/backend/internal/repository"
+	"github.com/zoehay/gw2armoury/backend/internal/database/repository"
 )
 
 type BagItemHandler struct {
-	BagItemRepository repository.BagItemRepository
+	BagItemRepository repository.BagItemRepositoryInterface
 }
 
-func NewBagItemHandler(bagItemRepository repository.BagItemRepository) *BagItemHandler {
+func NewBagItemHandler(bagItemRepository repository.BagItemRepositoryInterface) *BagItemHandler {
 	return &BagItemHandler{
 		BagItemRepository: bagItemRepository,
 	}

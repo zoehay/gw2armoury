@@ -2,7 +2,7 @@ package repositorymodels
 
 import "time"
 
-type Session struct {
+type DBSession struct {
 	SessionID string
 	Expires   time.Time
 }

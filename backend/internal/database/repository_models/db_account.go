@@ -1,9 +1,9 @@
 package repositorymodels
 
-type Account struct {
+type DBAccount struct {
 	AccountID   string // The unique persistent GW2 API account GUID
 	AccountName *string
 	APIKey      *string
 	Password    *string
-	Session     *Session
+	Session     *DBSession
 }

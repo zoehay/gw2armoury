@@ -5,8 +5,8 @@ import (
 	"strconv"
 
 	"github.com/lib/pq"
+	"github.com/zoehay/gw2armoury/backend/internal/database/repository"
 	gw2client "github.com/zoehay/gw2armoury/backend/internal/gw2_client"
-	"github.com/zoehay/gw2armoury/backend/internal/repository"
 )
 
 type ItemServiceInterface interface {
@@ -15,14 +15,14 @@ type ItemServiceInterface interface {
 }
 
 type ItemService struct {
-	GORMItemRepository *repository.GORMItemRepository
-	ItemProvider       gw2client.ItemDataProvider
+	ItemRepository *repository.ItemRepository
+	ItemProvider   gw2client.ItemDataProvider
 }
 
-func NewItemService(itemRepository *repository.GORMItemRepository, itemProvider gw2client.ItemDataProvider) *ItemService {
+func NewItemService(itemRepository *repository.ItemRepository, itemProvider gw2client.ItemDataProvider) *ItemService {
 	return &ItemService{
-		GORMItemRepository: itemRepository,
-		ItemProvider:       itemProvider,
+		ItemRepository: itemRepository,
+		ItemProvider:   itemProvider,
 	}
 }
 
@@ -33,8 +33,8 @@ func (service *ItemService) GetAndStoreItemsById(ids []int) error {
 	}
 
 	for _, item := range apiItems {
-		gormItem := item.ToGORMItem()
-		_, err := service.GORMItemRepository.Create(&gormItem)
+		dbItem := item.ToDBItem()
+		_, err := service.ItemRepository.Create(&dbItem)
 		if err != nil {
 			return fmt.Errorf("service error using gorm create: %s", err)
 		}
@@ -85,8 +85,8 @@ func (service *ItemService) GetAndStoreEachByIds(itemIds []int) error {
 
 	var duplicateKeyErrorIds []int
 	for _, item := range apiItems {
-		gormItem := item.ToGORMItem()
-		_, err := service.GORMItemRepository.Create(&gormItem)
+		dbItem := item.ToDBItem()
+		_, err := service.ItemRepository.Create(&dbItem)
 		if err != nil {
 			if isDuplicateKeyError(err) {
 				duplicateKeyErrorIds = append(duplicateKeyErrorIds, int(item.ID))

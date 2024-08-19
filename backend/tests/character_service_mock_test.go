@@ -11,9 +11,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"github.com/zoehay/gw2armoury/backend/internal/database"
+	database "github.com/zoehay/gw2armoury/backend/internal/database"
+	"github.com/zoehay/gw2armoury/backend/internal/database/repository"
 	gw2client "github.com/zoehay/gw2armoury/backend/internal/gw2_client"
-	"github.com/zoehay/gw2armoury/backend/internal/repository"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
 
@@ -39,16 +39,16 @@ func (s *CharacterServiceTestSuite) SetupSuite() {
 		log.Fatal("Error connecting to postgres", err)
 	}
 
-	bagItemRepository := repository.NewGORMBagItemRepository(db)
+	bagItemRepository := repository.NewBagItemRepository(db)
 	characterProvider := &gw2client.CharacterProviderMock{}
 	s.CharacterService = *services.NewCharacterService(&bagItemRepository, characterProvider)
 }
 
 func (s *CharacterServiceTestSuite) TearDownSuite() {
-	err := s.CharacterService.GORMBagItemRepository.DB.Exec("DROP TABLE gorm_bag_items;").Error
+	err := s.CharacterService.BagItemRepository.DB.Exec("DROP TABLE db_bag_items;").Error
 	assert.NoError(s.T(), err, "Failed to clear database")
 
-	db, err := s.CharacterService.GORMBagItemRepository.DB.DB()
+	db, err := s.CharacterService.BagItemRepository.DB.DB()
 	if err != nil {
 		s.T().Fatal(err)
 	}
@@ -61,7 +61,7 @@ func (s *CharacterServiceTestSuite) TestGetAndStoreAllCharacters() {
 }
 
 func (s *CharacterServiceTestSuite) TestGetBagItemsByCharacterName() {
-	bagItems, err := s.CharacterService.GORMBagItemRepository.GetByCharacterName("Roman Meows")
+	bagItems, err := s.CharacterService.BagItemRepository.GetByCharacterName("Roman Meows")
 	fmt.Println(PrintObject(bagItems[0]))
 	assert.NoError(s.T(), err, "Failed to get item by id")
 

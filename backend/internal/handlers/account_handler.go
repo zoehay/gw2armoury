@@ -7,18 +7,18 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zoehay/gw2armoury/backend/internal/repository"
-	repositorymodels "github.com/zoehay/gw2armoury/backend/internal/repository/repository_models"
+	"github.com/zoehay/gw2armoury/backend/internal/database/repository"
+	repositorymodels "github.com/zoehay/gw2armoury/backend/internal/database/repository_models"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
 
 type AccountHandler struct {
-	AccountRepository repository.AccountRepository
-	SessionRepository repository.SessionRepository
+	AccountRepository repository.AccountRepositoryInterface
+	SessionRepository repository.SessionRepositoryInterface
 	AccountService    services.AccountServiceInterface
 }
 
-func NewAccountHandler(accountRepository repository.AccountRepository, sessionRepository repository.SessionRepository, accountService services.AccountServiceInterface) *AccountHandler {
+func NewAccountHandler(accountRepository repository.AccountRepositoryInterface, sessionRepository repository.SessionRepositoryInterface, accountService services.AccountServiceInterface) *AccountHandler {
 	return &AccountHandler{
 		AccountRepository: accountRepository,
 		SessionRepository: sessionRepository,
@@ -45,7 +45,7 @@ func (handler AccountHandler) Create(c *gin.Context) {
 		stringAccountID = *apiAccountID
 	}
 
-	var newAccount = &repositorymodels.Account{
+	var newAccount = &repositorymodels.DBAccount{
 		AccountID:   stringAccountID,
 		AccountName: &accountCreate.AccountName,
 	}
@@ -115,10 +115,10 @@ func (handler AccountHandler) Logout(c *gin.Context) {
 	c.SetCookie("sessionID", "", -1, "/", "localhost", false, true)
 }
 
-func (handler AccountHandler) startSession(c *gin.Context, account *repositorymodels.Account) error {
+func (handler AccountHandler) startSession(c *gin.Context, account *repositorymodels.DBAccount) error {
 	// Create a session
 	newSessionID := generateSessionID()
-	var newSession = &repositorymodels.Session{
+	var newSession = &repositorymodels.DBSession{
 		SessionID: newSessionID,
 		Expires:   time.Now(),
 	}

@@ -3,9 +3,9 @@ package services
 import (
 	"fmt"
 
+	"github.com/zoehay/gw2armoury/backend/internal/database/repository"
 	gw2client "github.com/zoehay/gw2armoury/backend/internal/gw2_client"
 	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/gw2_models"
-	"github.com/zoehay/gw2armoury/backend/internal/repository"
 )
 
 type CharacterServiceInterface interface {
@@ -15,14 +15,14 @@ type CharacterServiceInterface interface {
 }
 
 type CharacterService struct {
-	GORMBagItemRepository *repository.GORMBagItemRepository
-	CharacterProvider     gw2client.CharacterDataProvider
+	BagItemRepository *repository.BagItemRepository
+	CharacterProvider gw2client.CharacterDataProvider
 }
 
-func NewCharacterService(bagItemRepository *repository.GORMBagItemRepository, characterProvider gw2client.CharacterDataProvider) *CharacterService {
+func NewCharacterService(bagItemRepository *repository.BagItemRepository, characterProvider gw2client.CharacterDataProvider) *CharacterService {
 	return &CharacterService{
-		GORMBagItemRepository: bagItemRepository,
-		CharacterProvider:     characterProvider,
+		BagItemRepository: bagItemRepository,
+		CharacterProvider: characterProvider,
 	}
 }
 
@@ -32,7 +32,7 @@ func (service *CharacterService) GetAndStoreAllCharacters(accountID string, apiK
 		return fmt.Errorf("service error using provider could not get characters: %s", err)
 	}
 
-	tx := service.GORMBagItemRepository.DB.Begin()
+	tx := service.BagItemRepository.DB.Begin()
 
 	defer func() {
 		r := recover()
@@ -71,8 +71,8 @@ func (service *CharacterService) storeCharacterInventory(accountID string, chara
 		for _, bag := range *apiBags {
 			for _, bagItem := range bag.Inventory {
 				if bagItem != nil {
-					gormBagItem := bagItem.ToGORMBagItem(accountID, character.Name)
-					_, err := service.GORMBagItemRepository.Create(&gormBagItem)
+					dbBagItem := bagItem.ToDBBagItem(accountID, character.Name)
+					_, err := service.BagItemRepository.Create(&dbBagItem)
 					if err != nil {
 						return fmt.Errorf("service error using gorm create bagitem %d for character %s: %s", bagItem.ID, character.Name, err)
 					}
@@ -84,7 +84,7 @@ func (service *CharacterService) storeCharacterInventory(accountID string, chara
 }
 
 func (service *CharacterService) clearCharacterInventory(character gw2models.GW2Character) error {
-	err := service.GORMBagItemRepository.DeleteByCharacterName(character.Name)
+	err := service.BagItemRepository.DeleteByCharacterName(character.Name)
 	if err != nil {
 		return fmt.Errorf("service error using gorm delete bagitems for character %s: %s", character.Name, err)
 	}

@@ -10,9 +10,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"github.com/zoehay/gw2armoury/backend/internal/database"
+	database "github.com/zoehay/gw2armoury/backend/internal/database"
+	"github.com/zoehay/gw2armoury/backend/internal/database/repository"
 	gw2client "github.com/zoehay/gw2armoury/backend/internal/gw2_client"
-	"github.com/zoehay/gw2armoury/backend/internal/repository"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
 
@@ -38,16 +38,16 @@ func (s *ItemServiceTestSuite) SetupSuite() {
 		log.Fatal("Error connecting to postgres", err)
 	}
 
-	itemRepository := repository.NewGORMItemRepository(db)
+	itemRepository := repository.NewItemRepository(db)
 	itemProvider := &gw2client.ItemProviderMock{}
 	s.ItemService = *services.NewItemService(&itemRepository, itemProvider)
 }
 
 func (s *ItemServiceTestSuite) TearDownSuite() {
-	err := s.ItemService.GORMItemRepository.DB.Exec("DROP TABLE gorm_items;").Error
+	err := s.ItemService.ItemRepository.DB.Exec("DROP TABLE db_items;").Error
 	assert.NoError(s.T(), err, "Failed to clear database")
 
-	db, err := s.ItemService.GORMItemRepository.DB.DB()
+	db, err := s.ItemService.ItemRepository.DB.DB()
 	if err != nil {
 		s.T().Fatal(err)
 	}
@@ -60,7 +60,7 @@ func (s *ItemServiceTestSuite) TestGetAndStoreAllItems() {
 }
 
 func (s *ItemServiceTestSuite) TestGetItemById() {
-	item, err := s.ItemService.GORMItemRepository.GetById(27952)
+	item, err := s.ItemService.ItemRepository.GetById(27952)
 	fmt.Println(PrintObject(item))
 	assert.NoError(s.T(), err, "Failed to get item by id")
 }

@@ -5,10 +5,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zoehay/gw2armoury/backend/internal/repository"
+	"github.com/zoehay/gw2armoury/backend/internal/database/repository"
 )
 
-func UseSession(accountRepository *repository.GORMAccountRepository) gin.HandlerFunc {
+func UseSession(accountRepository *repository.AccountRepository) gin.HandlerFunc {
 	return gin.HandlerFunc(func(c *gin.Context) {
 
 		sessionID, err := c.Cookie("sessionID")

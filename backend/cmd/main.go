@@ -9,11 +9,11 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/zoehay/gw2armoury/backend/internal/database"
+	database "github.com/zoehay/gw2armoury/backend/internal/database"
+	repository "github.com/zoehay/gw2armoury/backend/internal/database/repository"
 	gw2client "github.com/zoehay/gw2armoury/backend/internal/gw2_client"
 	"github.com/zoehay/gw2armoury/backend/internal/handlers"
 	"github.com/zoehay/gw2armoury/backend/internal/middleware"
-	"github.com/zoehay/gw2armoury/backend/internal/repository"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
 
@@ -31,10 +31,10 @@ func main() {
 		log.Fatal("Error initializing database connection", err)
 	}
 
-	itemRepository := repository.NewGORMItemRepository(db)
-	bagItemRepository := repository.NewGORMBagItemRepository(db)
-	accountRepository := repository.NewGORMAccountRepository(db)
-	sessionRepository := repository.NewGORMSessionRepository(db)
+	itemRepository := repository.NewItemRepository(db)
+	bagItemRepository := repository.NewBagItemRepository(db)
+	accountRepository := repository.NewAccountRepository(db)
+	sessionRepository := repository.NewSessionRepository(db)
 
 	apiKey := os.Getenv("TEST_API_KEY")
 	// itemService := services.NewItemService(&itemRepository)

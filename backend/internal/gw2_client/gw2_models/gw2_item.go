@@ -2,7 +2,7 @@ package gw2models
 
 import (
 	"github.com/lib/pq"
-	repositorymodels "github.com/zoehay/gw2armoury/backend/internal/repository/repository_models"
+	repositorymodels "github.com/zoehay/gw2armoury/backend/internal/database/repository_models"
 )
 
 type ItemRequest struct {
@@ -32,9 +32,9 @@ type GW2Item struct {
 	Details      *map[string]interface{} `json:"details,omitempty"`
 }
 
-func (gw2Item GW2Item) ToGORMItem() repositorymodels.GORMItem {
+func (gw2Item GW2Item) ToDBItem() repositorymodels.DBItem {
 	var details = (*repositorymodels.DetailsMap)(gw2Item.Details)
-	return repositorymodels.GORMItem{
+	return repositorymodels.DBItem{
 		ID:           gw2Item.ID,
 		ChatLink:     gw2Item.ChatLink,
 		Name:         gw2Item.Name,

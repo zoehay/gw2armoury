@@ -10,7 +10,7 @@ import (
 	"github.com/zoehay/gw2armoury/backend/internal/models"
 )
 
-type GORMItem struct {
+type DBItem struct {
 	Name         string
 	Description  string
 	Type         string
@@ -29,24 +29,24 @@ type GORMItem struct {
 	Details      *DetailsMap     `gorm:"type:json"`
 }
 
-func (gormItem GORMItem) ToItem() models.Item {
+func (dbItem DBItem) ToItem() models.Item {
 	return models.Item{
-		Name:         gormItem.Name,
-		Type:         gormItem.Name,
-		Level:        gormItem.Level,
-		Rarity:       gormItem.Rarity,
-		VendorValue:  gormItem.VendorValue,
-		DefaultSkin:  gormItem.DefaultSkin,
-		GameTypes:    gormItem.GameTypes,
-		Flags:        gormItem.Flags,
-		Restrictions: gormItem.Restrictions,
-		ID:           gormItem.ID,
-		ChatLink:     gormItem.ChatLink,
-		Icon:         gormItem.Icon,
-		Description:  gormItem.Description,
-		UpgradesInto: (*[]string)(gormItem.UpgradesInto),
-		UpgradesFrom: (*[]string)(gormItem.UpgradesFrom),
-		Details:      (*map[string]interface{})(gormItem.Details),
+		Name:         dbItem.Name,
+		Type:         dbItem.Name,
+		Level:        dbItem.Level,
+		Rarity:       dbItem.Rarity,
+		VendorValue:  dbItem.VendorValue,
+		DefaultSkin:  dbItem.DefaultSkin,
+		GameTypes:    dbItem.GameTypes,
+		Flags:        dbItem.Flags,
+		Restrictions: dbItem.Restrictions,
+		ID:           dbItem.ID,
+		ChatLink:     dbItem.ChatLink,
+		Icon:         dbItem.Icon,
+		Description:  dbItem.Description,
+		UpgradesInto: (*[]string)(dbItem.UpgradesInto),
+		UpgradesFrom: (*[]string)(dbItem.UpgradesFrom),
+		Details:      (*map[string]interface{})(dbItem.Details),
 	}
 }
 

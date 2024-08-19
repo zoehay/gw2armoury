@@ -2,7 +2,7 @@ package repositorymodels
 
 import "github.com/zoehay/gw2armoury/backend/internal/models"
 
-type GORMIconBagItem struct {
+type DBIconBagItem struct {
 	AccountID     string
 	CharacterName string
 	BagItemID     uint                    `json:"id"`
@@ -18,20 +18,19 @@ type GORMIconBagItem struct {
 	BoundTo       *string                 `json:"bound_to,omitempty"`
 }
 
-func (gormIconBagItem GORMIconBagItem) ToBagItem() models.BagItem {
+func (dbIconBagItem DBIconBagItem) ToBagItem() models.BagItem {
 	return models.BagItem{
-		// AccountID:     gormIconBagItem.AccountID,
-		// CharacterName: gormIconBagItem.CharacterName,
-		BagItemID: gormIconBagItem.BagItemID,
-		Icon:      gormIconBagItem.Icon,
-		Count:     gormIconBagItem.Count,
-		Charges:   gormIconBagItem.Charges,
-		Infusions: gormIconBagItem.Infusions,
-		Upgrades:  gormIconBagItem.Upgrades,
-		Skin:      gormIconBagItem.Skin,
-		Stats:     gormIconBagItem.Stats,
-		Dyes:      gormIconBagItem.Dyes,
-		Binding:   gormIconBagItem.Binding,
-		BoundTo:   gormIconBagItem.BoundTo,
+		CharacterName: dbIconBagItem.CharacterName,
+		BagItemID:     dbIconBagItem.BagItemID,
+		Icon:          dbIconBagItem.Icon,
+		Count:         dbIconBagItem.Count,
+		Charges:       dbIconBagItem.Charges,
+		Infusions:     dbIconBagItem.Infusions,
+		Upgrades:      dbIconBagItem.Upgrades,
+		Skin:          dbIconBagItem.Skin,
+		Stats:         dbIconBagItem.Stats,
+		Dyes:          dbIconBagItem.Dyes,
+		Binding:       dbIconBagItem.Binding,
+		BoundTo:       dbIconBagItem.BoundTo,
 	}
 }

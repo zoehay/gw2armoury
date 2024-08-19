@@ -10,9 +10,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"github.com/zoehay/gw2armoury/backend/internal/database"
+	database "github.com/zoehay/gw2armoury/backend/internal/database"
+	"github.com/zoehay/gw2armoury/backend/internal/database/repository"
 	gw2client "github.com/zoehay/gw2armoury/backend/internal/gw2_client"
-	"github.com/zoehay/gw2armoury/backend/internal/repository"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
 
@@ -38,16 +38,16 @@ func (s *AccountServiceTestSuite) SetupSuite() {
 		log.Fatal("Error connecting to postgres", err)
 	}
 
-	accountRepository := repository.NewGORMAccountRepository(db)
+	accountRepository := repository.NewAccountRepository(db)
 	accountProvider := &gw2client.AccountProviderMock{}
 	s.AccountService = *services.NewAccountService(&accountRepository, accountProvider)
 }
 
 // func (s *AccountServiceTestSuite) TearDownSuite() {
-// 	err := s.AccountService.GORMAccountRepository.DB.Exec("DROP TABLE accounts;").Error
+// 	err := s.AccountService.AccountRepository.DB.Exec("DROP TABLE accounts;").Error
 // 	assert.NoError(s.T(), err, "Failed to clear database")
 
-// 	db, err := s.AccountService.GORMAccountRepository.DB.DB()
+// 	db, err := s.AccountService.AccountRepository.DB.DB()
 // 	if err != nil {
 // 		s.T().Fatal(err)
 // 	}

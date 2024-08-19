@@ -5,7 +5,7 @@ import (
 )
 
 // MVP do not care about which bag an item is in
-type GORMBagItem struct {
+type DBBagItem struct {
 	AccountID     string
 	CharacterName string
 	BagItemID     uint
