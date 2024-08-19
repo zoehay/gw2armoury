@@ -8,17 +8,17 @@ import (
 	"strings"
 
 	"github.com/zoehay/gw2armoury/backend/internal/clients"
-	apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/api_models"
+	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/gw2_models"
 )
 
 type ItemDataProvider interface {
-	GetItemsByIds(intArrIds []int) ([]apimodels.APIItem, error)
+	GetItemsByIds(intArrIds []int) ([]gw2models.GW2Item, error)
 	GetAllItemIds() ([]int, error)
 }
 
 type ItemProvider struct{}
 
-func (itemProvider *ItemProvider) GetItemsByIds(intArrIds []int) ([]apimodels.APIItem, error) {
+func (itemProvider *ItemProvider) GetItemsByIds(intArrIds []int) ([]gw2models.GW2Item, error) {
 	idString := strings.Join(IntArrToStringArr(intArrIds), ",")
 	res, err := clients.GetItemsById(idString)
 
@@ -35,7 +35,7 @@ func (itemProvider *ItemProvider) GetItemsByIds(intArrIds []int) ([]apimodels.AP
 		return nil, fmt.Errorf("provider io.ReadAll error: %s", err)
 	}
 
-	var result []apimodels.APIItem
+	var result []gw2models.GW2Item
 	if err = json.Unmarshal(body, &result); err != nil {
 		return nil, fmt.Errorf("provider json.Unmarshal error: %s", err)
 	}

@@ -3,7 +3,7 @@ package services
 import (
 	"fmt"
 
-	gw2api "github.com/zoehay/gw2armoury/backend/internal/gw2_api"
+	gw2client "github.com/zoehay/gw2armoury/backend/internal/gw2_client"
 	"github.com/zoehay/gw2armoury/backend/internal/repository"
 )
 
@@ -13,10 +13,10 @@ type AccountServiceInterface interface {
 
 type AccountService struct {
 	GORMAccountRepository *repository.GORMAccountRepository
-	AccountProvider       gw2api.AccountDataProvider
+	AccountProvider       gw2client.AccountDataProvider
 }
 
-func NewAccountService(accountRepository *repository.GORMAccountRepository, accountProvider gw2api.AccountDataProvider) *AccountService {
+func NewAccountService(accountRepository *repository.GORMAccountRepository, accountProvider gw2client.AccountDataProvider) *AccountService {
 	return &AccountService{
 		GORMAccountRepository: accountRepository,
 		AccountProvider:       accountProvider,

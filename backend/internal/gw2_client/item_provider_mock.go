@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"os"
 
-	apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/api_models"
+	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/gw2_models"
 )
 
 type ItemProviderMock struct{}
 
-func (itemProvider *ItemProviderMock) GetItemsByIds(intArrIds []int) ([]apimodels.APIItem, error) {
+func (itemProvider *ItemProviderMock) GetItemsByIds(intArrIds []int) ([]gw2models.GW2Item, error) {
 	apiItems, err := itemProvider.readItemFromFile("../test_data/item_test_data.txt")
 
 	if err != nil {
@@ -24,13 +24,13 @@ func (itemProvider *ItemProviderMock) GetAllItemIds() ([]int, error) {
 	return mockAllItemIds, nil
 }
 
-func (service *ItemProviderMock) readItemFromFile(filepath string) ([]apimodels.APIItem, error) {
+func (service *ItemProviderMock) readItemFromFile(filepath string) ([]gw2models.GW2Item, error) {
 	content, err := os.ReadFile(filepath)
 	if err != nil {
 		return nil, err
 	}
 
-	var items []apimodels.APIItem
+	var items []gw2models.GW2Item
 	err = json.Unmarshal(content, &items)
 	if err != nil {
 		return nil, err

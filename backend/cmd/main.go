@@ -10,7 +10,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/zoehay/gw2armoury/backend/internal/database"
-	gw2api "github.com/zoehay/gw2armoury/backend/internal/gw2_api"
+	gw2client "github.com/zoehay/gw2armoury/backend/internal/gw2_client"
 	"github.com/zoehay/gw2armoury/backend/internal/handlers"
 	"github.com/zoehay/gw2armoury/backend/internal/middleware"
 	"github.com/zoehay/gw2armoury/backend/internal/repository"
@@ -38,9 +38,9 @@ func main() {
 
 	apiKey := os.Getenv("TEST_API_KEY")
 	// itemService := services.NewItemService(&itemRepository)
-	accountProvider := &gw2api.AccountProvider{}
+	accountProvider := &gw2client.AccountProvider{}
 	accountService := services.NewAccountService(&accountRepository, accountProvider)
-	characterProvider := &gw2api.CharacterProvider{}
+	characterProvider := &gw2client.CharacterProvider{}
 	characterService := services.NewCharacterService(&bagItemRepository, characterProvider)
 
 	itemHandler := handlers.NewItemHandler(&itemRepository)
@@ -83,8 +83,7 @@ func main() {
 	account := router.Group("/account")
 	account.Use(middleware.UseSession(&accountRepository))
 	{
-		account.GET("/characters/:charactername/bagitems", bagItemHandler.GetBagItemsByCharacter)
-		account.GET("/characters/:charactername/inventory", bagItemDetailsHandler.GetByCharacter)
+		account.GET("/characters/:charactername/inventory", bagItemHandler.GetByCharacter)
 	}
 
 	// router.GET("/account/inventory")

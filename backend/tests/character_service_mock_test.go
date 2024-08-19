@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"github.com/zoehay/gw2armoury/backend/internal/database"
-	gw2api "github.com/zoehay/gw2armoury/backend/internal/gw2_api"
+	gw2client "github.com/zoehay/gw2armoury/backend/internal/gw2_client"
 	"github.com/zoehay/gw2armoury/backend/internal/repository"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
@@ -40,7 +40,7 @@ func (s *CharacterServiceTestSuite) SetupSuite() {
 	}
 
 	bagItemRepository := repository.NewGORMBagItemRepository(db)
-	characterProvider := &gw2api.CharacterProviderMock{}
+	characterProvider := &gw2client.CharacterProviderMock{}
 	s.CharacterService = *services.NewCharacterService(&bagItemRepository, characterProvider)
 }
 

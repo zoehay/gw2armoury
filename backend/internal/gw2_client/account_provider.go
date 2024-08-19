@@ -6,16 +6,16 @@ import (
 	"io"
 
 	"github.com/zoehay/gw2armoury/backend/internal/clients"
-	apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/api_models"
+	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/gw2_models"
 )
 
 type AccountDataProvider interface {
-	GetAccount(apiKey string) (*apimodels.APIAccount, error)
+	GetAccount(apiKey string) (*gw2models.GW2Account, error)
 }
 
 type AccountProvider struct{}
 
-func (accountProvider *AccountProvider) GetAccount(apiKey string) (*apimodels.APIAccount, error) {
+func (accountProvider *AccountProvider) GetAccount(apiKey string) (*gw2models.GW2Account, error) {
 	res, err := clients.GetAccountID(apiKey)
 
 	if err != nil {
@@ -31,7 +31,7 @@ func (accountProvider *AccountProvider) GetAccount(apiKey string) (*apimodels.AP
 		return nil, fmt.Errorf("provider io.ReadAll error: %s", err)
 	}
 
-	var result apimodels.APIAccount
+	var result gw2models.GW2Account
 
 	if err = json.Unmarshal(body, &result); err != nil {
 		return nil, fmt.Errorf("provider json.Unmarshal error: %s", err)

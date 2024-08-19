@@ -1,11 +1,11 @@
-package apimodels
+package gw2models
 
 import (
 	"github.com/lib/pq"
 	repositorymodels "github.com/zoehay/gw2armoury/backend/internal/repository/repository_models"
 )
 
-type APIBagItem struct {
+type GW2BagItem struct {
 	ID        uint                    `json:"id"`
 	Count     uint                    `json:"count"`
 	Charges   *uint                   `json:"charges,omitempty"`
@@ -18,21 +18,21 @@ type APIBagItem struct {
 	BoundTo   *string                 `json:"bound_to,omitempty"`
 }
 
-func APIBagToGORMBagItem(accountID string, apiCharacterName string, apiBagItem APIBagItem) repositorymodels.GORMBagItem {
-	var stats = (*repositorymodels.DetailsMap)(apiBagItem.Stats)
+func (gw2BagItem GW2BagItem) ToGORMBagItem(accountID string, apiCharacterName string) repositorymodels.GORMBagItem {
+	var stats = (*repositorymodels.DetailsMap)(gw2BagItem.Stats)
 	return repositorymodels.GORMBagItem{
 		AccountID:     accountID,
 		CharacterName: apiCharacterName,
-		BagItemID:     apiBagItem.ID,
-		Count:         apiBagItem.Count,
-		Charges:       apiBagItem.Charges,
-		Infusions:     (*pq.Int64Array)(apiBagItem.Infusions),
-		Upgrades:      (*pq.Int64Array)(apiBagItem.Infusions),
-		Skin:          apiBagItem.Skin,
+		BagItemID:     gw2BagItem.ID,
+		Count:         gw2BagItem.Count,
+		Charges:       gw2BagItem.Charges,
+		Infusions:     (*pq.Int64Array)(gw2BagItem.Infusions),
+		Upgrades:      (*pq.Int64Array)(gw2BagItem.Infusions),
+		Skin:          gw2BagItem.Skin,
 		Stats:         stats,
-		Dyes:          (*pq.Int64Array)(apiBagItem.Infusions),
-		Binding:       apiBagItem.Binding,
-		BoundTo:       apiBagItem.BoundTo,
+		Dyes:          (*pq.Int64Array)(gw2BagItem.Infusions),
+		Binding:       gw2BagItem.Binding,
+		BoundTo:       gw2BagItem.BoundTo,
 	}
 
 }

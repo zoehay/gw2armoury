@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"os"
 
-	apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/api_models"
+	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/gw2_models"
 )
 
 type AccountProviderMock struct{}
 
-func (accountProvider *AccountProviderMock) GetAccount(apiKey string) (*apimodels.APIAccount, error) {
+func (accountProvider *AccountProviderMock) GetAccount(apiKey string) (*gw2models.GW2Account, error) {
 	apiAccount, err := accountProvider.ReadAccountFromFile("../test_data/account_test_data.txt")
 
 	if err != nil {
@@ -20,13 +20,13 @@ func (accountProvider *AccountProviderMock) GetAccount(apiKey string) (*apimodel
 	return apiAccount, nil
 }
 
-func (accountProvider *AccountProviderMock) ReadAccountFromFile(filepath string) (*apimodels.APIAccount, error) {
+func (accountProvider *AccountProviderMock) ReadAccountFromFile(filepath string) (*gw2models.GW2Account, error) {
 	content, err := os.ReadFile(filepath)
 	if err != nil {
 		return nil, err
 	}
 
-	var account apimodels.APIAccount
+	var account gw2models.GW2Account
 	err = json.Unmarshal(content, &account)
 	if err != nil {
 		return nil, err

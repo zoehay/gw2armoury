@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"os"
 
-	apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/api_models"
+	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/gw2_models"
 )
 
 type CharacterProviderMock struct{}
 
-func (characterProvider *CharacterProviderMock) GetAllCharacters(apiKey string) ([]apimodels.APICharacter, error) {
+func (characterProvider *CharacterProviderMock) GetAllCharacters(apiKey string) ([]gw2models.GW2Character, error) {
 	apiCharacters, err := characterProvider.ReadCharactersFromFile("../test_data/character_test_data.txt")
 
 	if err != nil {
@@ -20,13 +20,13 @@ func (characterProvider *CharacterProviderMock) GetAllCharacters(apiKey string) 
 	return apiCharacters, nil
 }
 
-func (characterProvider *CharacterProviderMock) ReadCharactersFromFile(filepath string) ([]apimodels.APICharacter, error) {
+func (characterProvider *CharacterProviderMock) ReadCharactersFromFile(filepath string) ([]gw2models.GW2Character, error) {
 	content, err := os.ReadFile(filepath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
 
-	var characters []apimodels.APICharacter
+	var characters []gw2models.GW2Character
 	err = json.Unmarshal(content, &characters)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal: %w", err)

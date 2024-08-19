@@ -6,16 +6,16 @@ import (
 	"io"
 
 	"github.com/zoehay/gw2armoury/backend/internal/clients"
-	apimodels "github.com/zoehay/gw2armoury/backend/internal/gw2_api/api_models"
+	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/gw2_models"
 )
 
 type CharacterDataProvider interface {
-	GetAllCharacters(apiKey string) ([]apimodels.APICharacter, error)
+	GetAllCharacters(apiKey string) ([]gw2models.GW2Character, error)
 }
 
 type CharacterProvider struct{}
 
-func (characterProvider *CharacterProvider) GetAllCharacters(apiKey string) ([]apimodels.APICharacter, error) {
+func (characterProvider *CharacterProvider) GetAllCharacters(apiKey string) ([]gw2models.GW2Character, error) {
 	res, err := clients.GetAllCharacters(apiKey)
 
 	if err != nil {
@@ -31,7 +31,7 @@ func (characterProvider *CharacterProvider) GetAllCharacters(apiKey string) ([]a
 		return nil, fmt.Errorf("provider io.ReadAll error: %s", err)
 	}
 
-	var result []apimodels.APICharacter
+	var result []gw2models.GW2Character
 
 	if err = json.Unmarshal(body, &result); err != nil {
 		return nil, fmt.Errorf("provider json.Unmarshal error: %s", err)

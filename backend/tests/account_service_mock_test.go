@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"github.com/zoehay/gw2armoury/backend/internal/database"
-	gw2api "github.com/zoehay/gw2armoury/backend/internal/gw2_api"
+	gw2client "github.com/zoehay/gw2armoury/backend/internal/gw2_client"
 	"github.com/zoehay/gw2armoury/backend/internal/repository"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
@@ -39,7 +39,7 @@ func (s *AccountServiceTestSuite) SetupSuite() {
 	}
 
 	accountRepository := repository.NewGORMAccountRepository(db)
-	accountProvider := &gw2api.AccountProviderMock{}
+	accountProvider := &gw2client.AccountProviderMock{}
 	s.AccountService = *services.NewAccountService(&accountRepository, accountProvider)
 }
 
