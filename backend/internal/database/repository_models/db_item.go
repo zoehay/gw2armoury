@@ -7,7 +7,7 @@ import (
 	"fmt"
 
 	"github.com/lib/pq"
-	"github.com/zoehay/gw2armoury/backend/internal/models"
+	"github.com/zoehay/gw2armoury/backend/internal/api/models"
 )
 
 type DBItem struct {

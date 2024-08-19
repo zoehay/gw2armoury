@@ -9,11 +9,11 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/zoehay/gw2armoury/backend/internal/api/handlers"
+	"github.com/zoehay/gw2armoury/backend/internal/api/middleware"
 	database "github.com/zoehay/gw2armoury/backend/internal/database"
 	repository "github.com/zoehay/gw2armoury/backend/internal/database/repository"
 	gw2client "github.com/zoehay/gw2armoury/backend/internal/gw2_client"
-	"github.com/zoehay/gw2armoury/backend/internal/handlers"
-	"github.com/zoehay/gw2armoury/backend/internal/middleware"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
 

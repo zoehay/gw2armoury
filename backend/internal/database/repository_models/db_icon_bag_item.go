@@ -1,6 +1,6 @@
 package repositorymodels
 
-import "github.com/zoehay/gw2armoury/backend/internal/models"
+import "github.com/zoehay/gw2armoury/backend/internal/api/models"
 
 type DBIconBagItem struct {
 	AccountID     string
