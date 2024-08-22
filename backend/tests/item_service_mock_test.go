@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	database "github.com/zoehay/gw2armoury/backend/internal/db"
-	"github.com/zoehay/gw2armoury/backend/internal/db/repository"
+	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	providers "github.com/zoehay/gw2armoury/backend/internal/gw2_client/providers"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
@@ -38,7 +38,7 @@ func (s *ItemServiceTestSuite) SetupSuite() {
 		log.Fatal("Error connecting to postgres", err)
 	}
 
-	itemRepository := repository.NewItemRepository(db)
+	itemRepository := repositories.NewItemRepository(db)
 	itemProvider := &providers.ItemProviderMock{}
 	s.ItemService = *services.NewItemService(&itemRepository, itemProvider)
 }

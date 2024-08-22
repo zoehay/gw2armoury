@@ -3,7 +3,7 @@ package services
 import (
 	"fmt"
 
-	"github.com/zoehay/gw2armoury/backend/internal/db/repository"
+	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	"github.com/zoehay/gw2armoury/backend/internal/gw2_client/providers"
 )
 
@@ -12,11 +12,11 @@ type AccountServiceInterface interface {
 }
 
 type AccountService struct {
-	AccountRepository *repository.AccountRepository
+	AccountRepository *repositories.AccountRepository
 	AccountProvider   providers.AccountDataProvider
 }
 
-func NewAccountService(accountRepository *repository.AccountRepository, accountProvider providers.AccountDataProvider) *AccountService {
+func NewAccountService(accountRepository *repositories.AccountRepository, accountProvider providers.AccountDataProvider) *AccountService {
 	return &AccountService{
 		AccountRepository: accountRepository,
 		AccountProvider:   accountProvider,

@@ -5,14 +5,14 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zoehay/gw2armoury/backend/internal/db/repository"
+	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 )
 
 type ItemHandler struct {
-	ItemRepository repository.ItemRepositoryInterface
+	ItemRepository repositories.ItemRepositoryInterface
 }
 
-func NewItemHandler(itemRepository repository.ItemRepositoryInterface) *ItemHandler {
+func NewItemHandler(itemRepository repositories.ItemRepositoryInterface) *ItemHandler {
 	return &ItemHandler{
 		ItemRepository: itemRepository,
 	}

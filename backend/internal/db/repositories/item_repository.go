@@ -1,4 +1,4 @@
-package repository
+package repositories
 
 import (
 	dbmodels "github.com/zoehay/gw2armoury/backend/internal/db/models"

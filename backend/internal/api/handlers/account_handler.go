@@ -8,17 +8,17 @@ import (
 
 	"github.com/gin-gonic/gin"
 	dbmodels "github.com/zoehay/gw2armoury/backend/internal/db/models"
-	"github.com/zoehay/gw2armoury/backend/internal/db/repository"
+	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
 
 type AccountHandler struct {
-	AccountRepository repository.AccountRepositoryInterface
-	SessionRepository repository.SessionRepositoryInterface
+	AccountRepository repositories.AccountRepositoryInterface
+	SessionRepository repositories.SessionRepositoryInterface
 	AccountService    services.AccountServiceInterface
 }
 
-func NewAccountHandler(accountRepository repository.AccountRepositoryInterface, sessionRepository repository.SessionRepositoryInterface, accountService services.AccountServiceInterface) *AccountHandler {
+func NewAccountHandler(accountRepository repositories.AccountRepositoryInterface, sessionRepository repositories.SessionRepositoryInterface, accountService services.AccountServiceInterface) *AccountHandler {
 	return &AccountHandler{
 		AccountRepository: accountRepository,
 		SessionRepository: sessionRepository,

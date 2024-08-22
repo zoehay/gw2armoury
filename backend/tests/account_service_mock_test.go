@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	database "github.com/zoehay/gw2armoury/backend/internal/db"
-	"github.com/zoehay/gw2armoury/backend/internal/db/repository"
+	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	providers "github.com/zoehay/gw2armoury/backend/internal/gw2_client/providers"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
@@ -38,7 +38,7 @@ func (s *AccountServiceTestSuite) SetupSuite() {
 		log.Fatal("Error connecting to postgres", err)
 	}
 
-	accountRepository := repository.NewAccountRepository(db)
+	accountRepository := repositories.NewAccountRepository(db)
 	accountProvider := &providers.AccountProviderMock{}
 	s.AccountService = *services.NewAccountService(&accountRepository, accountProvider)
 }

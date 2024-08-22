@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/lib/pq"
-	"github.com/zoehay/gw2armoury/backend/internal/db/repository"
+	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	"github.com/zoehay/gw2armoury/backend/internal/gw2_client/providers"
 )
 
@@ -15,11 +15,11 @@ type ItemServiceInterface interface {
 }
 
 type ItemService struct {
-	ItemRepository *repository.ItemRepository
+	ItemRepository *repositories.ItemRepository
 	ItemProvider   providers.ItemDataProvider
 }
 
-func NewItemService(itemRepository *repository.ItemRepository, itemProvider providers.ItemDataProvider) *ItemService {
+func NewItemService(itemRepository *repositories.ItemRepository, itemProvider providers.ItemDataProvider) *ItemService {
 	return &ItemService{
 		ItemRepository: itemRepository,
 		ItemProvider:   itemProvider,

@@ -12,7 +12,7 @@ import (
 	"github.com/zoehay/gw2armoury/backend/internal/api/handlers"
 	"github.com/zoehay/gw2armoury/backend/internal/api/middleware"
 	"github.com/zoehay/gw2armoury/backend/internal/db"
-	"github.com/zoehay/gw2armoury/backend/internal/db/repository"
+	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	"github.com/zoehay/gw2armoury/backend/internal/gw2_client/providers"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
@@ -31,10 +31,10 @@ func main() {
 		log.Fatal("Error initializing database connection", err)
 	}
 
-	itemRepository := repository.NewItemRepository(db)
-	bagItemRepository := repository.NewBagItemRepository(db)
-	accountRepository := repository.NewAccountRepository(db)
-	sessionRepository := repository.NewSessionRepository(db)
+	itemRepository := repositories.NewItemRepository(db)
+	bagItemRepository := repositories.NewBagItemRepository(db)
+	accountRepository := repositories.NewAccountRepository(db)
+	sessionRepository := repositories.NewSessionRepository(db)
 
 	apiKey := os.Getenv("TEST_API_KEY")
 	// itemService := services.NewItemService(&itemRepository)

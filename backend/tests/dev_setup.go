@@ -3,11 +3,11 @@ package tests
 import (
 	"fmt"
 
-	"github.com/zoehay/gw2armoury/backend/internal/db/repository"
+	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
 
-func GetItemsInCharacterBags(itemService *services.ItemService, bagItemRepository repository.BagItemRepository) error {
+func GetItemsInCharacterBags(itemService *services.ItemService, bagItemRepository repositories.BagItemRepository) error {
 	itemIds, err := bagItemRepository.GetIds()
 	fmt.Println("number of items", len(itemIds))
 	if err != nil {
