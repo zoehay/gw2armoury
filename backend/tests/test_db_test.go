@@ -9,7 +9,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	database "github.com/zoehay/gw2armoury/backend/internal/database"
+	database "github.com/zoehay/gw2armoury/backend/internal/db"
 	"gorm.io/gorm"
 )
 

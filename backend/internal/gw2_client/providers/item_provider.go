@@ -1,4 +1,4 @@
-package gw2api
+package providers
 
 import (
 	"encoding/json"
@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/zoehay/gw2armoury/backend/internal/clients"
-	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/gw2_models"
+	gw2client "github.com/zoehay/gw2armoury/backend/internal/gw2_client"
+	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/models"
 )
 
 type ItemDataProvider interface {
@@ -20,7 +20,7 @@ type ItemProvider struct{}
 
 func (itemProvider *ItemProvider) GetItemsByIds(intArrIds []int) ([]gw2models.GW2Item, error) {
 	idString := strings.Join(IntArrToStringArr(intArrIds), ",")
-	res, err := clients.GetItemsById(idString)
+	res, err := gw2client.GetItemsById(idString)
 
 	if err != nil {
 		return nil, fmt.Errorf("provider get error: %s", err)
@@ -44,7 +44,7 @@ func (itemProvider *ItemProvider) GetItemsByIds(intArrIds []int) ([]gw2models.GW
 }
 
 func (itemProvider *ItemProvider) GetAllItemIds() ([]int, error) {
-	res, err := clients.GetItemIds()
+	res, err := gw2client.GetItemIds()
 
 	if err != nil {
 		return nil, fmt.Errorf("provider get error: %s", err)

@@ -3,9 +3,9 @@ package services
 import (
 	"fmt"
 
-	"github.com/zoehay/gw2armoury/backend/internal/database/repository"
-	gw2client "github.com/zoehay/gw2armoury/backend/internal/gw2_client"
-	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/gw2_models"
+	"github.com/zoehay/gw2armoury/backend/internal/db/repository"
+	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/models"
+	"github.com/zoehay/gw2armoury/backend/internal/gw2_client/providers"
 )
 
 type CharacterServiceInterface interface {
@@ -16,10 +16,10 @@ type CharacterServiceInterface interface {
 
 type CharacterService struct {
 	BagItemRepository *repository.BagItemRepository
-	CharacterProvider gw2client.CharacterDataProvider
+	CharacterProvider providers.CharacterDataProvider
 }
 
-func NewCharacterService(bagItemRepository *repository.BagItemRepository, characterProvider gw2client.CharacterDataProvider) *CharacterService {
+func NewCharacterService(bagItemRepository *repository.BagItemRepository, characterProvider providers.CharacterDataProvider) *CharacterService {
 	return &CharacterService{
 		BagItemRepository: bagItemRepository,
 		CharacterProvider: characterProvider,

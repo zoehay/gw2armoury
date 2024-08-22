@@ -1,12 +1,12 @@
-package gw2api
+package providers
 
 import (
 	"encoding/json"
 	"fmt"
 	"io"
 
-	"github.com/zoehay/gw2armoury/backend/internal/clients"
-	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/gw2_models"
+	gw2client "github.com/zoehay/gw2armoury/backend/internal/gw2_client"
+	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/models"
 )
 
 type AccountDataProvider interface {
@@ -16,7 +16,7 @@ type AccountDataProvider interface {
 type AccountProvider struct{}
 
 func (accountProvider *AccountProvider) GetAccount(apiKey string) (*gw2models.GW2Account, error) {
-	res, err := clients.GetAccountID(apiKey)
+	res, err := gw2client.GetAccountID(apiKey)
 
 	if err != nil {
 		return nil, fmt.Errorf("provider get error: %s", err)

@@ -1,4 +1,4 @@
-package clients
+package gw2client
 
 import (
 	"fmt"

@@ -1,12 +1,12 @@
-package gw2api
+package providers
 
 import (
 	"encoding/json"
 	"fmt"
 	"io"
 
-	"github.com/zoehay/gw2armoury/backend/internal/clients"
-	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/gw2_models"
+	gw2client "github.com/zoehay/gw2armoury/backend/internal/gw2_client"
+	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/models"
 )
 
 type CharacterDataProvider interface {
@@ -16,7 +16,7 @@ type CharacterDataProvider interface {
 type CharacterProvider struct{}
 
 func (characterProvider *CharacterProvider) GetAllCharacters(apiKey string) ([]gw2models.GW2Character, error) {
-	res, err := clients.GetAllCharacters(apiKey)
+	res, err := gw2client.GetAllCharacters(apiKey)
 
 	if err != nil {
 		return nil, fmt.Errorf("provider get error: %s", err)
@@ -41,7 +41,7 @@ func (characterProvider *CharacterProvider) GetAllCharacters(apiKey string) ([]g
 }
 
 func (characterProvider *CharacterProvider) GetAllCharacterNames(apiKey string) ([]string, error) {
-	res, err := clients.GetCharacterNames(apiKey)
+	res, err := gw2client.GetCharacterNames(apiKey)
 
 	if err != nil {
 		return nil, fmt.Errorf("provider get error: %s", err)

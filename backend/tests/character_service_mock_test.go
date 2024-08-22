@@ -11,9 +11,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	database "github.com/zoehay/gw2armoury/backend/internal/database"
-	"github.com/zoehay/gw2armoury/backend/internal/database/repository"
-	gw2client "github.com/zoehay/gw2armoury/backend/internal/gw2_client"
+	database "github.com/zoehay/gw2armoury/backend/internal/db"
+	"github.com/zoehay/gw2armoury/backend/internal/db/repository"
+	"github.com/zoehay/gw2armoury/backend/internal/gw2_client/providers"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
 
@@ -40,7 +40,7 @@ func (s *CharacterServiceTestSuite) SetupSuite() {
 	}
 
 	bagItemRepository := repository.NewBagItemRepository(db)
-	characterProvider := &gw2client.CharacterProviderMock{}
+	characterProvider := &providers.CharacterProviderMock{}
 	s.CharacterService = *services.NewCharacterService(&bagItemRepository, characterProvider)
 }
 

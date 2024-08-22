@@ -11,9 +11,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/zoehay/gw2armoury/backend/internal/api/handlers"
 	"github.com/zoehay/gw2armoury/backend/internal/api/middleware"
-	database "github.com/zoehay/gw2armoury/backend/internal/database"
-	repository "github.com/zoehay/gw2armoury/backend/internal/database/repository"
-	gw2client "github.com/zoehay/gw2armoury/backend/internal/gw2_client"
+	"github.com/zoehay/gw2armoury/backend/internal/db"
+	"github.com/zoehay/gw2armoury/backend/internal/db/repository"
+	"github.com/zoehay/gw2armoury/backend/internal/gw2_client/providers"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
 
@@ -26,7 +26,7 @@ func main() {
 	}
 
 	dsn := os.Getenv("DB_DSN")
-	db, err := database.PostgresInit(dsn)
+	db, err := db.PostgresInit(dsn)
 	if err != nil {
 		log.Fatal("Error initializing database connection", err)
 	}
@@ -38,9 +38,9 @@ func main() {
 
 	apiKey := os.Getenv("TEST_API_KEY")
 	// itemService := services.NewItemService(&itemRepository)
-	accountProvider := &gw2client.AccountProvider{}
+	accountProvider := &providers.AccountProvider{}
 	accountService := services.NewAccountService(&accountRepository, accountProvider)
-	characterProvider := &gw2client.CharacterProvider{}
+	characterProvider := &providers.CharacterProvider{}
 	characterService := services.NewCharacterService(&bagItemRepository, characterProvider)
 
 	itemHandler := handlers.NewItemHandler(&itemRepository)

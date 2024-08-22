@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zoehay/gw2armoury/backend/internal/database/repository"
+	"github.com/zoehay/gw2armoury/backend/internal/db/repository"
 )
 
 type ItemHandler struct {

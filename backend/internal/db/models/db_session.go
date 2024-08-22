@@ -1,4 +1,4 @@
-package repositorymodels
+package dbmodels
 
 import "time"
 

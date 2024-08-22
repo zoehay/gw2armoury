@@ -3,7 +3,7 @@ package tests
 import (
 	"fmt"
 
-	"github.com/zoehay/gw2armoury/backend/internal/database/repository"
+	"github.com/zoehay/gw2armoury/backend/internal/db/repository"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
 

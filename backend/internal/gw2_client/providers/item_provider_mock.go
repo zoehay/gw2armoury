@@ -1,11 +1,11 @@
-package gw2api
+package providers
 
 import (
 	"encoding/json"
 	"fmt"
 	"os"
 
-	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/gw2_models"
+	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/models"
 )
 
 type ItemProviderMock struct{}

@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zoehay/gw2armoury/backend/internal/database/repository"
-	repositorymodels "github.com/zoehay/gw2armoury/backend/internal/database/repository_models"
+	dbmodels "github.com/zoehay/gw2armoury/backend/internal/db/models"
+	"github.com/zoehay/gw2armoury/backend/internal/db/repository"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
 
@@ -45,7 +45,7 @@ func (handler AccountHandler) Create(c *gin.Context) {
 		stringAccountID = *apiAccountID
 	}
 
-	var newAccount = &repositorymodels.DBAccount{
+	var newAccount = &dbmodels.DBAccount{
 		AccountID:   stringAccountID,
 		AccountName: &accountCreate.AccountName,
 	}
@@ -115,10 +115,10 @@ func (handler AccountHandler) Logout(c *gin.Context) {
 	c.SetCookie("sessionID", "", -1, "/", "localhost", false, true)
 }
 
-func (handler AccountHandler) startSession(c *gin.Context, account *repositorymodels.DBAccount) error {
+func (handler AccountHandler) startSession(c *gin.Context, account *dbmodels.DBAccount) error {
 	// Create a session
 	newSessionID := generateSessionID()
-	var newSession = &repositorymodels.DBSession{
+	var newSession = &dbmodels.DBSession{
 		SessionID: newSessionID,
 		Expires:   time.Now(),
 	}

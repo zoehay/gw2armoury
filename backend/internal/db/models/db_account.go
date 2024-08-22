@@ -1,4 +1,4 @@
-package repositorymodels
+package dbmodels
 
 type DBAccount struct {
 	AccountID   string // The unique persistent GW2 API account GUID

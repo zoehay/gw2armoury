@@ -1,14 +1,14 @@
 package repository
 
 import (
-	repositorymodels "github.com/zoehay/gw2armoury/backend/internal/database/repository_models"
+	dbmodels "github.com/zoehay/gw2armoury/backend/internal/db/models"
 	"gorm.io/gorm"
 )
 
 type SessionRepositoryInterface interface {
-	Create(session *repositorymodels.DBSession) (*repositorymodels.DBSession, error)
+	Create(session *dbmodels.DBSession) (*dbmodels.DBSession, error)
 	Delete(sessionID string) error
-	Get(sessionID string) (*repositorymodels.DBSession, error)
+	Get(sessionID string) (*dbmodels.DBSession, error)
 	// Reset(session *repositorymodels.Session) (*repositorymodels.Session, error)
 }
 
@@ -22,7 +22,7 @@ func NewSessionRepository(db *gorm.DB) SessionRepository {
 	}
 }
 
-func (repository *SessionRepository) Create(session *repositorymodels.DBSession) (*repositorymodels.DBSession, error) {
+func (repository *SessionRepository) Create(session *dbmodels.DBSession) (*dbmodels.DBSession, error) {
 	err := repository.DB.Create(&session).Error
 	if err != nil {
 		return nil, err
@@ -32,14 +32,14 @@ func (repository *SessionRepository) Create(session *repositorymodels.DBSession)
 }
 
 func (repository *SessionRepository) Delete(sessionID string) error {
-	var session *repositorymodels.DBSession
+	var session *dbmodels.DBSession
 	err := repository.DB.Where("session_id = ?", sessionID).Delete(&session).Error
 
 	return err
 }
 
-func (repository *SessionRepository) Get(sessionID string) (*repositorymodels.DBSession, error) {
-	var session *repositorymodels.DBSession
+func (repository *SessionRepository) Get(sessionID string) (*dbmodels.DBSession, error) {
+	var session *dbmodels.DBSession
 	err := repository.DB.Where("session_id = ?", sessionID).Find(&session).Error
 	if err != nil {
 		return nil, err

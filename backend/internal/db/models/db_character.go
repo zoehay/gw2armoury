@@ -1,6 +1,6 @@
-package repositorymodels
+package dbmodels
 
-type GORMCharacter struct {
+type DBCharacter struct {
 	Name       string
 	Race       string
 	Gender     string

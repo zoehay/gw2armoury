@@ -1,17 +1,17 @@
-package repository
+package db
 
 import (
 	"errors"
 
 	"log"
 
-	"github.com/zoehay/gw2armoury/backend/internal/database/repository"
-	repositorymodels "github.com/zoehay/gw2armoury/backend/internal/database/repository_models"
+	dbmodels "github.com/zoehay/gw2armoury/backend/internal/db/models"
+	"github.com/zoehay/gw2armoury/backend/internal/db/repository"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var seedItems = []*repositorymodels.DBItem{
+var seedItems = []*dbmodels.DBItem{
 	{
 		ID:          28445,
 		Name:        "Strong Soft Wood Longbow of Fire",
@@ -40,7 +40,7 @@ func PostgresInit(dsn string) (*gorm.DB, error) {
 	}
 
 	log.Print("Run db migrate")
-	err = db.AutoMigrate(&repositorymodels.DBItem{}, &repositorymodels.DBBagItem{})
+	err = db.AutoMigrate(&dbmodels.DBItem{}, &dbmodels.DBBagItem{})
 	if err != nil {
 		return nil, err
 	}
