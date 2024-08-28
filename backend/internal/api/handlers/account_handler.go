@@ -30,37 +30,50 @@ func (handler AccountHandler) Create(c *gin.Context) {
 	var accountCreate AccountCreate
 
 	if err := c.BindJSON(&accountCreate); err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"request body bind json error": err.Error()})
 		return
 	}
 
-	apiAccountID, err := handler.AccountService.GetAccountID(accountCreate.APIKey)
+	gw2AccountID, err := handler.AccountService.GetAccountID(accountCreate.APIKey)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error could not get account id from gw2 api": err.Error()})
 		return
 	}
 
-	var stringAccountID string
-	if apiAccountID != nil {
-		stringAccountID = *apiAccountID
+	account, err := handler.AccountRepository.GetByID(*gw2AccountID)
+	if account != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error existing account for account id": err.Error()})
+		return
 	}
+
+	var stringAccountID string
+	if gw2AccountID != nil {
+		stringAccountID = *gw2AccountID
+	}
+
+	// newSession := &dbmodels.DBSession{
+	// 	SessionID: '',
+	// 	Expires:   time.Now(),
+	// }
 
 	var newAccount = &dbmodels.DBAccount{
-		AccountID:   stringAccountID,
-		AccountName: &accountCreate.AccountName,
+		AccountID: stringAccountID,
+		// AccountName: &accountCreate.AccountName,
+		APIKey: &accountCreate.APIKey,
+		// Session:     newSession,
 	}
 
-	account, err := handler.AccountRepository.Create(newAccount)
+	account, err = handler.AccountRepository.Create(newAccount)
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"account repository create error": err.Error()})
 		return
 	}
 
-	err = handler.startSession(c, account)
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+	// err = handler.startSession(c, account)
+	// if err != nil {
+	// 	c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	// 	return
+	// }
 
 	c.IndentedJSON(http.StatusOK, account)
 
@@ -150,6 +163,6 @@ type AccountLogin struct {
 }
 
 type AccountCreate struct {
-	AccountName string
-	APIKey      string
+	// AccountName string
+	APIKey string
 }

@@ -7,7 +7,8 @@ import (
 
 type AccountRepositoryInterface interface {
 	GetBySession(sessionID string) (*dbmodels.DBAccount, error)
-	GetByName(accountName string) (*dbmodels.DBAccount, error)
+	GetByID(id string) (*dbmodels.DBAccount, error)
+	GetByName(name string) (*dbmodels.DBAccount, error)
 	Create(account *dbmodels.DBAccount) (*dbmodels.DBAccount, error)
 	UpdateSession(accountID string, sessionID string) (*dbmodels.DBAccount, error)
 }
@@ -34,10 +35,22 @@ func (repository *AccountRepository) GetBySession(sessionID string) (*dbmodels.D
 
 }
 
-func (repository *AccountRepository) GetByName(accountName string) (*dbmodels.DBAccount, error) {
+func (repository *AccountRepository) GetByID(id string) (*dbmodels.DBAccount, error) {
 	var account dbmodels.DBAccount
 
-	err := repository.DB.Where("AccountName = ?", accountName).First(&account).Error
+	err := repository.DB.Where("account_id = ?", id).First(&account).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &account, nil
+
+}
+
+func (repository *AccountRepository) GetByName(name string) (*dbmodels.DBAccount, error) {
+	var account dbmodels.DBAccount
+
+	err := repository.DB.Where("AccountName = ?", name).First(&account).Error
 	if err != nil {
 		return nil, err
 	}

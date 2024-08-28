@@ -9,8 +9,8 @@ import (
 )
 
 type CharacterServiceInterface interface {
-	GetAndStoreAllCharacters(apiKey string) error
-	storeCharacterInventory(character gw2models.GW2Character) error
+	GetAndStoreAllCharacters(accountID string, apiKey string) error
+	storeCharacterInventory(accountID string, character gw2models.GW2Character) error
 	clearCharacterInventory(character gw2models.GW2Character) error
 }
 

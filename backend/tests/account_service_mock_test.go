@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -55,7 +56,12 @@ func (s *AccountServiceTestSuite) SetupSuite() {
 // }
 
 func (s *AccountServiceTestSuite) TestGetAccount() {
-	account, err := s.AccountService.GetAccountID("apiKey")
-	fmt.Println(PrintObject(account))
+	account, err := s.AccountService.GetAccount("apiKey")
+	fmt.Println(printObject(account))
 	assert.NoError(s.T(), err, "Failed to get account")
+}
+
+func printObject(i interface{}) string {
+	s, _ := json.MarshalIndent(i, "", "\t")
+	return string(s)
 }

@@ -10,7 +10,7 @@ import (
 )
 
 type ItemServiceInterface interface {
-	GetAndStoreItemsById(stringOfIds string) error
+	GetAndStoreItemsById(ids []int) error
 	GetAndStoreAllItems() error
 }
 

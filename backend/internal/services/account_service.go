@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
+	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/models"
 	"github.com/zoehay/gw2armoury/backend/internal/gw2_client/providers"
 )
 
@@ -33,4 +34,16 @@ func (service *AccountService) GetAccountID(apiKey string) (*string, error) {
 	}
 
 	return account.ID, nil
+}
+
+func (service *AccountService) GetAccount(apiKey string) (*gw2models.GW2Account, error) {
+	account, err := service.AccountProvider.GetAccount(apiKey)
+	if err != nil {
+		return nil, fmt.Errorf("service error using provider could not get account id: %s", err)
+	}
+	if account.ID == nil {
+		return nil, fmt.Errorf("service error no account id: %s", err)
+	}
+
+	return account, nil
 }

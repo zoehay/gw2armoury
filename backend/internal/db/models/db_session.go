@@ -3,7 +3,7 @@ package dbmodels
 import "time"
 
 type DBSession struct {
-	SessionID string
+	SessionID string `gorm:"primaryKey"`
 	Expires   time.Time
 }
 
