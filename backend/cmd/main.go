@@ -45,6 +45,7 @@ func SetupTestRouter(dsn string, mocks bool) (*gin.Engine, *repositories.Reposit
 
 	router.POST("/login", accountHandler.Login)
 	router.POST("/signup", accountHandler.Create)
+	router.POST("/apikeys", accountHandler.CreateGuest)
 
 	account := router.Group("/account")
 	account.Use(middleware.UseSession(&repository.AccountRepository))

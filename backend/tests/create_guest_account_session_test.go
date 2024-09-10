@@ -19,18 +19,18 @@ import (
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
 
-type StartSessionTestSuite struct {
+type CreateGuestAccountSessionTestSuite struct {
 	suite.Suite
 	Router     *gin.Engine
 	Repository *repositories.Repository
 	Service    *services.Service
 }
 
-func TestStartSessionTestSuite(t *testing.T) {
-	suite.Run(t, new(StartSessionTestSuite))
+func TestCreateGuestAccountSessionSuite(t *testing.T) {
+	suite.Run(t, new(CreateGuestAccountSessionTestSuite))
 }
 
-func (s *StartSessionTestSuite) SetupSuite() {
+func (s *CreateGuestAccountSessionTestSuite) SetupSuite() {
 	envPath := filepath.Join("..", ".env")
 	err := godotenv.Load(envPath)
 	if err != nil {
@@ -59,7 +59,7 @@ func (s *StartSessionTestSuite) SetupSuite() {
 // 	db.Close()
 // }
 
-func (s *StartSessionTestSuite) TestStartSession() {
+func (s *CreateGuestAccountSessionTestSuite) TestAddAPIKey() {
 	// w := httptest.NewRecorder()
 	// c, _ := gin.CreateTestContext(w)
 	// req := &http.Request{
@@ -72,11 +72,12 @@ func (s *StartSessionTestSuite) TestStartSession() {
 	// req.URL.RawQuery = q.Encode()
 
 	// c.Request = req
+	gin.SetMode(gin.TestMode)
 
 	userJson := `{"AccountName":"Name forAccount", "APIKey":"stringthatisapikey", "Password":"stringthatispassword"}`
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/signup", strings.NewReader(userJson))
+	req, _ := http.NewRequest("POST", "/addkey", strings.NewReader(userJson))
 	s.Router.ServeHTTP(w, req)
 
 	fmt.Println(w.Body.String())

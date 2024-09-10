@@ -1,12 +1,15 @@
 package repositories
 
 import (
+	"time"
+
 	dbmodels "github.com/zoehay/gw2armoury/backend/internal/db/models"
 	"gorm.io/gorm"
 )
 
 type SessionRepositoryInterface interface {
 	Create(session *dbmodels.DBSession) (*dbmodels.DBSession, error)
+	Update(sessionID string) (*dbmodels.DBSession, error)
 	Delete(sessionID string) error
 	Get(sessionID string) (*dbmodels.DBSession, error)
 	// Reset(session *repositorymodels.Session) (*repositorymodels.Session, error)
@@ -24,6 +27,22 @@ func NewSessionRepository(db *gorm.DB) SessionRepository {
 
 func (repository *SessionRepository) Create(session *dbmodels.DBSession) (*dbmodels.DBSession, error) {
 	err := repository.DB.Create(&session).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return session, nil
+}
+
+func (repository *SessionRepository) Update(sessionID string) (*dbmodels.DBSession, error) {
+	var session *dbmodels.DBSession
+
+	err := repository.DB.Model(&session).Where("session_id = ?", sessionID).Update("expires", time.Now().Add(120*time.Second)).Error
+	if err != nil {
+		return nil, err
+	}
+
+	err = repository.DB.Where("session_id = ?", sessionID).First(&session).Error
 	if err != nil {
 		return nil, err
 	}

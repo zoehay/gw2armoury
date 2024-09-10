@@ -77,5 +77,10 @@ func (repository *AccountRepository) UpdateSession(accountID string, sessionID s
 		return nil, err
 	}
 
+	err = repository.DB.Where("AccountID = ?", accountID).First(&account).Error
+	if err != nil {
+		return nil, err
+	}
+
 	return &account, nil
 }
