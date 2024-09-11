@@ -5,5 +5,6 @@ type DBAccount struct {
 	AccountName *string
 	APIKey      *string
 	Password    *string
-	Session     *DBSession `gorm:"foreignKey:SessionID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	SessionID   *string    `gorm:"index"`
+	Session     *DBSession `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }

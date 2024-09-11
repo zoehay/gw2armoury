@@ -45,10 +45,11 @@ func (handler AccountHandler) CreateGuest(c *gin.Context) {
 	}
 
 	var account *dbmodels.DBAccount
+	var session *dbmodels.DBSession
 	existingAccount, err := handler.AccountRepository.GetByID(*gw2AccountID)
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		account, err = handler.generateNewGuestAccount(*gw2AccountID, createRequest.APIKey)
+		account, session, err = handler.generateNewGuestAccount(*gw2AccountID, createRequest.APIKey)
 		if err != nil {
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error creating new guest account": err.Error()})
 			return
@@ -58,14 +59,13 @@ func (handler AccountHandler) CreateGuest(c *gin.Context) {
 		return
 	} else {
 		account = existingAccount
-		_, err = handler.renewSession(account.Session)
+		session, err = handler.renewSession(account.Session)
 		if err != nil {
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error renewing session for existing account": err.Error()})
 			return
 		}
 	}
-
-	c.SetCookie("sessionID", account.Session.SessionID, 3600, "/", "localhost", false, true)
+	c.SetCookie("sessionID", session.SessionID, 3600, "/", "localhost", false, true)
 	c.IndentedJSON(http.StatusOK, account)
 }
 
@@ -135,7 +135,7 @@ func (handler AccountHandler) Login(c *gin.Context) {
 	}
 
 	// Add password verification
-	_, err = handler.generateNewSession(account)
+	_, _, err = handler.generateNewSession(account)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -168,47 +168,47 @@ func (handler AccountHandler) Logout(c *gin.Context) {
 	c.SetCookie("sessionID", "", -1, "/", "localhost", false, true)
 }
 
-func (handler AccountHandler) generateNewGuestAccount(accountID string, apiKey string) (account *dbmodels.DBAccount, err error) {
+func (handler AccountHandler) generateNewGuestAccount(accountID string, apiKey string) (updatedAccount *dbmodels.DBAccount, newSession *dbmodels.DBSession, err error) {
 	var newAccount = &dbmodels.DBAccount{
 		AccountID: accountID,
 		APIKey:    &apiKey,
 	}
 
-	account, err = handler.AccountRepository.Create(newAccount)
+	account, err := handler.AccountRepository.Create(newAccount)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf("account repository create error: %s", err)
+		return nil, nil, fmt.Errorf("account repository create error: %s", err)
 	}
 
-	_, err = handler.generateNewSession(account)
+	updatedAccount, newSession, err = handler.generateNewSession(account)
 	if err != nil {
-		return nil, fmt.Errorf("error generating session: %s", err)
+		return nil, nil, fmt.Errorf("error generating session: %s", err)
 	}
 
-	return account, nil
+	return updatedAccount, newSession, nil
 }
 
-func (handler AccountHandler) generateNewSession(account *dbmodels.DBAccount) (session *dbmodels.DBSession, err error) {
+func (handler AccountHandler) generateNewSession(account *dbmodels.DBAccount) (updatedAccount *dbmodels.DBAccount, newSession *dbmodels.DBSession, err error) {
 	newSessionID := handler.generateSessionID()
-	var newSession = &dbmodels.DBSession{
+	var session = &dbmodels.DBSession{
 		SessionID: newSessionID,
 		Expires:   time.Now().Add(120 * time.Second),
 	}
 
-	session, err = handler.SessionRepository.Create(newSession)
+	newSession, err = handler.SessionRepository.Create(session)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	account, err = handler.AccountRepository.UpdateSession(account.AccountID, session.SessionID)
+	updatedAccount, err = handler.AccountRepository.UpdateSession(account.AccountID, session)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return account.Session, nil
+	return updatedAccount, newSession, nil
 }
 
 func (handler AccountHandler) renewSession(session *dbmodels.DBSession) (updatedSession *dbmodels.DBSession, err error) {

@@ -10,7 +10,7 @@ type AccountRepositoryInterface interface {
 	GetByID(id string) (*dbmodels.DBAccount, error)
 	GetByName(name string) (*dbmodels.DBAccount, error)
 	Create(account *dbmodels.DBAccount) (*dbmodels.DBAccount, error)
-	UpdateSession(accountID string, sessionID string) (*dbmodels.DBAccount, error)
+	UpdateSession(accountID string, session *dbmodels.DBSession) (*dbmodels.DBAccount, error)
 }
 
 type AccountRepository struct {
@@ -26,7 +26,7 @@ func NewAccountRepository(db *gorm.DB) AccountRepository {
 func (repository *AccountRepository) GetBySession(sessionID string) (*dbmodels.DBAccount, error) {
 	var account dbmodels.DBAccount
 
-	err := repository.DB.Where("Session = ?", sessionID).First(&account).Error
+	err := repository.DB.Where("session_id = ?", sessionID).First(&account).Error
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (repository *AccountRepository) GetByID(id string) (*dbmodels.DBAccount, er
 func (repository *AccountRepository) GetByName(name string) (*dbmodels.DBAccount, error) {
 	var account dbmodels.DBAccount
 
-	err := repository.DB.Where("AccountName = ?", name).First(&account).Error
+	err := repository.DB.Where("account_name = ?", name).First(&account).Error
 	if err != nil {
 		return nil, err
 	}
@@ -69,15 +69,15 @@ func (repository *AccountRepository) Create(account *dbmodels.DBAccount) (*dbmod
 	return account, nil
 }
 
-func (repository *AccountRepository) UpdateSession(accountID string, sessionID string) (*dbmodels.DBAccount, error) {
+func (repository *AccountRepository) UpdateSession(accountID string, session *dbmodels.DBSession) (*dbmodels.DBAccount, error) {
 	var account dbmodels.DBAccount
 
-	err := repository.DB.Model(&account).Where("AccountID = ?", accountID).Update("Session", sessionID).Error
+	err := repository.DB.Model(&account).Where("account_id = ?", accountID).Update("Session", session).Error
 	if err != nil {
 		return nil, err
 	}
 
-	err = repository.DB.Where("AccountID = ?", accountID).First(&account).Error
+	err = repository.DB.Where("account_id = ?", accountID).First(&account).Error
 	if err != nil {
 		return nil, err
 	}

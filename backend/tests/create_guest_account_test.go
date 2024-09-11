@@ -48,7 +48,21 @@ func (s *CreateGuestAccountTestSuite) SetupSuite() {
 	s.Service = service
 }
 
-func (s *CreateGuestAccountTestSuite) TestAddAPIKey() {
+func (s *CreateGuestAccountTestSuite) TearDownSuite() {
+	err := s.Repository.AccountRepository.DB.Exec("DROP TABLE db_accounts cascade;").Error
+	assert.NoError(s.T(), err, "Failed to clear database")
+
+	err = s.Repository.AccountRepository.DB.Exec("DROP TABLE db_sessions cascade;").Error
+	assert.NoError(s.T(), err, "Failed to clear database")
+
+	db, err := s.Repository.AccountRepository.DB.DB()
+	if err != nil {
+		s.T().Fatal(err)
+	}
+	db.Close()
+}
+
+func (s *CreateGuestAccountTestSuite) TestCreateGuestWithNewAPIKey() {
 	gin.SetMode(gin.TestMode)
 
 	userJson := `{"APIKey":"stringthatisapikey"}`
