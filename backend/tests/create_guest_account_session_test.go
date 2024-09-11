@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -15,15 +16,17 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"github.com/zoehay/gw2armoury/backend/cmd"
+	"github.com/zoehay/gw2armoury/backend/internal/api/handlers"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
 
 type CreateGuestAccountSessionTestSuite struct {
 	suite.Suite
-	Router     *gin.Engine
-	Repository *repositories.Repository
-	Service    *services.Service
+	Router         *gin.Engine
+	Repository     *repositories.Repository
+	Service        *services.Service
+	AccountHandler *handlers.AccountHandler
 }
 
 func TestCreateGuestAccountSessionSuite(t *testing.T) {
@@ -46,20 +49,25 @@ func (s *CreateGuestAccountSessionTestSuite) SetupSuite() {
 	s.Router = router
 	s.Repository = repository
 	s.Service = service
+	s.AccountHandler = handlers.NewAccountHandler(&repository.AccountRepository, &repository.SessionRepository, service.AccountService)
+
 }
 
-// func (s *StartSessionTestSuite) TearDownSuite() {
-// 	err := s.ItemService.ItemRepository.DB.Exec("DROP TABLE db_accounts;").Error
-// 	assert.NoError(s.T(), err, "Failed to clear database")
+func (s *CreateGuestAccountSessionTestSuite) TearDownSuite() {
+	err := s.Repository.AccountRepository.DB.Exec("DROP TABLE db_accounts cascade;").Error
+	assert.NoError(s.T(), err, "Failed to clear database")
 
-// 	db, err := s.ItemService.ItemRepository.DB.DB()
-// 	if err != nil {
-// 		s.T().Fatal(err)
-// 	}
-// 	db.Close()
-// }
+	err = s.Repository.AccountRepository.DB.Exec("DROP TABLE db_sessions cascade;").Error
+	assert.NoError(s.T(), err, "Failed to clear database")
 
-func (s *CreateGuestAccountSessionTestSuite) TestAddAPIKey() {
+	db, err := s.Repository.AccountRepository.DB.DB()
+	if err != nil {
+		s.T().Fatal(err)
+	}
+	db.Close()
+}
+
+func (s *CreateGuestAccountSessionTestSuite) TestCreateGuestWithNewAPIKey() {
 	// w := httptest.NewRecorder()
 	// c, _ := gin.CreateTestContext(w)
 	// req := &http.Request{
@@ -72,14 +80,31 @@ func (s *CreateGuestAccountSessionTestSuite) TestAddAPIKey() {
 	// req.URL.RawQuery = q.Encode()
 
 	// c.Request = req
-	gin.SetMode(gin.TestMode)
-
 	userJson := `{"AccountName":"Name forAccount", "APIKey":"stringthatisapikey", "Password":"stringthatispassword"}`
-
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/addkey", strings.NewReader(userJson))
-	s.Router.ServeHTTP(w, req)
 
-	fmt.Println(w.Body.String())
+	gin.SetMode(gin.TestMode)
+	c, _ := gin.CreateTestContext(w)
+
+	c.Request = req
+
+	s.AccountHandler.CreateGuest(c)
+
+	// userID, exists := c.Get("userID")
+	// assert.True(s.T(), exists, "add userid to context")
+
+	cookie := w.Result().Cookies()
+	fmt.Println("COOKIE", cookie[0])
+	fmt.Println("COOKIE", cookie[0].Value)
+	assert.Equal(s.T(), "sessionID", cookie[0].Name)
+
+	var response map[string]interface{}
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	if err != nil {
+		s.T().Fatalf("Failed to unmarshal response: %v", err)
+	}
+
+	assert.Equal(s.T(), response["SessionID"].(string), cookie[0].Value)
 	assert.Equal(s.T(), 200, w.Code)
 }

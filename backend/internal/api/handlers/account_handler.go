@@ -192,7 +192,11 @@ func (handler AccountHandler) generateNewGuestAccount(accountID string, apiKey s
 }
 
 func (handler AccountHandler) generateNewSession(account *dbmodels.DBAccount) (updatedAccount *dbmodels.DBAccount, newSession *dbmodels.DBSession, err error) {
-	newSessionID := handler.generateSessionID()
+	newSessionID, err := handler.generateSessionID()
+	if err != nil {
+		return nil, nil, err
+	}
+
 	var session = &dbmodels.DBSession{
 		SessionID: newSessionID,
 		Expires:   time.Now().Add(120 * time.Second),
@@ -219,10 +223,14 @@ func (handler AccountHandler) renewSession(session *dbmodels.DBSession) (updated
 	return updatedSession, nil
 }
 
-func (handler AccountHandler) generateSessionID() string {
+func (handler AccountHandler) generateSessionID() (sessionID string, err error) {
 	b := make([]byte, 32)
-	rand.Read(b)
-	return base64.URLEncoding.EncodeToString(b)
+	_, err = rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+	sessionID = base64.RawURLEncoding.EncodeToString(b)
+	return sessionID, nil
 }
 
 type AccountLogin struct {
