@@ -14,7 +14,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"github.com/zoehay/gw2armoury/backend/cmd"
+	"github.com/zoehay/gw2armoury/backend/internal/api/routes"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
@@ -38,7 +38,7 @@ func (s *CreateGuestAccountTestSuite) SetupSuite() {
 	}
 
 	dsn := os.Getenv("TEST_DB_DSN")
-	router, repository, service, err := cmd.SetupTestRouter(dsn, true)
+	router, repository, service, err := routes.SetupRouter(dsn, true)
 	if err != nil {
 		log.Fatal("Error setting up router", err)
 	}

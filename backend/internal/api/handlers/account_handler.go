@@ -19,13 +19,15 @@ type AccountHandler struct {
 	AccountRepository repositories.AccountRepositoryInterface
 	SessionRepository repositories.SessionRepositoryInterface
 	AccountService    services.AccountServiceInterface
+	CharacterService  services.CharacterServiceInterface
 }
 
-func NewAccountHandler(accountRepository repositories.AccountRepositoryInterface, sessionRepository repositories.SessionRepositoryInterface, accountService services.AccountServiceInterface) *AccountHandler {
+func NewAccountHandler(accountRepository repositories.AccountRepositoryInterface, sessionRepository repositories.SessionRepositoryInterface, accountService services.AccountServiceInterface, characterService services.CharacterServiceInterface) *AccountHandler {
 	return &AccountHandler{
 		AccountRepository: accountRepository,
 		SessionRepository: sessionRepository,
 		AccountService:    accountService,
+		CharacterService:  characterService,
 	}
 }
 
@@ -65,7 +67,15 @@ func (handler AccountHandler) CreateGuest(c *gin.Context) {
 			return
 		}
 	}
+
 	c.SetCookie("sessionID", session.SessionID, 3600, "/", "localhost", false, true)
+
+	err = handler.CharacterService.GetAndStoreAllCharacters(*gw2AccountID, createRequest.APIKey)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error getting characters after guest creation": err.Error()})
+		return
+	}
+
 	c.IndentedJSON(http.StatusOK, account)
 }
 

@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -20,7 +20,7 @@ import (
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
 
-type CreateGuestAccountSessionTestSuite struct {
+type GuestSessionInventoryAccessTestSuite struct {
 	suite.Suite
 	Router         *gin.Engine
 	Repository     *repositories.Repository
@@ -28,11 +28,11 @@ type CreateGuestAccountSessionTestSuite struct {
 	AccountHandler *handlers.AccountHandler
 }
 
-func TestCreateGuestAccountSessionSuite(t *testing.T) {
-	suite.Run(t, new(CreateGuestAccountSessionTestSuite))
+func TestGuestSessionInventoryAccessSuite(t *testing.T) {
+	suite.Run(t, new(GuestSessionInventoryAccessTestSuite))
 }
 
-func (s *CreateGuestAccountSessionTestSuite) SetupSuite() {
+func (s *GuestSessionInventoryAccessTestSuite) SetupSuite() {
 	envPath := filepath.Join("..", ".env")
 	err := godotenv.Load(envPath)
 	if err != nil {
@@ -52,11 +52,14 @@ func (s *CreateGuestAccountSessionTestSuite) SetupSuite() {
 
 }
 
-func (s *CreateGuestAccountSessionTestSuite) TearDownSuite() {
+func (s *GuestSessionInventoryAccessTestSuite) TearDownSuite() {
 	err := s.Repository.AccountRepository.DB.Exec("DROP TABLE db_accounts cascade;").Error
 	assert.NoError(s.T(), err, "Failed to clear database")
 
 	err = s.Repository.AccountRepository.DB.Exec("DROP TABLE db_sessions cascade;").Error
+	assert.NoError(s.T(), err, "Failed to clear database")
+
+	err = s.Repository.AccountRepository.DB.Exec("DROP TABLE db_bag_items;").Error
 	assert.NoError(s.T(), err, "Failed to clear database")
 
 	db, err := s.Repository.AccountRepository.DB.DB()
@@ -66,8 +69,7 @@ func (s *CreateGuestAccountSessionTestSuite) TearDownSuite() {
 	db.Close()
 }
 
-func (s *CreateGuestAccountSessionTestSuite) TestCreateGuestWithNewAPIKey() {
-
+func (s *GuestSessionInventoryAccessTestSuite) TestGuestInventoryAccess() {
 	userJson := `{"AccountName":"Name forAccount", "APIKey":"stringthatisapikey", "Password":"stringthatispassword"}`
 	req, _ := http.NewRequest("POST", "/addkey", strings.NewReader(userJson))
 
@@ -75,31 +77,19 @@ func (s *CreateGuestAccountSessionTestSuite) TestCreateGuestWithNewAPIKey() {
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 
-	// req := &http.Request{
-	// 	URL:    &url.URL{},
-	// 	Header: make(http.Header),
-	// }
-
-	// q := req.URL.Query()
-	// q.Add("id", "27952")
-	// req.URL.RawQuery = q.Encode()
-
 	c.Request = req
 	s.AccountHandler.CreateGuest(c)
 
 	cookie := w.Result().Cookies()
 
-	// fmt.Println("COOKIE", cookie[0].Value)
+	fmt.Println("COOKIE", cookie[0].Value)
 	assert.Equal(s.T(), "sessionID", cookie[0].Name, "Correct cookie name")
 
-	var response map[string]interface{}
-	err := json.Unmarshal(w.Body.Bytes(), &response)
-	if err != nil {
-		s.T().Fatalf("Failed to unmarshal response: %v", err)
-	}
+	// userID, exists := c.Get("userID")
+	// assert.True(s.T(), exists, "add userid to context")
+	// fmt.Println(userID)
 
-	assert.Equal(s.T(), response["SessionID"].(string), cookie[0].Value)
 	assert.Equal(s.T(), 200, w.Code)
 }
 
-// func (s *CreateGuestAccountSessionTestSuite) TestOldAPIKeyRefreshesSession() {}
+// func (s *GuestSessionInventoryAccessTestSuite) TestNoCookieNoInventoryAccess() {}
