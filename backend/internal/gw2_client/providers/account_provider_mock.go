@@ -11,7 +11,7 @@ import (
 type AccountProviderMock struct{}
 
 func (accountProvider *AccountProviderMock) GetAccount(apiKey string) (*gw2models.GW2Account, error) {
-	apiAccount, err := accountProvider.ReadAccountFromFile("../test_data/account_test_data.txt")
+	apiAccount, err := accountProvider.ReadAccountFromFile("../../test_data/account_test_data.txt")
 
 	if err != nil {
 		return nil, fmt.Errorf("error reading from test data file: %s", err)

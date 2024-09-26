@@ -11,7 +11,7 @@ import (
 type CharacterProviderMock struct{}
 
 func (characterProvider *CharacterProviderMock) GetAllCharacters(apiKey string) ([]gw2models.GW2Character, error) {
-	apiCharacters, err := characterProvider.ReadCharactersFromFile("../test_data/character_test_data.txt")
+	apiCharacters, err := characterProvider.ReadCharactersFromFile("../../test_data/character_test_data.txt")
 
 	if err != nil {
 		return nil, fmt.Errorf("error reading from test data file: %s", err)

@@ -11,7 +11,7 @@ import (
 type ItemProviderMock struct{}
 
 func (itemProvider *ItemProviderMock) GetItemsByIds(intArrIds []int) ([]gw2models.GW2Item, error) {
-	apiItems, err := itemProvider.readItemFromFile("../test_data/item_test_data.txt")
+	apiItems, err := itemProvider.readItemFromFile("../../test_data/item_test_data.txt")
 
 	if err != nil {
 		return nil, fmt.Errorf("error reading from test data file: %s", err)
