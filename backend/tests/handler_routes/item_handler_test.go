@@ -30,7 +30,7 @@ func TestItemHandlerTestSuite(t *testing.T) {
 }
 
 func (s *ItemHandlerTestSuite) SetupSuite() {
-	envPath := filepath.Join("..", ".env")
+	envPath := filepath.Join("../..", ".env")
 	err := godotenv.Load(envPath)
 	if err != nil {
 		log.Fatal("Error loading .env file:", err)

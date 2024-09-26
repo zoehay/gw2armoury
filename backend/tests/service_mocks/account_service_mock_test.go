@@ -27,7 +27,7 @@ func TestAccountServiceTestSuite(t *testing.T) {
 }
 
 func (s *AccountServiceTestSuite) SetupSuite() {
-	envPath := filepath.Join("..", ".env")
+	envPath := filepath.Join("../..", ".env")
 	err := godotenv.Load(envPath)
 	if err != nil {
 		log.Fatal("Error loading .env file:", err)
@@ -44,16 +44,16 @@ func (s *AccountServiceTestSuite) SetupSuite() {
 	s.AccountService = *services.NewAccountService(&accountRepository, accountProvider)
 }
 
-// func (s *AccountServiceTestSuite) TearDownSuite() {
-// 	err := s.AccountService.AccountRepository.DB.Exec("DROP TABLE accounts;").Error
-// 	assert.NoError(s.T(), err, "Failed to clear database")
+func (s *AccountServiceTestSuite) TearDownSuite() {
+	err := s.AccountService.AccountRepository.DB.Exec("DROP TABLE db_accounts;").Error
+	assert.NoError(s.T(), err, "Failed to clear database")
 
-// 	db, err := s.AccountService.AccountRepository.DB.DB()
-// 	if err != nil {
-// 		s.T().Fatal(err)
-// 	}
-// 	db.Close()
-// }
+	db, err := s.AccountService.AccountRepository.DB.DB()
+	if err != nil {
+		s.T().Fatal(err)
+	}
+	db.Close()
+}
 
 func (s *AccountServiceTestSuite) TestGetAccount() {
 	account, err := s.AccountService.GetAccount("apiKey")

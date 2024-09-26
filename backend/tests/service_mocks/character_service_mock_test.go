@@ -27,7 +27,7 @@ func TestCharacterServiceTestSuite(t *testing.T) {
 }
 
 func (s *CharacterServiceTestSuite) SetupSuite() {
-	envPath := filepath.Join("..", ".env")
+	envPath := filepath.Join("../..", ".env")
 	err := godotenv.Load(envPath)
 	if err != nil {
 		log.Fatal("Error loading .env file:", err)
