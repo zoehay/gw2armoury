@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -16,6 +17,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/zoehay/gw2armoury/backend/internal/api/handlers"
 	"github.com/zoehay/gw2armoury/backend/internal/api/routes"
+	dbmodels "github.com/zoehay/gw2armoury/backend/internal/db/models"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
@@ -70,26 +72,40 @@ func (s *GuestSessionInventoryAccessTestSuite) TearDownSuite() {
 }
 
 func (s *GuestSessionInventoryAccessTestSuite) TestGuestInventoryAccess() {
+
+	s.T().Log("GET /account with no cookie")
+	w0 := httptest.NewRecorder()
+	req0, _ := http.NewRequest("GET", "/account/characters/Roman%20Meows/inventory", nil)
+	s.Router.ServeHTTP(w0, req0)
+	assert.Equal(s.T(), http.StatusForbidden, w0.Code)
+
+	s.T().Log("Create account with POST /apikeys")
 	userJson := `{"AccountName":"Name forAccount", "APIKey":"stringthatisapikey", "Password":"stringthatispassword"}`
-	req, _ := http.NewRequest("POST", "/addkey", strings.NewReader(userJson))
+	w1 := httptest.NewRecorder()
+	req1, _ := http.NewRequest("POST", "/apikeys", strings.NewReader(userJson))
+	s.Router.ServeHTTP(w1, req1)
+	assert.Equal(s.T(), http.StatusOK, w1.Code)
+	cookie := w1.Result().Cookies()
 
-	gin.SetMode(gin.TestMode)
-	w := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(w)
+	s.T().Log("GET /account with cookie")
+	w2 := httptest.NewRecorder()
+	req2, _ := http.NewRequest("GET", "/account/characters/Roman%20Meows/inventory", nil)
+	req2.AddCookie(cookie[0])
+	s.Router.ServeHTTP(w2, req2)
+	assert.Equal(s.T(), http.StatusOK, w2.Code)
 
-	c.Request = req
-	s.AccountHandler.CreateGuest(c)
+	var response []dbmodels.DBIconBagItem
+	err := json.Unmarshal(w2.Body.Bytes(), &response)
+	if err != nil {
+		s.T().Fatalf("Failed to unmarshal response: %v", err)
+	}
+	fmt.Println(PrintObject(response))
 
-	cookie := w.Result().Cookies()
+}
 
-	fmt.Println("COOKIE", cookie[0].Value)
-	assert.Equal(s.T(), "sessionID", cookie[0].Name, "Correct cookie name")
-
-	// userID, exists := c.Get("userID")
-	// assert.True(s.T(), exists, "add userid to context")
-	// fmt.Println(userID)
-
-	assert.Equal(s.T(), 200, w.Code)
+func PrintObject(i interface{}) string {
+	s, _ := json.MarshalIndent(i, "", "\t")
+	return string(s)
 }
 
 // func (s *GuestSessionInventoryAccessTestSuite) TestNoCookieNoInventoryAccess() {}

@@ -12,15 +12,17 @@ func UseSession(accountRepository *repositories.AccountRepository) gin.HandlerFu
 	return gin.HandlerFunc(func(c *gin.Context) {
 
 		sessionID, err := c.Cookie("sessionID")
-		fmt.Printf("Cookie value: %s \n", sessionID)
+		// fmt.Printf("Cookie value: %s \n", sessionID)
 
 		if err != nil {
-			fmt.Println(err.Error())
-			//error getting cookie
+			c.IndentedJSON(http.StatusForbidden, gin.H{"error getting session cookie": err.Error()})
+			c.Abort()
+			return
 		}
 
 		if sessionID == "" {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.IndentedJSON(http.StatusForbidden, gin.H{"session error": err.Error()})
+			c.Abort()
 			return
 		} else {
 			account, err := accountRepository.GetBySession(sessionID)
@@ -30,7 +32,7 @@ func UseSession(accountRepository *repositories.AccountRepository) gin.HandlerFu
 
 			c.Set("accountName", account.AccountName)
 			c.Set("apiKey", account.APIKey)
-
+			c.Next()
 		}
 
 		// TODO Add token
@@ -42,6 +44,5 @@ func UseSession(accountRepository *repositories.AccountRepository) gin.HandlerFu
 		// 	return
 		// }
 
-		c.Next()
 	})
 }
