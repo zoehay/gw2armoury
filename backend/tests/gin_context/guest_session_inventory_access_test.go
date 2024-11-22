@@ -52,6 +52,8 @@ func (s *GuestSessionInventoryAccessTestSuite) SetupSuite() {
 	s.Service = service
 	s.AccountHandler = handlers.NewAccountHandler(&repository.AccountRepository, &repository.SessionRepository, service.AccountService, service.CharacterService)
 
+	s.Service.ItemService.GetAndStoreAllItems()
+
 }
 
 func (s *GuestSessionInventoryAccessTestSuite) TearDownSuite() {
@@ -71,14 +73,15 @@ func (s *GuestSessionInventoryAccessTestSuite) TearDownSuite() {
 	db.Close()
 }
 
-func (s *GuestSessionInventoryAccessTestSuite) TestGuestInventoryAccess() {
-
+func (s *GuestSessionInventoryAccessTestSuite) TestNoCookieNoInventoryAccess() {
 	s.T().Log("GET /account with no cookie")
 	w0 := httptest.NewRecorder()
 	req0, _ := http.NewRequest("GET", "/account/characters/Roman%20Meows/inventory", nil)
 	s.Router.ServeHTTP(w0, req0)
 	assert.Equal(s.T(), http.StatusForbidden, w0.Code)
+}
 
+func (s *GuestSessionInventoryAccessTestSuite) TestGuestInventoryAccess() {
 	s.T().Log("Create account with POST /apikeys")
 	userJson := `{"AccountName":"Name forAccount", "APIKey":"stringthatisapikey", "Password":"stringthatispassword"}`
 	w1 := httptest.NewRecorder()
@@ -100,12 +103,9 @@ func (s *GuestSessionInventoryAccessTestSuite) TestGuestInventoryAccess() {
 		s.T().Fatalf("Failed to unmarshal response: %v", err)
 	}
 	fmt.Println(PrintObject(response))
-
 }
 
 func PrintObject(i interface{}) string {
 	s, _ := json.MarshalIndent(i, "", "\t")
 	return string(s)
 }
-
-// func (s *GuestSessionInventoryAccessTestSuite) TestNoCookieNoInventoryAccess() {}
