@@ -3,12 +3,13 @@ package middleware
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 )
 
-func UseSession(accountRepository *repositories.AccountRepository) gin.HandlerFunc {
+func UseSession(accountRepository *repositories.AccountRepository, sessionRepository *repositories.SessionRepository) gin.HandlerFunc {
 	return gin.HandlerFunc(func(c *gin.Context) {
 
 		sessionID, err := c.Cookie("sessionID")
@@ -22,6 +23,22 @@ func UseSession(accountRepository *repositories.AccountRepository) gin.HandlerFu
 
 		if sessionID == "" {
 			c.IndentedJSON(http.StatusForbidden, gin.H{"session error": err.Error()})
+			c.Abort()
+			return
+		}
+
+		dbSession, err := sessionRepository.Get(sessionID)
+		if err != nil {
+			c.IndentedJSON(http.StatusForbidden, gin.H{"sessionID not in database": err.Error()})
+			c.Abort()
+			return
+		}
+
+		now := time.Now()
+		isExpired := dbSession.Expires.Before(now)
+
+		if isExpired {
+			c.IndentedJSON(http.StatusForbidden, gin.H{"error": "session is expired"})
 			c.Abort()
 			return
 		} else {

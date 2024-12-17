@@ -89,7 +89,6 @@ func (s *CreateGuestAccountSessionTestSuite) TestCreateGuestWithNewAPIKey() {
 
 	cookie := w.Result().Cookies()
 
-	// fmt.Println("COOKIE", cookie[0].Value)
 	assert.Equal(s.T(), "sessionID", cookie[0].Name, "Correct cookie name")
 
 	var response map[string]interface{}
