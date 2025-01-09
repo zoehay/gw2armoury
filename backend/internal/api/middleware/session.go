@@ -47,6 +47,7 @@ func UseSession(accountRepository *repositories.AccountRepository, sessionReposi
 				fmt.Println(err.Error())
 			}
 
+			c.Set("accountID", account.AccountID)
 			c.Set("accountName", account.AccountName)
 			c.Set("apiKey", account.APIKey)
 			c.Next()

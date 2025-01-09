@@ -29,13 +29,19 @@ func (BagItemHandler BagItemHandler) GetByCharacter(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, items)
 }
 
-// func (BagItemHandler BagItemHandler) GetByAccount(c *gin.Context) {
-// 	accountId := c.Params.ByName("accountid")
-// 	items, err := BagItemHandler.BagItemRepository.GetDetailsByAccountID(accountID)
-// 	if err != nil {
-// 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// 		return
-// 	}
+func (BagItemHandler BagItemHandler) GetByAccount(c *gin.Context) {
+	value, exists := c.Get("accountID")
+	if !exists {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "could not find Gin Context accountID"})
+		return
+	}
 
-// 	c.IndentedJSON(http.StatusOK, items)
-// }
+	accountID := value.(string)
+	items, err := BagItemHandler.BagItemRepository.GetIconBagItemByAccountID(accountID)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, items)
+}

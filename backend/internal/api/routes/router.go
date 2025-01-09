@@ -48,6 +48,7 @@ func SetupRouter(dsn string, mocks bool) (*gin.Engine, *repositories.Repository,
 	account := router.Group("/account")
 	account.Use(middleware.UseSession(&repository.AccountRepository, &repository.SessionRepository))
 	{
+		account.GET("/characters/inventory", bagItemHandler.GetByAccount)
 		account.GET("/characters/:charactername/inventory", bagItemHandler.GetByCharacter)
 	}
 
