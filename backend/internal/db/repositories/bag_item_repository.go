@@ -73,6 +73,10 @@ func (repository *BagItemRepository) GetIconBagItemByCharacterName(characterName
 		return nil, err
 	}
 
+	for i := range bagItemWithIcon {
+		bagItemWithIcon[i].ToBagItem()
+	}
+
 	return bagItemWithIcon, nil
 
 }
@@ -88,6 +92,10 @@ func (repository *BagItemRepository) GetIconBagItemByAccountID(accountID string)
 
 	if err != nil {
 		return nil, err
+	}
+
+	for i := range bagItemWithIcon {
+		bagItemWithIcon[i].ToBagItem()
 	}
 
 	return bagItemWithIcon, nil

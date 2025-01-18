@@ -16,8 +16,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"github.com/zoehay/gw2armoury/backend/internal/api/handlers"
+	"github.com/zoehay/gw2armoury/backend/internal/api/models"
 	"github.com/zoehay/gw2armoury/backend/internal/api/routes"
-	dbmodels "github.com/zoehay/gw2armoury/backend/internal/db/models"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 )
@@ -97,7 +97,7 @@ func (s *GuestSessionInventoryAccessTestSuite) TestGuestInventoryAccess() {
 	s.Router.ServeHTTP(w2, req2)
 	assert.Equal(s.T(), http.StatusOK, w2.Code)
 
-	var response []dbmodels.DBIconBagItem
+	var response []models.BagItem
 	err := json.Unmarshal(w2.Body.Bytes(), &response)
 	if err != nil {
 		s.T().Fatalf("Failed to unmarshal response: %v", err)

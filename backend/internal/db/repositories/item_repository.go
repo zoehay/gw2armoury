@@ -53,6 +53,10 @@ func (repository *ItemRepository) GetAll() ([]dbmodels.DBItem, error) {
 		return nil, err
 	}
 
+	for i := range items {
+		items[i].ToItem()
+	}
+
 	return items, nil
 
 }
@@ -65,6 +69,7 @@ func (repository *ItemRepository) GetFirst() (*dbmodels.DBItem, error) {
 		return nil, err
 	}
 
+	item.ToItem()
 	return &item, nil
 
 }
@@ -77,6 +82,7 @@ func (repository *ItemRepository) GetById(id int) (*dbmodels.DBItem, error) {
 		return nil, err
 	}
 
+	item.ToItem()
 	return &item, nil
 
 }
@@ -87,6 +93,10 @@ func (repository *ItemRepository) GetByIds(ids []int) (*[]dbmodels.DBItem, error
 	err := repository.DB.Where(ids).Find(&items).Error
 	if err != nil {
 		return nil, err
+	}
+
+	for i := range items {
+		items[i].ToItem()
 	}
 
 	return &items, nil

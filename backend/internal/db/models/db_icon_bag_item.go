@@ -3,8 +3,8 @@ package dbmodels
 import "github.com/zoehay/gw2armoury/backend/internal/api/models"
 
 type DBIconBagItem struct {
-	AccountID     string
-	CharacterName string
+	AccountID     string                  `json:"account_id"`
+	CharacterName string                  `json:"character_name"`
 	BagItemID     uint                    `json:"id"`
 	Icon          string                  `json:"icon"`
 	Count         uint                    `json:"count"`
