@@ -1,4 +1,4 @@
-package tests
+package servicemocks_test
 
 import (
 	"fmt"
@@ -14,6 +14,7 @@ import (
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	providers "github.com/zoehay/gw2armoury/backend/internal/gw2_client/providers"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
+	"github.com/zoehay/gw2armoury/backend/tests/testutils"
 )
 
 type ItemServiceTestSuite struct {
@@ -61,6 +62,6 @@ func (s *ItemServiceTestSuite) TestGetAndStoreAllItems() {
 
 func (s *ItemServiceTestSuite) TestGetItemById() {
 	item, err := s.ItemService.ItemRepository.GetById(27952)
-	fmt.Println(PrintObject(item))
+	fmt.Println(testutils.PrintObject(item))
 	assert.NoError(s.T(), err, "Failed to get item by id")
 }

@@ -1,7 +1,6 @@
-package tests
+package handlerroutes_test
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -69,6 +68,5 @@ func (s *ItemHandlerTestSuite) TestGetItemById() {
 	req, _ := http.NewRequest("GET", "/items/27952", nil)
 	s.Router.ServeHTTP(w, req)
 
-	fmt.Println(w.Body.String())
 	assert.Equal(s.T(), 200, w.Code)
 }

@@ -1,8 +1,7 @@
-package tests
+package gincontext_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -102,10 +101,4 @@ func (s *GuestSessionInventoryAccessTestSuite) TestGuestInventoryAccess() {
 	if err != nil {
 		s.T().Fatalf("Failed to unmarshal response: %v", err)
 	}
-	fmt.Println(PrintObject(response))
-}
-
-func PrintObject(i interface{}) string {
-	s, _ := json.MarshalIndent(i, "", "\t")
-	return string(s)
 }

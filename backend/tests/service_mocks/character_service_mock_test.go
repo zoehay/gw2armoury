@@ -1,7 +1,6 @@
-package tests
+package servicemocks_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -15,6 +14,7 @@ import (
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	"github.com/zoehay/gw2armoury/backend/internal/gw2_client/providers"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
+	"github.com/zoehay/gw2armoury/backend/tests/testutils"
 )
 
 type CharacterServiceTestSuite struct {
@@ -62,12 +62,7 @@ func (s *CharacterServiceTestSuite) TestGetAndStoreAllCharacters() {
 
 func (s *CharacterServiceTestSuite) TestGetBagItemsByCharacterName() {
 	bagItems, err := s.CharacterService.BagItemRepository.GetByCharacterName("Roman Meows")
-	fmt.Println(PrintObject(bagItems[0]))
+	fmt.Println(testutils.PrintObject(bagItems[0]))
 	assert.NoError(s.T(), err, "Failed to get item by id")
 
-}
-
-func PrintObject(i interface{}) string {
-	s, _ := json.MarshalIndent(i, "", "\t")
-	return string(s)
 }

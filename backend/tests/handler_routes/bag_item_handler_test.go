@@ -1,4 +1,4 @@
-package tests
+package handlerroutes_test
 
 import (
 	"encoding/json"
@@ -122,11 +122,6 @@ func UnmarshalBagItems(bodyBytes []byte) ([]models.BagItem, error) {
 		return nil, err
 	}
 	return response, nil
-}
-
-func PrintObject(i interface{}) string {
-	s, _ := json.MarshalIndent(i, "", "\t")
-	return string(s)
 }
 
 func BagItemsResponseOK(bagItems []models.BagItem) bool {

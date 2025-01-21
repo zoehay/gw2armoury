@@ -1,4 +1,4 @@
-package tests
+package handlerroutes_test
 
 import (
 	"fmt"

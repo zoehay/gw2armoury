@@ -1,4 +1,4 @@
-package tests
+package gincontext_test
 
 import (
 	"encoding/json"

@@ -1,7 +1,6 @@
-package tests
+package servicemocks_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -15,6 +14,7 @@ import (
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	providers "github.com/zoehay/gw2armoury/backend/internal/gw2_client/providers"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
+	"github.com/zoehay/gw2armoury/backend/tests/testutils"
 )
 
 type AccountServiceTestSuite struct {
@@ -57,11 +57,6 @@ func (s *AccountServiceTestSuite) TearDownSuite() {
 
 func (s *AccountServiceTestSuite) TestGetAccount() {
 	account, err := s.AccountService.GetAccount("apiKey")
-	fmt.Println(printObject(account))
+	fmt.Println(testutils.PrintObject(account))
 	assert.NoError(s.T(), err, "Failed to get account")
-}
-
-func printObject(i interface{}) string {
-	s, _ := json.MarshalIndent(i, "", "\t")
-	return string(s)
 }
