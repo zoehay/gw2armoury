@@ -14,7 +14,7 @@ import (
 )
 
 func LoadEnvDSN() string {
-	// replace env with docker secrets?
+	// replace env with docker secrets
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file:", err)
@@ -38,6 +38,14 @@ func SetupRouter(dsn string, mocks bool) (*gin.Engine, *repositories.Repository,
 	accountHandler := handlers.NewAccountHandler(&repository.AccountRepository, &repository.SessionRepository, service.AccountService, service.CharacterService)
 
 	router := gin.Default()
+
+	err = router.SetTrustedProxies([]string{"127.0.0.1"})
+	if err != nil {
+		log.Fatalf("Failed to set trusted proxies: %v", err)
+	}
+
+	router.Use(middleware.SetCORS())
+
 	router.GET("/items", itemHandler.GetAllItems)
 	router.GET("/items/:id", itemHandler.GetItemByID)
 
