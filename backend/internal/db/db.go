@@ -27,6 +27,13 @@ var seedItems = []*dbmodels.DBItem{
 	},
 }
 
+// var initAPIKey = "initkeystring"
+
+// var seedAccount = *&dbmodels.DBAccount{
+// 	AccountID: "testingaccountID",
+// 	APIKey:    &initAPIKey,
+// }
+
 func PostgresInit(dsn string) (*gorm.DB, error) {
 
 	// Add logic to ping db

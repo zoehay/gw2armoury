@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/models"
 )
@@ -11,7 +12,16 @@ import (
 type AccountProviderMock struct{}
 
 func (accountProvider *AccountProviderMock) GetAccount(apiKey string) (*gw2models.GW2Account, error) {
-	apiAccount, err := accountProvider.ReadAccountFromFile("../../test_data/account_test_data.txt")
+	wd, _ := os.Getwd()
+	isTesting := strings.Contains(wd, "test")
+	leadingFilepath := ""
+
+	if isTesting {
+		leadingFilepath = "../."
+	}
+
+	filepath := fmt.Sprintf("%s./test_data/account_test_data.txt", leadingFilepath)
+	apiAccount, err := accountProvider.ReadAccountFromFile(filepath)
 
 	if err != nil {
 		return nil, fmt.Errorf("error reading from test data file: %s", err)

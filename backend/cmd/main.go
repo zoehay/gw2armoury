@@ -11,7 +11,7 @@ func main() {
 	// router, _ := SetupRouter(dsn)
 	// router.Run("127.0.0.1:8000")
 
-	router, _, _, err := routes.SetupRouter(dsn, false)
+	router, _, _, err := routes.SetupRouter(dsn, true)
 	if err != nil {
 		log.Fatal("Error setting up router", err)
 	}

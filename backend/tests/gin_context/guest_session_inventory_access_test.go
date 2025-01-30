@@ -2,6 +2,7 @@ package gincontext_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -19,6 +20,7 @@ import (
 	"github.com/zoehay/gw2armoury/backend/internal/api/routes"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
+	"github.com/zoehay/gw2armoury/backend/tests/testutils"
 )
 
 type GuestSessionInventoryAccessTestSuite struct {
@@ -101,4 +103,5 @@ func (s *GuestSessionInventoryAccessTestSuite) TestGuestInventoryAccess() {
 	if err != nil {
 		s.T().Fatalf("Failed to unmarshal response: %v", err)
 	}
+	fmt.Println(testutils.PrintObject(response))
 }
