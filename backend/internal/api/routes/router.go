@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -22,14 +21,11 @@ func LoadEnvDSN() string {
 	}
 
 	appMode := os.Getenv("APP_ENV")
-	fmt.Println(appMode)
-
 	dsn := os.Getenv("DB_DSN")
 
 	if appMode == "development" {
 		dsn = os.Getenv("TEST_DB_DSN")
 	}
-
 	return dsn
 }
 

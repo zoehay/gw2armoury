@@ -21,13 +21,13 @@ func (accountProvider *AccountProviderMock) GetAccount(apiKey string) (*gw2model
 	}
 
 	filepath := fmt.Sprintf("%s./test_data/account_test_data.txt", leadingFilepath)
-	apiAccount, err := accountProvider.ReadAccountFromFile(filepath)
+	account, err := accountProvider.ReadAccountFromFile(filepath)
 
 	if err != nil {
 		return nil, fmt.Errorf("error reading from test data file: %s", err)
 	}
 
-	return apiAccount, nil
+	return account, nil
 }
 
 func (accountProvider *AccountProviderMock) ReadAccountFromFile(filepath string) (*gw2models.GW2Account, error) {

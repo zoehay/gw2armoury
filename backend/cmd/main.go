@@ -2,16 +2,23 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/zoehay/gw2armoury/backend/internal/api/routes"
 )
 
 func main() {
-	dsn := routes.LoadEnvDSN()
 	// router, _ := SetupRouter(dsn)
 	// router.Run("127.0.0.1:8000")
 
-	router, _, _, err := routes.SetupRouter(dsn, true)
+	dsn := routes.LoadEnvDSN()
+	mocks := false
+	appMode := os.Getenv("APP_ENV")
+	if appMode == "development" {
+		mocks = true
+	}
+
+	router, _, _, err := routes.SetupRouter(dsn, mocks)
 	if err != nil {
 		log.Fatal("Error setting up router", err)
 	}

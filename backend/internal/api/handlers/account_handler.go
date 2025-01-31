@@ -61,10 +61,18 @@ func (handler AccountHandler) CreateGuest(c *gin.Context) {
 		return
 	} else {
 		account = existingAccount
-		session, err = handler.renewSession(account.Session)
-		if err != nil {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error renewing session for existing account": err.Error()})
-			return
+		if account.Session != nil {
+			session, err = handler.renewSession(account.Session)
+			if err != nil {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"error renewing session for existing account": err.Error()})
+				return
+			}
+		} else {
+			account, session, err = handler.generateNewSession(account)
+			if err != nil {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"error generating new session for existing account": err.Error()})
+				return
+			}
 		}
 	}
 
@@ -76,7 +84,7 @@ func (handler AccountHandler) CreateGuest(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, account)
+	c.IndentedJSON(http.StatusOK, account.ToAccount())
 }
 
 func (handler AccountHandler) Create(c *gin.Context) {
@@ -125,7 +133,7 @@ func (handler AccountHandler) Create(c *gin.Context) {
 	// 	return
 	// }
 
-	c.IndentedJSON(http.StatusOK, account)
+	c.IndentedJSON(http.StatusOK, account.ToAccount())
 
 }
 
@@ -151,7 +159,7 @@ func (handler AccountHandler) Login(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, account)
+	c.IndentedJSON(http.StatusOK, account.ToAccount())
 
 	// refresh account info in db
 
