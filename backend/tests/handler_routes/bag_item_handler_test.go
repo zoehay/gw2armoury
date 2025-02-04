@@ -1,7 +1,6 @@
 package handlerroutes_test
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -18,6 +17,7 @@ import (
 	"github.com/zoehay/gw2armoury/backend/internal/api/routes"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
+	"github.com/zoehay/gw2armoury/backend/tests/testutils"
 )
 
 type BagItemHandlerTestSuite struct {
@@ -70,6 +70,9 @@ func (s *BagItemHandlerTestSuite) TearDownSuite() {
 	err = s.Repository.AccountRepository.DB.Exec("DROP TABLE db_bag_items;").Error
 	assert.NoError(s.T(), err, "Failed to clear database")
 
+	err = s.Repository.AccountRepository.DB.Exec("DROP TABLE db_items;").Error
+	assert.NoError(s.T(), err, "Failed to clear database")
+
 	db, err := s.Repository.AccountRepository.DB.DB()
 	if err != nil {
 		s.T().Fatal(err)
@@ -83,16 +86,16 @@ func (s *BagItemHandlerTestSuite) TestGetByAccount() {
 	req.AddCookie(s.Cookie)
 	s.Router.ServeHTTP(w, req)
 
-	response, err := UnmarshalBagItems(w.Body.Bytes())
+	responseBagItems, err := testutils.UnmarshalToType[[]models.BagItem](w)
 	if err != nil {
 		s.T().Fatalf("Failed to unmarshal response: %v", err)
 	}
 	assert.Equal(s.T(), 200, w.Code)
 
-	bagItemsResponseOK := BagItemsResponseOK(response)
+	bagItemsResponseOK := BagItemsResponseOK(responseBagItems)
 	assert.Equal(s.T(), true, bagItemsResponseOK)
 
-	allSameCharacterName := BagItemsAllSameCharacterName(response)
+	allSameCharacterName := BagItemsAllSameCharacterName(responseBagItems)
 	assert.Equal(s.T(), false, allSameCharacterName)
 }
 
@@ -102,33 +105,24 @@ func (s *BagItemHandlerTestSuite) TestGetByCharacterName() {
 	req.AddCookie(s.Cookie)
 	s.Router.ServeHTTP(w, req)
 
-	response, err := UnmarshalBagItems(w.Body.Bytes())
+	responseBagItems, err := testutils.UnmarshalToType[[]models.BagItem](w)
 	if err != nil {
-		s.T().Fatalf("Failed to unmarshal response: %v", err)
+		s.T().Errorf("Failed to unmarshal response: %v", err)
 	}
 
-	bagItemsResponseOK := BagItemsResponseOK(response)
+	bagItemsResponseOK := BagItemsResponseOK(responseBagItems)
 	assert.Equal(s.T(), true, bagItemsResponseOK)
 
-	allSameCharacterName := BagItemsAllSameCharacterName(response)
+	allSameCharacterName := BagItemsAllSameCharacterName(responseBagItems)
 	assert.Equal(s.T(), true, allSameCharacterName)
 	assert.Equal(s.T(), 200, w.Code)
 }
 
-func UnmarshalBagItems(bodyBytes []byte) ([]models.BagItem, error) {
-	var response []models.BagItem
-	err := json.Unmarshal(bodyBytes, &response)
-	if err != nil {
-		return nil, err
-	}
-	return response, nil
-}
-
-func BagItemsResponseOK(bagItems []models.BagItem) bool {
-	if len(bagItems) == 0 {
+func BagItemsResponseOK(bagItems *[]models.BagItem) bool {
+	if len(*bagItems) == 0 {
 		return false
 	} else {
-		if len(bagItems[0].CharacterName) != 0 {
+		if len((*bagItems)[0].CharacterName) != 0 {
 			return true
 		} else {
 			return false
@@ -136,9 +130,9 @@ func BagItemsResponseOK(bagItems []models.BagItem) bool {
 	}
 }
 
-func BagItemsAllSameCharacterName(bagItems []models.BagItem) bool {
-	characterName := bagItems[0].CharacterName
-	for _, bagItem := range bagItems {
+func BagItemsAllSameCharacterName(bagItems *[]models.BagItem) bool {
+	characterName := (*bagItems)[0].CharacterName
+	for _, bagItem := range *bagItems {
 		if bagItem.CharacterName == characterName {
 			continue
 		} else {

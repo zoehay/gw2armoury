@@ -1,8 +1,6 @@
 package handlerroutes_test
 
 import (
-	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -34,13 +32,13 @@ func (s *CreateAccountTestSuite) SetupSuite() {
 	envPath := filepath.Join("../..", ".env")
 	err := godotenv.Load(envPath)
 	if err != nil {
-		log.Fatal("Error loading .env file:", err)
+		s.T().Errorf("Error loading .env file: %v", err)
 	}
 
 	dsn := os.Getenv("TEST_DB_DSN")
 	router, repository, service, err := routes.SetupRouter(dsn, true)
 	if err != nil {
-		log.Fatal("Error setting up router", err)
+		s.T().Errorf("Error setting up router: %v", err)
 	}
 
 	s.Router = router
@@ -66,7 +64,6 @@ func (s *CreateAccountTestSuite) TestCreateAccount() {
 	req, _ := http.NewRequest("POST", "/signup", strings.NewReader(userJson))
 	s.Router.ServeHTTP(w, req)
 
-	fmt.Println(w.Body.String())
 	assert.Equal(s.T(), 200, w.Code)
 }
 

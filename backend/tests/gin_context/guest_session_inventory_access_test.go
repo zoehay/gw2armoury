@@ -2,22 +2,16 @@ package gincontext_test
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"github.com/zoehay/gw2armoury/backend/internal/api/handlers"
 	"github.com/zoehay/gw2armoury/backend/internal/api/models"
-	"github.com/zoehay/gw2armoury/backend/internal/api/routes"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 	"github.com/zoehay/gw2armoury/backend/tests/testutils"
@@ -36,16 +30,9 @@ func TestGuestSessionInventoryAccessSuite(t *testing.T) {
 }
 
 func (s *GuestSessionInventoryAccessTestSuite) SetupSuite() {
-	envPath := filepath.Join("../..", ".env")
-	err := godotenv.Load(envPath)
+	router, repository, service, err := testutils.DBRouterSetup()
 	if err != nil {
-		log.Fatal("Error loading .env file:", err)
-	}
-
-	dsn := os.Getenv("TEST_DB_DSN")
-	router, repository, service, err := routes.SetupRouter(dsn, true)
-	if err != nil {
-		log.Fatal("Error setting up router", err)
+		s.T().Errorf("Error setting up router: %v", err)
 	}
 
 	s.Router = router
@@ -54,24 +41,14 @@ func (s *GuestSessionInventoryAccessTestSuite) SetupSuite() {
 	s.AccountHandler = handlers.NewAccountHandler(&repository.AccountRepository, &repository.SessionRepository, service.AccountService, service.CharacterService)
 
 	s.Service.ItemService.GetAndStoreAllItems()
-
 }
 
 func (s *GuestSessionInventoryAccessTestSuite) TearDownSuite() {
-	err := s.Repository.AccountRepository.DB.Exec("DROP TABLE db_accounts cascade;").Error
-	assert.NoError(s.T(), err, "Failed to clear database")
-
-	err = s.Repository.AccountRepository.DB.Exec("DROP TABLE db_sessions cascade;").Error
-	assert.NoError(s.T(), err, "Failed to clear database")
-
-	err = s.Repository.AccountRepository.DB.Exec("DROP TABLE db_bag_items;").Error
-	assert.NoError(s.T(), err, "Failed to clear database")
-
-	db, err := s.Repository.AccountRepository.DB.DB()
+	dropTables := []string{"db_accounts", "db_sessions", "db_bag_items", "db_items"}
+	err := testutils.TearDownDropTables(s.Repository, dropTables)
 	if err != nil {
 		s.T().Fatal(err)
 	}
-	db.Close()
 }
 
 func (s *GuestSessionInventoryAccessTestSuite) TestNoCookieNoInventoryAccess() {
@@ -101,7 +78,6 @@ func (s *GuestSessionInventoryAccessTestSuite) TestGuestInventoryAccess() {
 	var response []models.BagItem
 	err := json.Unmarshal(w2.Body.Bytes(), &response)
 	if err != nil {
-		s.T().Fatalf("Failed to unmarshal response: %v", err)
+		s.T().Errorf("Failed to unmarshal response: %v", err)
 	}
-	fmt.Println(testutils.PrintObject(response))
 }

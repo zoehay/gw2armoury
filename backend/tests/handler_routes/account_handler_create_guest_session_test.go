@@ -1,7 +1,6 @@
 package handlerroutes_test
 
 import (
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -13,6 +12,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+	"github.com/zoehay/gw2armoury/backend/internal/api/models"
 	"github.com/zoehay/gw2armoury/backend/internal/api/routes"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
@@ -34,13 +34,13 @@ func (s *CreateGuestSessionTestSuite) SetupSuite() {
 	envPath := filepath.Join("../..", ".env")
 	err := godotenv.Load(envPath)
 	if err != nil {
-		log.Fatal("Error loading .env file:", err)
+		s.T().Errorf("Error loading .env file: %v", err)
 	}
 
 	dsn := os.Getenv("TEST_DB_DSN")
 	router, repository, service, err := routes.SetupRouter(dsn, true)
 	if err != nil {
-		log.Fatal("Error setting up router", err)
+		s.T().Errorf("Error setting up router: %v", err)
 	}
 
 	s.Router = router
@@ -77,12 +77,12 @@ func (s *CreateGuestSessionTestSuite) TestCreateGuestWithNewAPIKey() {
 
 	dbAccount, err := s.Repository.AccountRepository.GetByID("gw2apiaccountidstring")
 	if err != nil {
-		log.Fatal("Error getting account from db:", err)
+		s.T().Errorf("Error getting account from db: %v", err)
 	}
 
-	account, err := testutils.UnmarshalAccount(w)
+	account, err := testutils.UnmarshalToType[models.Account](w)
 	if err != nil {
-		s.T().Fatalf("Failed to unmarshal response: %v", err)
+		s.T().Errorf("Failed to unmarshal response: %v", err)
 	}
 
 	cookieSessionID := w.Result().Cookies()[0].Value
