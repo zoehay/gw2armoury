@@ -1,18 +1,12 @@
 package servicemocks_test
 
 import (
-	"fmt"
-	"log"
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"github.com/zoehay/gw2armoury/backend/internal/api/handlers"
-	"github.com/zoehay/gw2armoury/backend/internal/api/routes"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
 	"github.com/zoehay/gw2armoury/backend/tests/testutils"
@@ -31,16 +25,9 @@ func TestAccountRouterServiceTestSuite(t *testing.T) {
 }
 
 func (s *AccountRouterServiceTestSuite) SetupSuite() {
-	envPath := filepath.Join("../..", ".env")
-	err := godotenv.Load(envPath)
+	router, repository, service, err := testutils.DBRouterSetup()
 	if err != nil {
-		log.Fatal("Error loading .env file:", err)
-	}
-
-	dsn := os.Getenv("TEST_DB_DSN")
-	router, repository, service, err := routes.SetupRouter(dsn, true)
-	if err != nil {
-		log.Fatal("Error setting up router", err)
+		s.T().Errorf("Error setting up router: %v", err)
 	}
 
 	s.Router = router
@@ -50,18 +37,15 @@ func (s *AccountRouterServiceTestSuite) SetupSuite() {
 }
 
 func (s *AccountRouterServiceTestSuite) TearDownSuite() {
-	err := s.Repository.AccountRepository.DB.Exec("DROP TABLE db_accounts;").Error
-	assert.NoError(s.T(), err, "Failed to clear database")
-
-	db, err := s.Repository.AccountRepository.DB.DB()
+	dropTables := []string{"db_accounts", "db_sessions"}
+	err := testutils.TearDownDropTables(s.Repository, dropTables)
 	if err != nil {
-		s.T().Fatal(err)
+		s.T().Errorf("Error tearing down suite: %v", err)
 	}
-	db.Close()
 }
 
 func (s *AccountRouterServiceTestSuite) TestGetAccount() {
 	account, err := s.Service.AccountService.GetAccount("apiKey")
-	fmt.Println(testutils.PrintObject(account))
+	testutils.PrintObject(account)
 	assert.NoError(s.T(), err, "Failed to get account")
 }

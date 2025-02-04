@@ -3,18 +3,15 @@ package handlerroutes_test
 import (
 	"net/http"
 	"net/http/httptest"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"github.com/zoehay/gw2armoury/backend/internal/api/routes"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
+	"github.com/zoehay/gw2armoury/backend/tests/testutils"
 )
 
 type CreateAccountTestSuite struct {
@@ -29,14 +26,7 @@ func TestCreateAccountTestSuite(t *testing.T) {
 }
 
 func (s *CreateAccountTestSuite) SetupSuite() {
-	envPath := filepath.Join("../..", ".env")
-	err := godotenv.Load(envPath)
-	if err != nil {
-		s.T().Errorf("Error loading .env file: %v", err)
-	}
-
-	dsn := os.Getenv("TEST_DB_DSN")
-	router, repository, service, err := routes.SetupRouter(dsn, true)
+	router, repository, service, err := testutils.DBRouterSetup()
 	if err != nil {
 		s.T().Errorf("Error setting up router: %v", err)
 	}
@@ -47,14 +37,11 @@ func (s *CreateAccountTestSuite) SetupSuite() {
 }
 
 func (s *CreateAccountTestSuite) TearDownSuite() {
-	err := s.Repository.AccountRepository.DB.Exec("DROP TABLE db_accounts cascade;").Error
-	assert.NoError(s.T(), err, "Failed to clear database")
-
-	db, err := s.Repository.AccountRepository.DB.DB()
+	dropTables := []string{"db_accounts", "db_sessions"}
+	err := testutils.TearDownDropTables(s.Repository, dropTables)
 	if err != nil {
-		s.T().Fatal(err)
+		s.T().Errorf("Error tearing down suite: %v", err)
 	}
-	db.Close()
 }
 
 func (s *CreateAccountTestSuite) TestCreateAccount() {

@@ -46,7 +46,7 @@ func (s *CreateGuestAccountSessionTestSuite) TearDownSuite() {
 	dropTables := []string{"db_accounts", "db_sessions"}
 	err := testutils.TearDownDropTables(s.Repository, dropTables)
 	if err != nil {
-		s.T().Fatal(err)
+		s.T().Errorf("Error tearing down suite: %v", err)
 	}
 }
 
