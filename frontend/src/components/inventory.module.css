@@ -1,0 +1,22 @@
+.group {
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: start;
+}
+
+.tile {
+    width: 3rem;
+    height: 3rem;
+    /* outline: solid 0.1rem red; */
+}
+
+.icon {
+    width: 3rem;
+    height: 3rem;
+    object-fit: contain;
+}
+
+

@@ -1,11 +1,12 @@
 import React, { ReactNode } from "react";
+import inventory from "./inventory.module.css";
 
 interface InventoryGroupProps {
   children: ReactNode;
 }
 
 const InventoryGroup: React.FC<InventoryGroupProps> = ({ children }) => {
-  return <div>{children}</div>;
+  return <div className={inventory.group}>{children}</div>;
 };
 
 export default InventoryGroup;

@@ -42,6 +42,12 @@ func SetupRouter(dsn string, mocks bool) (*gin.Engine, *repositories.Repository,
 	bagItemHandler := handlers.NewBagItemHandler(&repository.BagItemRepository)
 	accountHandler := handlers.NewAccountHandler(&repository.AccountRepository, &repository.SessionRepository, service.AccountService, service.CharacterService)
 
+	// dev seed
+	err = db.CheckAndSeedDatabase(repository.ItemRepository, *service.ItemService)
+	if err != nil {
+		log.Fatal("Error seeding database", err)
+	}
+
 	router := gin.Default()
 
 	err = router.SetTrustedProxies([]string{"127.0.0.1"})

@@ -217,7 +217,7 @@ func (handler AccountHandler) generateNewSession(account *dbmodels.DBAccount) (u
 
 	var session = &dbmodels.DBSession{
 		SessionID: newSessionID,
-		Expires:   time.Now().Add(120 * time.Second),
+		Expires:   time.Now().Add(3600 * time.Second),
 	}
 
 	newSession, err = handler.SessionRepository.Create(session)

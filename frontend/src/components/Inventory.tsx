@@ -4,6 +4,7 @@ import { useContext, useEffect, useState } from "react";
 // import { ClientContext } from "../util/ClientContext";
 import BagItem from "../models/BagItem";
 import { ClientContext } from "../util/ClientContext";
+import content from "./content.module.css";
 
 // let item1: BagItem = {
 //     AccountID: "accountidstring",
@@ -13,7 +14,6 @@ import { ClientContext } from "../util/ClientContext";
 //     Count: 7,
 //     Binding: "Account"
 // }
-
 
 // let item2: BagItem = {
 //   AccountID: "accountidstring",
@@ -27,8 +27,8 @@ const Inventory = () => {
   let [bagItems, setBagItems] = useState<BagItem[] | null>(null);
   let context = useContext(ClientContext);
   let client = context;
-  let itemTiles: JSX.Element[]
-  
+  let itemTiles: JSX.Element[];
+
   async function fetchData() {
     let items: BagItem[] = await client.getBagItems();
     // let items = [item1, item2]
@@ -36,18 +36,17 @@ const Inventory = () => {
   }
 
   useEffect(() => {
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
-if (bagItems) {
-  itemTiles= bagItems.map((item, index) => (
-    <InventoryTile bagItem={item} key={index} />
-  ));
-}
+  if (bagItems) {
+    itemTiles = bagItems.map((item, index) => (
+      <InventoryTile bagItem={item} key={index} />
+    ));
+  }
 
   return (
-    <div>
-      <h2>Inventory</h2>
+    <div className={content.page}>
       <InventoryGroup>{itemTiles!}</InventoryGroup>
     </div>
   );

@@ -12,7 +12,7 @@ const ManageKeys = () => {
 };
 
 const KeyInput = () => {
-  const fieldName = "Password";
+  const fieldName = "API Key";
   const [formState, setFormState] = useState("");
   let context = useContext(ClientContext);
   let client = context;

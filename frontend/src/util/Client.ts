@@ -25,6 +25,7 @@ export class Client {
       console.log(response)
       if (response.ok) {
         let responseJSON = await response.json();
+        console.log(responseJSON)
         return responseJSON;
       }
     } catch (error) {
@@ -43,7 +44,6 @@ export class Client {
         body: body,
       });
 
-      console.log(response)
       if (response.ok) {
         let responseJSON = await response.json();
         return responseJSON;
@@ -54,11 +54,11 @@ export class Client {
   }
 
   async getBagItems(): Promise<BagItem[]> {
-    let endpoint: string = `${this.baseURL}/items`;
-    let response: Response = await this.clientGet(endpoint);
-    console.log(response)
-    if (response.data) {
-      return response.data;
+    let endpoint: string = `${this.baseURL}/account/characters/inventory`;
+    let response: unknown = await this.clientGet(endpoint);
+    let bagItems = response as BagItem[] 
+    if (bagItems) {
+      return bagItems;
     } else {
       return [];
     }

@@ -1,15 +1,15 @@
 interface Account {
-	AccountID :  string;
-	AccountName? :string;
-	APIKey?     :string;
-	Password?  :  string;
-	SessionID ? : string;
-	Session   ? :  Session;
+	accountID :  string;
+	accountName? :string;
+	apiKey?     :string;
+	password?  :  string;
+	sessionID ? : string;
+	session   ? :  Session;
 }
 
 interface Session {
-    SessionID:   string;
-    Expires:  Date;
+    sessionID:   string;
+    expires:  Date;
 }
 
 export default Account

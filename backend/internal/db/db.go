@@ -6,6 +6,7 @@ import (
 
 	dbmodels "github.com/zoehay/gw2armoury/backend/internal/db/models"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
+	"github.com/zoehay/gw2armoury/backend/internal/services"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -55,16 +56,14 @@ func PostgresInit(dsn string) (*gorm.DB, error) {
 
 }
 
-func CheckAndSeedDatabase(itemRepository repositories.ItemRepository) error {
+func CheckAndSeedDatabase(itemRepository repositories.ItemRepository, itemService services.ItemService) error {
 	_, err := itemRepository.GetFirst()
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		log.Print("Seeding database")
-		for _, seedItem := range seedItems {
-			if _, err := itemRepository.Create(seedItem); err != nil {
-				return err
-			}
+		err = itemService.GetAndStoreAllItems()
+		if err != nil {
+			return err
 		}
-
 	} else {
 		log.Print("Database already seeded")
 	}

@@ -1,17 +1,16 @@
 interface BagItem {
-  AccountID: string;
-  CharacterName: string;
-  BagItemID: number;
-  Icon: string;
-  Count: number;
-  Charges?: number;
-  Infusions?: number[];
-  Upgrades?: number[];
-  Skin?: number;
-  Stats?: { [key: string]: unknown };
-  Dyes?: number[];
-  Binding?: string;
-  BoundTo?: string;
+  character_name: string; 
+  id: number;
+  icon: string;
+  count: number;
+  charges?: number;
+  infusions?: number[];
+  upgrades?: number[];
+  skin?: number;
+  stats?: { [key: string]: unknown };
+  dyes?: number[];
+  binding?: string;
+  boundTo?: string;
 }
 
 export default BagItem;
