@@ -5,6 +5,7 @@ import "github.com/zoehay/gw2armoury/backend/internal/api/models"
 type DBIconBagItem struct {
 	AccountID     string                  `json:"account_id"`
 	CharacterName string                  `json:"character_name"`
+	Name          *string                 `json:"name"`
 	BagItemID     uint                    `json:"id"`
 	Icon          string                  `json:"icon"`
 	Count         uint                    `json:"count"`
@@ -21,6 +22,7 @@ type DBIconBagItem struct {
 func (dbIconBagItem DBIconBagItem) ToBagItem() models.BagItem {
 	return models.BagItem{
 		CharacterName: dbIconBagItem.CharacterName,
+		Name:          dbIconBagItem.Name,
 		BagItemID:     dbIconBagItem.BagItemID,
 		Icon:          dbIconBagItem.Icon,
 		Count:         dbIconBagItem.Count,

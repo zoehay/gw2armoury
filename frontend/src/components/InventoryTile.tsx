@@ -9,7 +9,7 @@ export interface InventoryTileProps {
 export const InventoryTile: React.FC<InventoryTileProps> = ({ bagItem }) => {
   return (
     <div className={inventory.tile}>
-      <img className={inventory.icon} src={bagItem.icon} alt="bagItem icon" />
+      <img className={inventory.icon} src={bagItem.icon} alt={bagItem.name} />
     </div>
   );
 };

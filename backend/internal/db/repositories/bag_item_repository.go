@@ -64,7 +64,7 @@ func (repository *BagItemRepository) GetIconBagItemByCharacterName(characterName
 	var bagItemWithIcon []dbmodels.DBIconBagItem
 
 	err := repository.DB.Table("db_bag_items").
-		Select("db_bag_items.*, db_items.icon").
+		Select("db_bag_items.*, db_items.icon, db_items.name").
 		Joins("left join db_items on db_bag_items.bag_item_id = db_items.id").
 		Where("db_bag_items.character_name = ?", characterName).
 		Scan(&bagItemWithIcon).Error
@@ -85,7 +85,7 @@ func (repository *BagItemRepository) GetIconBagItemByAccountID(accountID string)
 	var bagItemWithIcon []dbmodels.DBIconBagItem
 
 	err := repository.DB.Table("db_bag_items").
-		Select("db_bag_items.*, db_items.icon").
+		Select("db_bag_items.*, db_items.icon, db_items.name").
 		Joins("left join db_items on db_bag_items.bag_item_id = db_items.id").
 		Where("db_bag_items.account_id = ?", accountID).
 		Scan(&bagItemWithIcon).Error
