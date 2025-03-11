@@ -21,11 +21,8 @@ export class Client {
       let response = await fetch(endpoint, {
         credentials: "include",
       });
-
-      console.log(response)
       if (response.ok) {
-        let responseJSON = await response.json();
-        console.log(responseJSON)
+        let responseJSON = await response.json();       
         return responseJSON;
       }
     } catch (error) {

@@ -1,27 +1,9 @@
 import { InventoryTile } from "./InventoryTile";
 import InventoryGroup from "./InventoryGroup";
 import { useContext, useEffect, useState } from "react";
-// import { ClientContext } from "../util/ClientContext";
 import BagItem from "../models/BagItem";
 import { ClientContext } from "../util/ClientContext";
 import content from "./content.module.css";
-
-// let item1: BagItem = {
-//     AccountID: "accountidstring",
-//     CharacterName: "Roman Meows",
-//     BagItemID: 43772,
-//     Icon: "",
-//     Count: 7,
-//     Binding: "Account"
-// }
-
-// let item2: BagItem = {
-//   AccountID: "accountidstring",
-//   CharacterName: "Roman Meows",
-//   BagItemID: 89140,
-//   Icon: "",
-//   Count: 250,
-// }
 
 const Inventory = () => {
   let [bagItems, setBagItems] = useState<BagItem[] | null>(null);
@@ -31,7 +13,6 @@ const Inventory = () => {
 
   async function fetchData() {
     let items: BagItem[] = await client.getBagItems();
-    // let items = [item1, item2]
     setBagItems(items);
   }
 

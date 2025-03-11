@@ -1,16 +1,28 @@
 .group {
     display: flex;
     box-sizing: border-box;
-    width: 100%;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: start;
+    transform: rotate(0deg);
+    @media (min-width: 46rem) {
+        margin: 3rem;
+        max-width: 75rem;
+      }
 }
 
 .tile {
     width: 3rem;
     height: 3rem;
-    /* outline: solid 0.1rem red; */
+    position: relative;
+    text-align: right;
+}
+
+.count {
+    position: absolute;
+    z-index:1;
+    color: white;
+    margin-top: 0;
 }
 
 .icon {
@@ -19,4 +31,16 @@
     object-fit: contain;
 }
 
-
+.tooltip {
+    width: 7rem;
+    height: 7rem;
+    position: fixed;
+    z-index: 2;
+    background-color: black;
+    text-align: left;
+    @media (min-width: 46rem) {
+        position: absolute;
+        margin-left: 3rem;
+        top: 0;
+    }
+}
