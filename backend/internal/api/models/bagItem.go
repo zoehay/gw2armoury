@@ -3,6 +3,7 @@ package models
 type BagItem struct {
 	CharacterName string                  `json:"character_name"`
 	Name          *string                 `json:"name"`
+	Description   *string                 `json:"description"`
 	BagItemID     uint                    `json:"id"`
 	Icon          string                  `json:"icon"`
 	Count         uint                    `json:"count"`

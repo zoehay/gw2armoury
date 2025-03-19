@@ -33,7 +33,7 @@
 
 .tooltip {
     width: 7rem;
-    height: 7rem;
+    min-height: 5rem;
     position: fixed;
     z-index: 2;
     background-color: black;
@@ -43,4 +43,16 @@
         margin-left: 3rem;
         top: 0;
     }
+}
+
+.tooltip > .name {
+    font-size: 1rem;
+    padding: 0.25rem;
+    margin: 0rem;
+}
+
+.tooltip > .description {
+    font-size: 0.75rem;
+    padding: 0rem 0.75rem;
+    margin: 0rem;
 }

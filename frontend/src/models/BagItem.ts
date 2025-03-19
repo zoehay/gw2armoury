@@ -1,6 +1,7 @@
 interface BagItem {
   character_name: string; 
   name?: string;
+  description?: string;
   id: number;
   icon: string;
   count: number;
