@@ -1,9 +1,9 @@
 import { InventoryTile } from "./InventoryTile";
 import InventoryGroup from "./InventoryGroup";
 import { useContext, useEffect, useState } from "react";
-import BagItem from "../models/BagItem";
-import { ClientContext } from "../util/ClientContext";
-import content from "./content.module.css";
+import BagItem from "../../models/BagItem";
+import { ClientContext } from "../../util/ClientContext";
+import content from "../content.module.css";
 
 const Inventory = () => {
   let [bagItems, setBagItems] = useState<BagItem[] | null>(null);

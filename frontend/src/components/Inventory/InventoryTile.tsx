@@ -1,4 +1,4 @@
-import BagItem from "../models/BagItem";
+import BagItem from "../../models/BagItem";
 import React, { useState } from "react";
 import inventory from "./inventory.module.css";
 
@@ -27,7 +27,6 @@ export const InventoryTile: React.FC<InventoryTileProps> = ({ bagItem }) => {
       onMouseEnter={handleMouseEnter}
       onClick={handleTapToggle}
       onMouseLeave={handleMouseLeave}
-      // onClickAway={handleTap}
     >
       {bagItem.count > 1 && (
         <div className={inventory.count}>{bagItem.count}</div>
