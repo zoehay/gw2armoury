@@ -6,22 +6,39 @@
     justify-content: center;
     width: 100%;
     margin-bottom: 1rem;
-    @media (min-width: 46rem) {
-        height: 5rem
-      }
 }
 
-.desktopDiv {
+.desktop {
     display: none;
     @media (min-width: 46rem) {
+        width: 100%;
+        max-width: 75rem;
         display: flex;
         align-items: center;
     }
 }
 
-.mobileDiv {
+.desktopContent {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.desktopLinks {
+    display: flex;
+    justify-content: space-between;
+}
+
+.link {
+    margin: 1rem;
+}
+
+.mobile {
     display: grid;
     justify-content: left;
+    width: 100%;
     @media (min-width: 46rem) {
       display: none;
     }
@@ -35,7 +52,7 @@
   align-items: flex-start;
   width: 100%;
   height: 100%;
-  left: 0rem;
+  transition: left 0.5s ease;
 }
 
 .mobileDropdown {
@@ -46,5 +63,4 @@
   flex-direction: column;
   width: 50%;
   height: 100%;
-  left: 0rem;
 }

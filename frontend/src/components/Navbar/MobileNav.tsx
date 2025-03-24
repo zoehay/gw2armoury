@@ -3,13 +3,14 @@ import { useState } from "react";
 
 export const MobileNav = () => {
   let [showMenu, setShowMenu] = useState(false);
-  let alt;
+  let position;
 
   if (!showMenu) {
-    alt = "options";
+    position = "-100%";
   } else {
-    alt = "close";
+    position = "0%";
   }
+  let style = { left: position } as React.CSSProperties;
 
   const handleClose = () => {
     if (showMenu) {
@@ -20,11 +21,16 @@ export const MobileNav = () => {
   return (
     <>
       <button onClick={() => setShowMenu(!showMenu)}> </button>
-      {showMenu && (
-        <div className={navbar.mobileDropdownWrapper} onClick={handleClose}>
-          <div className={navbar.mobileDropdown}></div>
+      <div
+        className={navbar.mobileDropdownWrapper}
+        onClick={handleClose}
+        style={style}
+      >
+        <div className={navbar.mobileDropdown}>
+          <ul className={navbar.link}>Manage Keys</ul>
+          <ul className={navbar.link}>Inventory</ul>
         </div>
-      )}
+      </div>
     </>
   );
 };

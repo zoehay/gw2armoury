@@ -5,10 +5,10 @@ import navbar from "./navbar.module.css";
 export const Navbar = () => {
   return (
     <div className={navbar.nav}>
-      <div className={navbar.mobileDiv}>
+      <div className={navbar.mobile}>
         <MobileNav></MobileNav>
       </div>
-      <div className={navbar.desktopDiv}>
+      <div className={navbar.desktop}>
         <DesktopNav></DesktopNav>
       </div>
     </div>
