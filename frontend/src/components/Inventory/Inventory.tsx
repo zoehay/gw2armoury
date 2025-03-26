@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import BagItem from "../../models/BagItem";
+import { BagItem } from "../../models/BagItem";
 import { ClientContext } from "../../util/ClientContext";
 import content from "../content.module.css";
 import CharacterInventory from "./CharacterInventory";
@@ -22,7 +22,7 @@ const Inventory = () => {
   function sortBagItems(items: BagItem[]) {
     let inventories: CharacterInventories = new Map();
     for (let item of items) {
-      let characterName = item.character_name;
+      let characterName = item.characterName;
       if (inventories.get(characterName)) {
         inventories.get(characterName)?.push(item);
       } else {

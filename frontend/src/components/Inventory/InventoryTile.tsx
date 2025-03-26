@@ -1,4 +1,4 @@
-import BagItem from "../../models/BagItem";
+import { BagItem } from "../../models/BagItem";
 import React, { useState } from "react";
 import inventory from "./inventory.module.css";
 

@@ -1,5 +1,5 @@
 import Account from "../models/Account";
-import BagItem from "../models/BagItem";
+import {BagItem, APIBagItem, APIBagItemToBagItem} from "../models/BagItem";
 
 export interface ClientInterface {
   getBagItems(): BagItem[];
@@ -53,7 +53,8 @@ export class Client {
   async getBagItems(): Promise<BagItem[]> {
     let endpoint: string = `${this.baseURL}/account/characters/inventory`;
     let response: unknown = await this.clientGet(endpoint);
-    let bagItems = response as BagItem[] 
+    let apiBagItems = response as APIBagItem[]
+    let bagItems: BagItem[] = apiBagItems.map(APIBagItemToBagItem)
     if (bagItems) {
       return bagItems;
     } else {

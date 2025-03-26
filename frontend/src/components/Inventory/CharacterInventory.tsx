@@ -1,6 +1,6 @@
 import React from "react";
 import inventory from "./inventory.module.css";
-import BagItem from "../../models/BagItem";
+import { BagItem } from "../../models/BagItem";
 import { InventoryTile } from "./InventoryTile";
 
 interface CharacterProps {
