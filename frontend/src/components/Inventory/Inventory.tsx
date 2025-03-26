@@ -1,34 +1,57 @@
-import { InventoryTile } from "./InventoryTile";
-import InventoryGroup from "./InventoryGroup";
 import { useContext, useEffect, useState } from "react";
 import BagItem from "../../models/BagItem";
 import { ClientContext } from "../../util/ClientContext";
 import content from "../content.module.css";
+import CharacterInventory from "./CharacterInventory";
+import inventory from "./inventory.module.css";
+
+type CharacterInventories = Map<string, BagItem[]>;
 
 const Inventory = () => {
-  let [bagItems, setBagItems] = useState<BagItem[] | null>(null);
   let context = useContext(ClientContext);
   let client = context;
-  let itemTiles: JSX.Element[];
+
+  let [characterInventories, setCharacterInventories] =
+    useState<CharacterInventories>(new Map());
 
   async function fetchData() {
     let items: BagItem[] = await client.getBagItems();
-    setBagItems(items);
+    setCharacterInventories(sortBagItems(items));
+  }
+
+  function sortBagItems(items: BagItem[]) {
+    let inventories: CharacterInventories = new Map();
+    for (let item of items) {
+      let characterName = item.character_name;
+      if (inventories.get(characterName)) {
+        inventories.get(characterName)?.push(item);
+      } else {
+        inventories.set(characterName, [item]);
+      }
+    }
+    return inventories;
   }
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  if (bagItems) {
-    itemTiles = bagItems.map((item, index) => (
-      <InventoryTile bagItem={item} key={index} />
-    ));
+  let characters: JSX.Element[] = [];
+
+  if (characterInventories) {
+    characterInventories.forEach((value: BagItem[], index: string) => {
+      characters.push(
+        <CharacterInventory
+          characterName={index}
+          contents={value}
+        ></CharacterInventory>
+      );
+    });
   }
 
   return (
     <div className={content.page}>
-      <InventoryGroup>{itemTiles!}</InventoryGroup>
+      <div className={inventory.inventory}>{characters!}</div>
     </div>
   );
 };

@@ -1,9 +1,9 @@
 import "./App.css";
-import Inventory from "./components/Inventory/Inventory";
 import ManageKeys from "./components/ManageKeys";
 import { ClientProvider } from "./util/ClientContext";
 import content from "./components/content.module.css";
 import { Navbar } from "./components/Navbar/Navbar";
+import Inventory from "./components/Inventory/Inventory";
 
 function App() {
   return (
