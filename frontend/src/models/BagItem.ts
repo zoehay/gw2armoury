@@ -13,6 +13,7 @@ export interface BagItem {
   dyes?: number[];
   binding?: string;
   boundTo?: string;
+  rarity?: string;
 }
 
 export interface APIBagItem {
@@ -30,6 +31,7 @@ export interface APIBagItem {
   dyes?: number[];
   binding?: string;
   bound_to?: string;
+  rarity?: string;
 }
 
 export function APIBagItemToBagItem(apiBagItem: APIBagItem): BagItem {
@@ -48,6 +50,7 @@ return {
   dyes: apiBagItem.dyes,
   binding: apiBagItem.binding,
   boundTo: apiBagItem.bound_to,
+  rarity: apiBagItem.rarity as string,
 }
 
 }

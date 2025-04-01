@@ -2,7 +2,7 @@ package dbmodels
 
 import "github.com/zoehay/gw2armoury/backend/internal/api/models"
 
-type DBIconBagItem struct {
+type DBDetailBagItem struct {
 	AccountID     string                  `json:"account_id"`
 	CharacterName string                  `json:"character_name"`
 	Name          *string                 `json:"name"`
@@ -18,9 +18,10 @@ type DBIconBagItem struct {
 	Dyes          *[]int64                `json:"dyes,omitempty" gorm:"type:integer[]"`
 	Binding       *string                 `json:"binding,omitempty"`
 	BoundTo       *string                 `json:"bound_to,omitempty"`
+	Rarity        *string                 `json:"rarity"`
 }
 
-func (dbIconBagItem DBIconBagItem) ToBagItem() models.BagItem {
+func (dbIconBagItem DBDetailBagItem) ToBagItem() models.BagItem {
 	return models.BagItem{
 		CharacterName: dbIconBagItem.CharacterName,
 		Name:          dbIconBagItem.Name,
@@ -36,5 +37,6 @@ func (dbIconBagItem DBIconBagItem) ToBagItem() models.BagItem {
 		Dyes:          dbIconBagItem.Dyes,
 		Binding:       dbIconBagItem.Binding,
 		BoundTo:       dbIconBagItem.BoundTo,
+		Rarity:        dbIconBagItem.Rarity,
 	}
 }

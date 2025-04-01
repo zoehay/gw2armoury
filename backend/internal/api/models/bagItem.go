@@ -15,4 +15,5 @@ type BagItem struct {
 	Dyes          *[]int64                `json:"dyes,omitempty" gorm:"type:integer[]"`
 	Binding       *string                 `json:"binding,omitempty"`
 	BoundTo       *string                 `json:"bound_to,omitempty"`
+	Rarity        *string                 `json:"rarity"`
 }

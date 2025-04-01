@@ -20,7 +20,7 @@ func NewBagItemHandler(bagItemRepository repositories.BagItemRepositoryInterface
 func (BagItemHandler BagItemHandler) GetByCharacter(c *gin.Context) {
 	characterName := c.Params.ByName("charactername")
 
-	items, err := BagItemHandler.BagItemRepository.GetIconBagItemByCharacterName(characterName)
+	items, err := BagItemHandler.BagItemRepository.GetDetailBagItemByCharacterName(characterName)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -37,7 +37,7 @@ func (BagItemHandler BagItemHandler) GetByAccount(c *gin.Context) {
 	}
 
 	accountID := value.(string)
-	items, err := BagItemHandler.BagItemRepository.GetIconBagItemByAccountID(accountID)
+	items, err := BagItemHandler.BagItemRepository.GetDetailBagItemByAccountID(accountID)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

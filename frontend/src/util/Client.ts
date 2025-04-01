@@ -69,7 +69,6 @@ export class Client {
 
     let endpoint: string = `${this.baseURL}/apikeys`;
     let response: Response = await this.clientPost(endpoint, body)
-    console.log(response)
     if (response.data) {
       return response.data;
     } else {
