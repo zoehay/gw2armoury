@@ -32,12 +32,12 @@ export const InventoryTile: React.FC<InventoryTileProps> = ({ bagItem }) => {
         <div className={inventory.count}>{bagItem.count}</div>
       )}
       <img className={inventory.icon} src={bagItem.icon} alt={bagItem.name} />
-      {displayDetails && <ItemToolTip bagItem={bagItem}></ItemToolTip>}
+      {displayDetails && <ToolTip bagItem={bagItem}></ToolTip>}
     </div>
   );
 };
 
-const ItemToolTip: React.FC<InventoryTileProps> = ({ bagItem }) => {
+const ToolTip: React.FC<InventoryTileProps> = ({ bagItem }) => {
   return (
     <div className={inventory.tooltip}>
       <p className={inventory.name}>{bagItem.name}</p>

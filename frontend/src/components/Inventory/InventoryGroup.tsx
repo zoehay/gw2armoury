@@ -3,12 +3,12 @@ import inventory from "./inventory.module.css";
 import { BagItem } from "../../models/BagItem";
 import { InventoryTile } from "./InventoryTile";
 
-interface CharacterProps {
+interface InventoryGroupProps {
   characterName: string;
   contents?: BagItem[];
 }
 
-const CharacterInventory: React.FC<CharacterProps> = ({
+const InventoryGroup: React.FC<InventoryGroupProps> = ({
   characterName,
   contents,
 }) => {
@@ -20,11 +20,11 @@ const CharacterInventory: React.FC<CharacterProps> = ({
   }
 
   return (
-    <div className={inventory.characterInventory}>
-      <div className={inventory.characterName}>{characterName}</div>
+    <div className={inventory.group}>
+      <div className={inventory.name}>{characterName}</div>
       <div className={inventory.contents}>{itemTiles}</div>
     </div>
   );
 };
 
-export default CharacterInventory;
+export default InventoryGroup;

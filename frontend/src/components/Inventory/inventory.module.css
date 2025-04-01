@@ -1,16 +1,18 @@
-.inventory {
+
+
+.inventoryGroups {
     transform: rotate(0deg);    
 }
 
-.characterInventory {
+.group {
     display: block;
 }
 
-.characterName {
+.group > .name {
     font-weight: bold;
 }
 
-.contents {
+.group > .contents {
     display: flex;
     box-sizing: border-box;
     flex-direction: row;
@@ -28,14 +30,14 @@
     text-align: right;
 }
 
-.count {
+.tile > .count {
     position: absolute;
     z-index:1;
     color: white;
     margin-top: 0;
 }
 
-.icon {
+.tile > .icon {
     transform: rotate(0deg);
     width: 3rem;
     height: 3rem;
