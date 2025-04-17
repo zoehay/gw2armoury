@@ -31,6 +31,9 @@ func (s *ItemServiceTestSuite) SetupSuite() {
 	s.Router = router
 	s.Repository = repository
 	s.Service = service
+
+	err = s.Service.ItemService.ItemRepository.DB.Exec("TRUNCATE TABLE db_items;").Error
+	assert.NoError(s.T(), err, "Failed to clear database")
 }
 
 func (s *ItemServiceTestSuite) TearDownSuite() {

@@ -34,10 +34,10 @@ func (s *ItemHandlerTestSuite) SetupSuite() {
 	s.Repository = repository
 	s.Service = service
 
-	err = s.Service.ItemService.GetAndStoreAllItems()
-	if err != nil {
-		s.T().Errorf("Error getting and storing items: %v", err)
-	}
+	// err = s.Service.ItemService.GetAndStoreAllItems()
+	// if err != nil {
+	// 	s.T().Errorf("Error getting and storing items: %v", err)
+	// }
 
 }
 

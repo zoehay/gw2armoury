@@ -31,109 +31,170 @@ func NewAccountHandler(accountRepository repositories.AccountRepositoryInterface
 	}
 }
 
-func (handler AccountHandler) CreateGuest(c *gin.Context) {
+func (handler AccountHandler) PostAPIKey(c *gin.Context) {
 
-	var createRequest CreateGuestRequest
+	var createGuestRequest CreateGuestRequest
 
-	if err := c.BindJSON(&createRequest); err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"request body bind json error": err.Error()})
+	if err := c.BindJSON(&createGuestRequest); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"request body bind json error": err.Error()})
 		return
 	}
 
-	gw2AccountID, err := handler.AccountService.GetAccountID(createRequest.APIKey)
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error could not get account id from gw2 api": err.Error()})
+	// verify GW2 account
+	gw2AccountID, err := handler.AccountService.GetAccountID(createGuestRequest.APIKey)
+	if err != nil || gw2AccountID == nil {
+		c.IndentedJSON(http.StatusBadGateway, gin.H{"error could not get account id from gw2 api": err.Error()})
 		return
 	}
 
 	var account *dbmodels.DBAccount
 	var session *dbmodels.DBSession
-	existingAccount, err := handler.AccountRepository.GetByID(*gw2AccountID)
 
+	existingAccount, err := handler.AccountRepository.GetByID(*gw2AccountID)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		account, session, err = handler.generateNewGuestAccount(*gw2AccountID, createRequest.APIKey)
+		// new user
+		account, session, err = handler.generateNewGuestAccount(*gw2AccountID, createGuestRequest.APIKey)
 		if err != nil {
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error creating new guest account": err.Error()})
 			return
 		}
 	} else if err != nil {
+		// database error
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error accessing account database": err.Error()})
 		return
 	} else {
+		// existing user
 		account = existingAccount
-		if account.Session != nil {
-			session, err = handler.renewSession(account.Session)
-			if err != nil {
-				c.IndentedJSON(http.StatusInternalServerError, gin.H{"error renewing session for existing account": err.Error()})
-				return
-			}
-		} else {
-			account, session, err = handler.generateNewSession(account)
-			if err != nil {
-				c.IndentedJSON(http.StatusInternalServerError, gin.H{"error generating new session for existing account": err.Error()})
-				return
-			}
+		account, session, err = handler.renewOrGenerateSession(account)
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"session error for existing guest": err.Error()})
 		}
 	}
 
 	c.SetCookie("sessionID", session.SessionID, 3600, "/", "localhost", false, true)
 
-	err = handler.CharacterService.GetAndStoreAllCharacters(*gw2AccountID, createRequest.APIKey)
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error getting characters after guest creation": err.Error()})
-		return
+	if isRecrawlDue(account.LastCrawl) {
+		err = handler.CharacterService.GetAndStoreAllCharacters(*gw2AccountID, createGuestRequest.APIKey)
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error getting characters after guest creation": err.Error()})
+			return
+		}
+		err = handler.AccountRepository.UpdateLastCrawl(*gw2AccountID)
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error updating account last crawl": err.Error()})
+			return
+		}
 	}
 
 	c.IndentedJSON(http.StatusOK, account.ToAccount())
 }
 
+func (handler AccountHandler) renewOrGenerateSession(account *dbmodels.DBAccount) (*dbmodels.DBAccount, *dbmodels.DBSession, error) {
+	var session *dbmodels.DBSession
+	var err error
+
+	if account.Session != nil {
+		session, err = handler.renewSession(account.Session)
+		if err != nil {
+			return nil, nil, fmt.Errorf("error renewing session for existing account: %w", err)
+		}
+	} else {
+		account, session, err = handler.generateNewSession(account)
+		if err != nil {
+			return nil, nil, fmt.Errorf("error generating new session for existing account: %w", err)
+		}
+	}
+
+	return account, session, nil
+}
+
+func isRecrawlDue(lastCrawl *time.Time) bool {
+	minHoursSinceCrawl := float64(1)
+	var elapsed float64
+
+	if lastCrawl != nil {
+		t := time.Now()
+		elapsed = t.Sub(*lastCrawl).Hours()
+	}
+
+	return (elapsed >= minHoursSinceCrawl || lastCrawl == nil)
+}
+
 func (handler AccountHandler) Create(c *gin.Context) {
-	var accountCreate CreateRequest
+	var createRequest CreateRequest
 
-	if err := c.BindJSON(&accountCreate); err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"request body bind json error": err.Error()})
+	if err := c.BindJSON(&createRequest); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"request body bind json error": err.Error()})
 		return
 	}
 
-	gw2AccountID, err := handler.AccountService.GetAccountID(accountCreate.APIKey)
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error could not get account id from gw2 api": err.Error()})
+	// verify GW2 account
+	gw2AccountID, err := handler.AccountService.GetAccountID(createRequest.APIKey)
+	if err != nil || gw2AccountID == nil {
+		c.IndentedJSON(http.StatusBadGateway, gin.H{"error could not get account id from gw2 api": err.Error()})
 		return
 	}
+	// TODO password encryption
 
-	account, err := handler.AccountRepository.GetByID(*gw2AccountID)
-	if account != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error existing account for account id": err.Error()})
-		return
-	}
-
-	var stringAccountID string
-	if gw2AccountID != nil {
-		stringAccountID = *gw2AccountID
-	}
-
-	//password encryption
-
+	var account *dbmodels.DBAccount
+	var session *dbmodels.DBSession
 	var newAccount = &dbmodels.DBAccount{
-		AccountID:   stringAccountID,
-		AccountName: &accountCreate.AccountName,
-		APIKey:      &accountCreate.APIKey,
+		AccountID:   *gw2AccountID,
+		AccountName: &createRequest.AccountName,
+		APIKey:      &createRequest.APIKey,
+		Password:    &createRequest.Password,
 		// Session:     newSession,
 	}
 
-	account, err = handler.AccountRepository.Create(newAccount)
+	existingAccount, err := handler.AccountRepository.GetByID(*gw2AccountID)
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"account repository create error": err.Error()})
-		return
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			account, err = handler.AccountRepository.Create(newAccount)
+			if err != nil {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"account repository create error": err.Error()})
+				return
+			}
+		} else {
+			if err != nil {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"error accessing account db": err.Error()})
+				return
+			}
+		}
+	} else if existingAccount != nil {
+		if existingAccount.Password != nil {
+			// existing account
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error existing account for account id": err.Error()})
+			return
+		} else {
+			// existing guest account, upgrade to full account
+			account, err = handler.AccountRepository.Update(existingAccount, newAccount)
+			if err != nil {
+				c.IndentedJSON(http.StatusInternalServerError, gin.H{"account repository updates error": err.Error()})
+				return
+			}
+		}
 	}
 
-	// err = handler.startSession(c, account)
-	// if err != nil {
-	// 	c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	// 	return
-	// }
+	updatedAccount, session, err := handler.renewOrGenerateSession(account)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"session error for existing guest": err.Error()})
+	}
 
-	c.IndentedJSON(http.StatusOK, account.ToAccount())
+	if isRecrawlDue(account.LastCrawl) {
+		err = handler.CharacterService.GetAndStoreAllCharacters(*gw2AccountID, *account.APIKey)
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error getting characters after guest creation": err.Error()})
+			return
+		}
+		err = handler.AccountRepository.UpdateLastCrawl(*gw2AccountID)
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error updating account last crawl": err.Error()})
+			return
+		}
+	}
+
+	c.SetCookie("sessionID", session.SessionID, 3600, "/", "localhost", false, true)
+	c.IndentedJSON(http.StatusOK, updatedAccount.ToAccount())
 
 }
 
@@ -225,7 +286,7 @@ func (handler AccountHandler) generateNewSession(account *dbmodels.DBAccount) (u
 		return nil, nil, err
 	}
 
-	updatedAccount, err = handler.AccountRepository.UpdateSession(account.AccountID, session)
+	updatedAccount, err = handler.AccountRepository.UpdateSession(account.AccountID, newSession)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -42,8 +42,7 @@ func SetupRouter(dsn string, mocks bool) (*gin.Engine, *repositories.Repository,
 	bagItemHandler := handlers.NewBagItemHandler(&repository.BagItemRepository)
 	accountHandler := handlers.NewAccountHandler(&repository.AccountRepository, &repository.SessionRepository, service.AccountService, service.CharacterService)
 
-	// dev seed
-	err = db.CheckAndSeedDatabase(repository.ItemRepository, *service.ItemService)
+	err = db.SeedItems(repository.ItemRepository, *service.ItemService)
 	if err != nil {
 		log.Fatal("Error seeding database", err)
 	}
@@ -62,7 +61,7 @@ func SetupRouter(dsn string, mocks bool) (*gin.Engine, *repositories.Repository,
 
 	router.POST("/login", accountHandler.Login)
 	router.POST("/signup", accountHandler.Create)
-	router.POST("/apikeys", accountHandler.CreateGuest)
+	router.POST("/apikeys", accountHandler.PostAPIKey)
 
 	account := router.Group("/account")
 	account.Use(middleware.UseSession(&repository.AccountRepository, &repository.SessionRepository))

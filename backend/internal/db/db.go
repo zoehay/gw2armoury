@@ -11,33 +11,9 @@ import (
 	"gorm.io/gorm"
 )
 
-var seedItems = []*dbmodels.DBItem{
-	{
-		ID:          28445,
-		Name:        "Strong Soft Wood Longbow of Fire",
-		Icon:        "https://render.guildwars2.com/file/C6110F52DF5AFE0F00A56F9E143E9732176DDDE9/65015.png",
-		Description: "",
-		Type:        "Weapon"},
-	{
-		ID:     12452,
-		Name:   "Omnomberry Bar",
-		Type:   "Consumable",
-		Level:  80,
-		Rarity: "Fine",
-		Icon:   "https://render.guildwars2.com/file/6BD5B65FBC6ED450219EC86DD570E59F4DA3791F/433643.png",
-	},
-}
-
-// var initAPIKey = "initkeystring"
-
-// var seedAccount = *&dbmodels.DBAccount{
-// 	AccountID: "testingaccountID",
-// 	APIKey:    &initAPIKey,
-// }
-
 func PostgresInit(dsn string) (*gorm.DB, error) {
 
-	// Add logic to ping db
+	// Add ping db
 	// time.Sleep(30 * time.Second)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -56,7 +32,7 @@ func PostgresInit(dsn string) (*gorm.DB, error) {
 
 }
 
-func CheckAndSeedDatabase(itemRepository repositories.ItemRepository, itemService services.ItemService) error {
+func SeedItems(itemRepository repositories.ItemRepository, itemService services.ItemService) error {
 	_, err := itemRepository.GetFirst()
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		log.Print("Seeding database")
