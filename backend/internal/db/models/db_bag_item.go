@@ -7,7 +7,7 @@ import (
 // MVP do not care about which bag an item is in
 type DBBagItem struct {
 	AccountID     string
-	CharacterName string
+	CharacterName *string
 	BagItemID     uint
 	Count         uint
 	Charges       *uint

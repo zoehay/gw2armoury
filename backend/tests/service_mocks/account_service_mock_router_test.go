@@ -33,7 +33,7 @@ func (s *AccountRouterServiceTestSuite) SetupSuite() {
 	s.Router = router
 	s.Repository = repository
 	s.Service = service
-	s.AccountHandler = handlers.NewAccountHandler(&repository.AccountRepository, &repository.SessionRepository, service.AccountService, service.CharacterService)
+	s.AccountHandler = handlers.NewAccountHandler(&repository.AccountRepository, &repository.SessionRepository, service.AccountService, service.BagItemService)
 }
 
 func (s *AccountRouterServiceTestSuite) TearDownSuite() {

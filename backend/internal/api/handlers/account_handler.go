@@ -19,15 +19,15 @@ type AccountHandler struct {
 	AccountRepository repositories.AccountRepositoryInterface
 	SessionRepository repositories.SessionRepositoryInterface
 	AccountService    services.AccountServiceInterface
-	CharacterService  services.CharacterServiceInterface
+	BagItemService    services.BagItemServiceInterface
 }
 
-func NewAccountHandler(accountRepository repositories.AccountRepositoryInterface, sessionRepository repositories.SessionRepositoryInterface, accountService services.AccountServiceInterface, characterService services.CharacterServiceInterface) *AccountHandler {
+func NewAccountHandler(accountRepository repositories.AccountRepositoryInterface, sessionRepository repositories.SessionRepositoryInterface, accountService services.AccountServiceInterface, bagItemService services.BagItemServiceInterface) *AccountHandler {
 	return &AccountHandler{
 		AccountRepository: accountRepository,
 		SessionRepository: sessionRepository,
 		AccountService:    accountService,
-		CharacterService:  characterService,
+		BagItemService:    bagItemService,
 	}
 }
 
@@ -41,14 +41,15 @@ func (handler AccountHandler) PostAPIKey(c *gin.Context) {
 	}
 
 	// verify GW2 account
-	gw2AccountID, err := handler.AccountService.GetAccountID(createGuestRequest.APIKey)
-	if err != nil || gw2AccountID == nil {
+	gw2Account, err := handler.AccountService.GetAccount(createGuestRequest.APIKey)
+	if err != nil || gw2Account == nil || gw2Account.ID == nil {
 		c.IndentedJSON(http.StatusBadGateway, gin.H{"error could not get account id from gw2 api": err.Error()})
 		return
 	}
 
 	var account *dbmodels.DBAccount
 	var session *dbmodels.DBSession
+	gw2AccountID := gw2Account.ID
 
 	existingAccount, err := handler.AccountRepository.GetByID(*gw2AccountID)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -74,7 +75,7 @@ func (handler AccountHandler) PostAPIKey(c *gin.Context) {
 	c.SetCookie("sessionID", session.SessionID, 3600, "/", "localhost", false, true)
 
 	if isRecrawlDue(account.LastCrawl) {
-		err = handler.CharacterService.GetAndStoreAllCharacters(*gw2AccountID, createGuestRequest.APIKey)
+		err = handler.BagItemService.GetAndStoreAllCharacters(*gw2AccountID, createGuestRequest.APIKey)
 		if err != nil {
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error getting characters after guest creation": err.Error()})
 			return
@@ -129,12 +130,14 @@ func (handler AccountHandler) Create(c *gin.Context) {
 	}
 
 	// verify GW2 account
-	gw2AccountID, err := handler.AccountService.GetAccountID(createRequest.APIKey)
-	if err != nil || gw2AccountID == nil {
+	gw2Account, err := handler.AccountService.GetAccount(createRequest.APIKey)
+	if err != nil || gw2Account == nil || gw2Account.ID == nil {
 		c.IndentedJSON(http.StatusBadGateway, gin.H{"error could not get account id from gw2 api": err.Error()})
 		return
 	}
 	// TODO password encryption
+
+	gw2AccountID := gw2Account.ID
 
 	var account *dbmodels.DBAccount
 	var session *dbmodels.DBSession
@@ -181,7 +184,7 @@ func (handler AccountHandler) Create(c *gin.Context) {
 	}
 
 	if isRecrawlDue(account.LastCrawl) {
-		err = handler.CharacterService.GetAndStoreAllCharacters(*gw2AccountID, *account.APIKey)
+		err = handler.BagItemService.GetAndStoreAllCharacters(*gw2AccountID, *account.APIKey)
 		if err != nil {
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error getting characters after guest creation": err.Error()})
 			return

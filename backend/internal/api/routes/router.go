@@ -40,7 +40,7 @@ func SetupRouter(dsn string, mocks bool) (*gin.Engine, *repositories.Repository,
 
 	itemHandler := handlers.NewItemHandler(&repository.ItemRepository)
 	bagItemHandler := handlers.NewBagItemHandler(&repository.BagItemRepository)
-	accountHandler := handlers.NewAccountHandler(&repository.AccountRepository, &repository.SessionRepository, service.AccountService, service.CharacterService)
+	accountHandler := handlers.NewAccountHandler(&repository.AccountRepository, &repository.SessionRepository, service.AccountService, service.BagItemService)
 
 	err = db.SeedItems(repository.ItemRepository, *service.ItemService)
 	if err != nil {

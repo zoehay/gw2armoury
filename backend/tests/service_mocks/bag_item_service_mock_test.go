@@ -11,18 +11,18 @@ import (
 	"github.com/zoehay/gw2armoury/backend/tests/testutils"
 )
 
-type CharacterServiceTestSuite struct {
+type BagItemAccountServiceTestSuite struct {
 	suite.Suite
 	Router     *gin.Engine
 	Repository *repositories.Repository
 	Service    *services.Service
 }
 
-func TestCharacterServiceTestSuite(t *testing.T) {
-	suite.Run(t, new(CharacterServiceTestSuite))
+func TestBagItemAccountServiceTestSuite(t *testing.T) {
+	suite.Run(t, new(BagItemAccountServiceTestSuite))
 }
 
-func (s *CharacterServiceTestSuite) SetupSuite() {
+func (s *BagItemAccountServiceTestSuite) SetupSuite() {
 	router, repository, service, err := testutils.DBRouterSetup()
 	if err != nil {
 		s.T().Errorf("Error setting up router: %v", err)
@@ -33,7 +33,7 @@ func (s *CharacterServiceTestSuite) SetupSuite() {
 	s.Service = service
 }
 
-func (s *CharacterServiceTestSuite) TearDownSuite() {
+func (s *BagItemAccountServiceTestSuite) TearDownSuite() {
 	dropTables := []string{"db_accounts", "db_sessions", "db_bag_items", "db_items"}
 	err := testutils.TearDownDropTables(s.Repository, dropTables)
 	if err != nil {
@@ -41,12 +41,13 @@ func (s *CharacterServiceTestSuite) TearDownSuite() {
 	}
 }
 
-func (s *CharacterServiceTestSuite) TestGetAndStoreAllCharacters() {
-	err := s.Service.BagItemService.GetAndStoreAllCharacters("accountid", "apikeystring")
+func (s *BagItemAccountServiceTestSuite) TestGetAndStoreAccountInventory() {
+	err := s.Service.BagItemService.GetAndStoreAccountInventory("accountid", "apikeystring")
 	assert.NoError(s.T(), err, "Failed to get and store items")
 }
 
-func (s *CharacterServiceTestSuite) TestGetBagItemsByCharacterName() {
-	_, err := s.Service.BagItemService.BagItemRepository.GetByCharacterName("Roman Meows")
-	assert.NoError(s.T(), err, "Failed to get item by id")
+func (s *BagItemAccountServiceTestSuite) TestGetBagItemsByAccount() {
+	bagItems, err := s.Service.BagItemService.BagItemRepository.GetDetailBagItemByAccountID("accountid")
+	testutils.PrintObject(bagItems)
+	assert.NoError(s.T(), err, "Failed to get account bag items")
 }

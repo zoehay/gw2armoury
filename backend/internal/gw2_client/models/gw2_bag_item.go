@@ -18,7 +18,7 @@ type GW2BagItem struct {
 	BoundTo   *string                 `json:"bound_to,omitempty"`
 }
 
-func (gw2BagItem GW2BagItem) ToDBBagItem(accountID string, apiCharacterName string) dbmodels.DBBagItem {
+func (gw2BagItem GW2BagItem) ToDBBagItem(accountID string, apiCharacterName *string) dbmodels.DBBagItem {
 	var stats = (*dbmodels.DetailsMap)(gw2BagItem.Stats)
 	return dbmodels.DBBagItem{
 		AccountID:     accountID,

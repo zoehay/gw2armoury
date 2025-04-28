@@ -49,6 +49,12 @@ func (repository *BagItemRepository) GetByCharacterName(characterName string) ([
 	return bagItems, nil
 }
 
+func (repository *BagItemRepository) DeleteAccountInventory(accountID string) error {
+	err := repository.DB.Where("db_bag_items.account_id = ?", accountID).Where("character_name IS NULL").Delete(&dbmodels.DBBagItem{}).Error
+
+	return err
+}
+
 func (repository *BagItemRepository) GetIds() ([]int, error) {
 	var bagItemIds []int
 	err := repository.DB.Model(&dbmodels.DBBagItem{}).Pluck("bag_item_id", &bagItemIds).Error

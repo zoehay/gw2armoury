@@ -9,7 +9,7 @@ import (
 )
 
 type AccountServiceInterface interface {
-	GetAccountID(apiKey string) (*string, error)
+	GetAccount(apiKey string) (*gw2models.GW2Account, error)
 }
 
 type AccountService struct {
@@ -22,18 +22,6 @@ func NewAccountService(accountRepository *repositories.AccountRepository, accoun
 		AccountRepository: accountRepository,
 		AccountProvider:   accountProvider,
 	}
-}
-
-func (service *AccountService) GetAccountID(apiKey string) (*string, error) {
-	account, err := service.AccountProvider.GetAccount(apiKey)
-	if err != nil {
-		return nil, fmt.Errorf("service error using provider could not get account id: %s", err)
-	}
-	if account.ID == nil {
-		return nil, fmt.Errorf("service error no account id: %s", err)
-	}
-
-	return account.ID, nil
 }
 
 func (service *AccountService) GetAccount(apiKey string) (*gw2models.GW2Account, error) {

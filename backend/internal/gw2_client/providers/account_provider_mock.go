@@ -44,3 +44,37 @@ func (accountProvider *AccountProviderMock) ReadAccountFromFile(filepath string)
 
 	return &account, nil
 }
+
+func (accountProvider *AccountProviderMock) GetAccountInventory(apiKey string) (*[]gw2models.GW2BagItem, error) {
+	wd, _ := os.Getwd()
+	isTesting := strings.Contains(wd, "test")
+	leadingFilepath := ""
+
+	if isTesting {
+		leadingFilepath = "../."
+	}
+
+	filepath := fmt.Sprintf("%s./test_data/account_inventory_test_data.txt", leadingFilepath)
+	accountInventory, err := accountProvider.ReadAccountInventoryFromFile(filepath)
+
+	if err != nil {
+		return nil, fmt.Errorf("error reading from test data file: %s", err)
+	}
+
+	return accountInventory, nil
+}
+
+func (accountProvider *AccountProviderMock) ReadAccountInventoryFromFile(filepath string) (*[]gw2models.GW2BagItem, error) {
+	content, err := os.ReadFile(filepath)
+	if err != nil {
+		return nil, err
+	}
+
+	var accountInventory *[]gw2models.GW2BagItem
+	err = json.Unmarshal(content, &accountInventory)
+	if err != nil {
+		return nil, err
+	}
+
+	return accountInventory, nil
+}
