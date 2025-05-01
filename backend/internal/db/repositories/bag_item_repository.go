@@ -7,8 +7,10 @@ import (
 
 type BagItemRepositoryInterface interface {
 	Create(BagItem *dbmodels.DBBagItem) (*dbmodels.DBBagItem, error)
+	DeleteByAccountID(accountID string) error
 	DeleteByCharacterName(characterName string) error
 	GetByCharacterName(characterName string) ([]dbmodels.DBBagItem, error)
+	DeleteSharedInventory(accountID string) error
 	GetIds() ([]int, error)
 	GetDetailBagItemByCharacterName(characterName string) ([]dbmodels.DBDetailBagItem, error)
 	GetDetailBagItemByAccountID(accountID string) ([]dbmodels.DBDetailBagItem, error)
@@ -33,6 +35,12 @@ func (repository *BagItemRepository) Create(BagItem *dbmodels.DBBagItem) (*dbmod
 	return BagItem, nil
 }
 
+func (repository *BagItemRepository) DeleteByAccountID(accountID string) error {
+	err := repository.DB.Where("db_bag_items.account_id = ?", accountID).Delete(&dbmodels.DBBagItem{}).Error
+
+	return err
+}
+
 func (repository *BagItemRepository) DeleteByCharacterName(characterName string) error {
 	err := repository.DB.Where("character_name = ?", characterName).Delete(&dbmodels.DBBagItem{}).Error
 
@@ -49,8 +57,8 @@ func (repository *BagItemRepository) GetByCharacterName(characterName string) ([
 	return bagItems, nil
 }
 
-func (repository *BagItemRepository) DeleteAccountInventory(accountID string) error {
-	err := repository.DB.Where("db_bag_items.account_id = ?", accountID).Where("character_name IS NULL").Delete(&dbmodels.DBBagItem{}).Error
+func (repository *BagItemRepository) DeleteSharedInventory(accountID string) error {
+	err := repository.DB.Where("db_bag_items.account_id = ?", accountID).Where("character_name IS NULL OR character_name = ''").Delete(&dbmodels.DBBagItem{}).Error
 
 	return err
 }

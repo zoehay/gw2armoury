@@ -9,10 +9,14 @@ import (
 )
 
 type BagItemServiceInterface interface {
+	GetAndStoreAllBagItems(accountID string, apiKey string) error
+	StoreCharacterInventory(accountID string, character gw2models.GW2Character) error
+	StoreSharedInventory(accountID string, accountInventory *[]gw2models.GW2BagItem) error
+
 	GetAndStoreAllCharacters(accountID string, apiKey string) error
-	storeCharacterInventory(accountID string, character gw2models.GW2Character) error
-	clearCharacterInventory(character gw2models.GW2Character) error
-	GetAndStoreAccountInventory(accountID string, apiKey string) error
+	GetAndStoreSharedInventory(accountID string, apiKey string) error
+	ClearCharacterInventory(characterName string) error
+	ClearSharedInventory(accountID string) error
 }
 
 type BagItemService struct {
@@ -29,7 +33,11 @@ func NewBagItemService(bagItemRepository *repositories.BagItemRepository, charac
 	}
 }
 
-func (service *BagItemService) GetAndStoreAccountInventory(accountID string, apiKey string) error {
+func (service *BagItemService) GetAndStoreAllBagItems(accountID string, apiKey string) error {
+	characters, err := service.CharacterProvider.GetAllCharacters(apiKey)
+	if err != nil {
+		return fmt.Errorf("service error using provider could not get characters: %s", err)
+	}
 
 	accountInventory, err := service.AccountProvider.GetAccountInventory(apiKey)
 	if err != nil {
@@ -49,13 +57,57 @@ func (service *BagItemService) GetAndStoreAccountInventory(accountID string, api
 		return err
 	}
 
-	err = service.clearAccountInventory(accountID)
+	err = service.BagItemRepository.DeleteByAccountID(accountID)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	err = service.storeAccountInventory(accountID, accountInventory)
+	err = service.StoreSharedInventory(accountID, accountInventory)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	for _, character := range characters {
+		err = service.StoreCharacterInventory(accountID, character)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	return tx.Commit().Error
+
+}
+
+func (service *BagItemService) GetAndStoreSharedInventory(accountID string, apiKey string) error {
+
+	accountInventory, err := service.AccountProvider.GetAccountInventory(apiKey)
+	if err != nil {
+		return fmt.Errorf("service error using provider could not get account inventory: %s", err)
+	}
+
+	tx := service.BagItemRepository.DB.Begin()
+
+	defer func() {
+		r := recover()
+		if r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	err = service.ClearSharedInventory(accountID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = service.StoreSharedInventory(accountID, accountInventory)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -85,14 +137,12 @@ func (service *BagItemService) GetAndStoreAllCharacters(accountID string, apiKey
 	}
 
 	for _, character := range characters {
-		fmt.Println(character.Name)
-
-		err = service.clearCharacterInventory(character)
+		err = service.ClearCharacterInventory(character.Name)
 		if err != nil {
 			tx.Rollback()
 			return err
 		}
-		err = service.storeCharacterInventory(accountID, character)
+		err = service.StoreCharacterInventory(accountID, character)
 		if err != nil {
 			tx.Rollback()
 			return err
@@ -103,7 +153,7 @@ func (service *BagItemService) GetAndStoreAllCharacters(accountID string, apiKey
 
 }
 
-func (service *BagItemService) storeCharacterInventory(accountID string, character gw2models.GW2Character) error {
+func (service *BagItemService) StoreCharacterInventory(accountID string, character gw2models.GW2Character) error {
 	apiBags := character.Bags
 
 	if apiBags != nil {
@@ -113,7 +163,7 @@ func (service *BagItemService) storeCharacterInventory(accountID string, charact
 					dbBagItem := bagItem.ToDBBagItem(accountID, &character.Name)
 					_, err := service.BagItemRepository.Create(&dbBagItem)
 					if err != nil {
-						return fmt.Errorf("service error using gorm create bagitem %d for character %s: %s", bagItem.ID, character.Name, err)
+						return fmt.Errorf("service error using create bagitem %d for character %s: %s", bagItem.ID, character.Name, err)
 					}
 				}
 			}
@@ -122,30 +172,30 @@ func (service *BagItemService) storeCharacterInventory(accountID string, charact
 	return nil
 }
 
-func (service *BagItemService) storeAccountInventory(accountID string, accountInventory *[]gw2models.GW2BagItem) error {
+func (service *BagItemService) StoreSharedInventory(accountID string, accountInventory *[]gw2models.GW2BagItem) error {
 	for _, bagItem := range *accountInventory {
 		dbBagItem := bagItem.ToDBBagItem(accountID, nil)
 		_, err := service.BagItemRepository.Create(&dbBagItem)
 		if err != nil {
-			return fmt.Errorf("service error using gorm create bagitem %d for account %s: %s", bagItem.ID, accountID, err)
+			return fmt.Errorf("service error using create bagitem %d for account %s: %s", bagItem.ID, accountID, err)
 		}
 	}
 	return nil
 }
 
-func (service *BagItemService) clearCharacterInventory(character gw2models.GW2Character) error {
-	err := service.BagItemRepository.DeleteByCharacterName(character.Name)
+func (service *BagItemService) ClearCharacterInventory(characterName string) error {
+	err := service.BagItemRepository.DeleteByCharacterName(characterName)
 	if err != nil {
-		return fmt.Errorf("service error using gorm delete bagitems for character %s: %s", character.Name, err)
+		return fmt.Errorf("service error using delete bagitems for character %s: %s", characterName, err)
 	}
 
 	return nil
 }
 
-func (service *BagItemService) clearAccountInventory(accountID string) error {
-	err := service.BagItemRepository.DeleteAccountInventory(accountID)
+func (service *BagItemService) ClearSharedInventory(accountID string) error {
+	err := service.BagItemRepository.DeleteSharedInventory(accountID)
 	if err != nil {
-		return fmt.Errorf("service error using gorm delete bagitems for account %s: %s", accountID, err)
+		return fmt.Errorf("service error using delete bagitems for account %s: %s", accountID, err)
 	}
 
 	return nil
