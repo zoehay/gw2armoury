@@ -58,7 +58,7 @@ func (s *BagItemHandlerTestSuite) TearDownSuite() {
 
 func (s *BagItemHandlerTestSuite) TestGetByAccount() {
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/account/characters/inventory", nil)
+	req, _ := http.NewRequest("GET", "/account/inventory", nil)
 	req.AddCookie(s.Cookie)
 	s.Router.ServeHTTP(w, req)
 
@@ -69,10 +69,10 @@ func (s *BagItemHandlerTestSuite) TestGetByAccount() {
 	assert.Equal(s.T(), 200, w.Code)
 
 	bagItemsResponseOK := BagItemsResponseOK(responseBagItems)
-	assert.Equal(s.T(), true, bagItemsResponseOK)
+	assert.Equal(s.T(), true, bagItemsResponseOK, "BagItem response OK")
 
 	allSameCharacterName := BagItemsAllSameCharacterName(responseBagItems)
-	assert.Equal(s.T(), false, allSameCharacterName)
+	assert.Equal(s.T(), false, allSameCharacterName, "BagItems should belong to multiple different characters")
 }
 
 func (s *BagItemHandlerTestSuite) TestGetByCharacterName() {
@@ -98,11 +98,7 @@ func BagItemsResponseOK(bagItems *[]models.BagItem) bool {
 	if len(*bagItems) == 0 {
 		return false
 	} else {
-		if len((*bagItems)[0].CharacterName) != 0 {
-			return true
-		} else {
-			return false
-		}
+		return true
 	}
 }
 

@@ -18,14 +18,16 @@ import (
 type AccountHandler struct {
 	AccountRepository repositories.AccountRepositoryInterface
 	SessionRepository repositories.SessionRepositoryInterface
+	BagItemRepository repositories.BagItemRepositoryInterface
 	AccountService    services.AccountServiceInterface
 	BagItemService    services.BagItemServiceInterface
 }
 
-func NewAccountHandler(accountRepository repositories.AccountRepositoryInterface, sessionRepository repositories.SessionRepositoryInterface, accountService services.AccountServiceInterface, bagItemService services.BagItemServiceInterface) *AccountHandler {
+func NewAccountHandler(accountRepository repositories.AccountRepositoryInterface, sessionRepository repositories.SessionRepositoryInterface, bagItemRepostiory repositories.BagItemRepositoryInterface, accountService services.AccountServiceInterface, bagItemService services.BagItemServiceInterface) *AccountHandler {
 	return &AccountHandler{
 		AccountRepository: accountRepository,
 		SessionRepository: sessionRepository,
+		BagItemRepository: bagItemRepostiory,
 		AccountService:    accountService,
 		BagItemService:    bagItemService,
 	}
@@ -33,15 +35,15 @@ func NewAccountHandler(accountRepository repositories.AccountRepositoryInterface
 
 func (handler AccountHandler) PostAPIKey(c *gin.Context) {
 
-	var createGuestRequest CreateGuestRequest
+	var apiKeyRequest APIKeyRequest
 
-	if err := c.BindJSON(&createGuestRequest); err != nil {
+	if err := c.BindJSON(&apiKeyRequest); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"request body bind json error": err.Error()})
 		return
 	}
 
 	// verify GW2 account
-	gw2Account, err := handler.AccountService.GetAccount(createGuestRequest.APIKey)
+	gw2Account, err := handler.AccountService.GetAccount(apiKeyRequest.APIKey)
 	if err != nil || gw2Account == nil || gw2Account.ID == nil {
 		c.IndentedJSON(http.StatusBadGateway, gin.H{"error could not get account id from gw2 api": err.Error()})
 		return
@@ -54,7 +56,7 @@ func (handler AccountHandler) PostAPIKey(c *gin.Context) {
 	existingAccount, err := handler.AccountRepository.GetByID(*gw2AccountID)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		// new user
-		account, session, err = handler.generateNewGuestAccount(*gw2AccountID, createGuestRequest.APIKey)
+		account, session, err = handler.generateNewGuestAccount(*gw2AccountID, apiKeyRequest.APIKey)
 		if err != nil {
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error creating new guest account": err.Error()})
 			return
@@ -66,6 +68,10 @@ func (handler AccountHandler) PostAPIKey(c *gin.Context) {
 	} else {
 		// existing user
 		account = existingAccount
+		err := handler.AccountRepository.UpdateAPIKey(*account.APIKey, apiKeyRequest.APIKey)
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error updating api key": err.Error()})
+		}
 		account, session, err = handler.renewOrGenerateSession(account)
 		if err != nil {
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{"session error for existing guest": err.Error()})
@@ -74,10 +80,10 @@ func (handler AccountHandler) PostAPIKey(c *gin.Context) {
 
 	c.SetCookie("sessionID", session.SessionID, 3600, "/", "localhost", false, true)
 
-	if isRecrawlDue(account.LastCrawl) {
-		err = handler.BagItemService.GetAndStoreAllCharacters(*gw2AccountID, createGuestRequest.APIKey)
+	if handler.isRecrawlDue(account.LastCrawl) {
+		err = handler.BagItemService.GetAndStoreAllBagItems(*gw2AccountID, apiKeyRequest.APIKey)
 		if err != nil {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error getting characters after guest creation": err.Error()})
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error getting inventory after guest creation": err.Error()})
 			return
 		}
 		err = handler.AccountRepository.UpdateLastCrawl(*gw2AccountID)
@@ -90,35 +96,31 @@ func (handler AccountHandler) PostAPIKey(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, account.ToAccount())
 }
 
-func (handler AccountHandler) renewOrGenerateSession(account *dbmodels.DBAccount) (*dbmodels.DBAccount, *dbmodels.DBSession, error) {
-	var session *dbmodels.DBSession
-	var err error
+func (handler AccountHandler) DeleteAPIKey(c *gin.Context) {
+	var deleteKeyRequest DeleteKeyRequest
 
-	if account.Session != nil {
-		session, err = handler.renewSession(account.Session)
-		if err != nil {
-			return nil, nil, fmt.Errorf("error renewing session for existing account: %w", err)
-		}
-	} else {
-		account, session, err = handler.generateNewSession(account)
-		if err != nil {
-			return nil, nil, fmt.Errorf("error generating new session for existing account: %w", err)
-		}
+	if err := c.BindJSON(&deleteKeyRequest); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"request body bind json error": err.Error()})
+		return
 	}
 
-	return account, session, nil
-}
+	accountID := c.MustGet("accountID").(string)
 
-func isRecrawlDue(lastCrawl *time.Time) bool {
-	minHoursSinceCrawl := float64(1)
-	var elapsed float64
-
-	if lastCrawl != nil {
-		t := time.Now()
-		elapsed = t.Sub(*lastCrawl).Hours()
+	// delete api key from account
+	err := handler.AccountRepository.DeleteAPIKey(accountID)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error deleting api key": err.Error()})
+		return
 	}
 
-	return (elapsed >= minHoursSinceCrawl || lastCrawl == nil)
+	// delete associated bag items
+	err = handler.BagItemRepository.DeleteByAccountID(accountID)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error deleting bag items": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"API key deleted": deleteKeyRequest.APIKey})
 }
 
 func (handler AccountHandler) Create(c *gin.Context) {
@@ -183,10 +185,10 @@ func (handler AccountHandler) Create(c *gin.Context) {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"session error for existing guest": err.Error()})
 	}
 
-	if isRecrawlDue(account.LastCrawl) {
-		err = handler.BagItemService.GetAndStoreAllCharacters(*gw2AccountID, *account.APIKey)
+	if handler.isRecrawlDue(account.LastCrawl) {
+		err = handler.BagItemService.GetAndStoreAllBagItems(*gw2AccountID, *account.APIKey)
 		if err != nil {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error getting characters after guest creation": err.Error()})
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error getting inventory after guest creation": err.Error()})
 			return
 		}
 		err = handler.AccountRepository.UpdateLastCrawl(*gw2AccountID)
@@ -248,6 +250,37 @@ func (handler AccountHandler) Logout(c *gin.Context) {
 
 	// delete cookie
 	c.SetCookie("sessionID", "", -1, "/", "localhost", false, true)
+}
+
+func (handler AccountHandler) renewOrGenerateSession(account *dbmodels.DBAccount) (*dbmodels.DBAccount, *dbmodels.DBSession, error) {
+	var session *dbmodels.DBSession
+	var err error
+
+	if account.Session != nil {
+		session, err = handler.renewSession(account.Session)
+		if err != nil {
+			return nil, nil, fmt.Errorf("error renewing session for existing account: %w", err)
+		}
+	} else {
+		account, session, err = handler.generateNewSession(account)
+		if err != nil {
+			return nil, nil, fmt.Errorf("error generating new session for existing account: %w", err)
+		}
+	}
+
+	return account, session, nil
+}
+
+func (handler AccountHandler) isRecrawlDue(lastCrawl *time.Time) bool {
+	minHoursSinceCrawl := float64(1)
+	var elapsed float64
+
+	if lastCrawl != nil {
+		t := time.Now()
+		elapsed = t.Sub(*lastCrawl).Hours()
+	}
+
+	return (elapsed >= minHoursSinceCrawl || lastCrawl == nil)
 }
 
 func (handler AccountHandler) generateNewGuestAccount(accountID string, apiKey string) (updatedAccount *dbmodels.DBAccount, newSession *dbmodels.DBSession, err error) {
@@ -326,6 +359,10 @@ type CreateRequest struct {
 	Password    string
 }
 
-type CreateGuestRequest struct {
+type APIKeyRequest struct {
+	APIKey string
+}
+
+type DeleteKeyRequest struct {
 	APIKey string
 }

@@ -40,7 +40,7 @@ func SetupRouter(dsn string, mocks bool) (*gin.Engine, *repositories.Repository,
 
 	itemHandler := handlers.NewItemHandler(&repository.ItemRepository)
 	bagItemHandler := handlers.NewBagItemHandler(&repository.BagItemRepository)
-	accountHandler := handlers.NewAccountHandler(&repository.AccountRepository, &repository.SessionRepository, service.AccountService, service.BagItemService)
+	accountHandler := handlers.NewAccountHandler(&repository.AccountRepository, &repository.SessionRepository, &repository.BagItemRepository, service.AccountService, service.BagItemService)
 
 	err = db.SeedItems(repository.ItemRepository, *service.ItemService)
 	if err != nil {
@@ -66,7 +66,7 @@ func SetupRouter(dsn string, mocks bool) (*gin.Engine, *repositories.Repository,
 	account := router.Group("/account")
 	account.Use(middleware.UseSession(&repository.AccountRepository, &repository.SessionRepository))
 	{
-		account.GET("/characters/inventory", bagItemHandler.GetByAccount)
+		account.GET("/inventory", bagItemHandler.GetByAccount)
 		account.GET("/characters/:charactername/inventory", bagItemHandler.GetByCharacter)
 	}
 

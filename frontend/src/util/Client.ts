@@ -51,7 +51,7 @@ export class Client {
   }
 
   async getBagItems(): Promise<BagItem[]> {
-    let endpoint: string = `${this.baseURL}/account/characters/inventory`;
+    let endpoint: string = `${this.baseURL}/account/inventory`;
     let response: unknown = await this.clientGet(endpoint);
     let apiBagItems = response as APIBagItem[]
     let bagItems: BagItem[] = apiBagItems.map(APIBagItemToBagItem)

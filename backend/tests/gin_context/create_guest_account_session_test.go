@@ -38,12 +38,12 @@ func (s *CreateGuestAccountSessionTestSuite) SetupSuite() {
 	s.Router = router
 	s.Repository = repository
 	s.Service = service
-	s.AccountHandler = handlers.NewAccountHandler(&repository.AccountRepository, &repository.SessionRepository, service.AccountService, service.BagItemService)
+	s.AccountHandler = handlers.NewAccountHandler(&repository.AccountRepository, &repository.SessionRepository, &repository.BagItemRepository, service.AccountService, service.BagItemService)
 
 }
 
 func (s *CreateGuestAccountSessionTestSuite) TearDownSuite() {
-	dropTables := []string{"db_accounts", "db_sessions"}
+	dropTables := []string{"db_accounts", "db_sessions", "db_bag_items"}
 	err := testutils.TearDownDropTables(s.Repository, dropTables)
 	if err != nil {
 		s.T().Errorf("Error tearing down suite: %v", err)
