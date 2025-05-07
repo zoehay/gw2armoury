@@ -1,13 +1,20 @@
+import { Link } from "react-router-dom";
 import navbar from "./navbar.module.css";
 
-export const DesktopNav = () => {
+const DesktopNav = () => {
   return (
     <div className={navbar.desktopContent}>
       <p>Logo</p>
       <div className={navbar.desktopLinks}>
-        <ul className={navbar.link}>Manage Keys</ul>
-        <ul className={navbar.link}>Inventory</ul>
+        <Link to={`manageKeys`} className={navbar.link}>
+          Manage Keys
+        </Link>
+        <Link to={`inventory`} className={navbar.link}>
+          Inventory
+        </Link>
       </div>
     </div>
   );
 };
+
+export default DesktopNav;

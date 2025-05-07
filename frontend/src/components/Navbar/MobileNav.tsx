@@ -1,7 +1,8 @@
 import navbar from "./navbar.module.css";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
-export const MobileNav = () => {
+const MobileNav = () => {
   let [showMenu, setShowMenu] = useState(false);
   let position;
 
@@ -27,10 +28,16 @@ export const MobileNav = () => {
         style={style}
       >
         <div className={navbar.mobileDropdown}>
-          <ul className={navbar.link}>Manage Keys</ul>
-          <ul className={navbar.link}>Inventory</ul>
+          <Link to={`manageKeys`} className={navbar.link}>
+            Manage Keys
+          </Link>
+          <Link to={`inventory`} className={navbar.link}>
+            Inventory
+          </Link>
         </div>
       </div>
     </>
   );
 };
+
+export default MobileNav;

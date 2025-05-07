@@ -1,9 +1,10 @@
 import { useContext, useState } from "react";
 import { ClientContext } from "../util/ClientContext";
+import content from "./content.module.css";
 
 const ManageKeys = () => {
   return (
-    <div>
+    <div className={content.main}>
       <>Add A Key</>
 
       <KeyInput></KeyInput>

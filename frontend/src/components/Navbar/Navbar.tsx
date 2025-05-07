@@ -1,8 +1,8 @@
-import { DesktopNav } from "./DesktopNav";
-import { MobileNav } from "./MobileNav";
+import DesktopNav from "./DesktopNav";
+import MobileNav from "./MobileNav";
 import navbar from "./navbar.module.css";
 
-export const Navbar = () => {
+const Navbar = () => {
   return (
     <div className={navbar.nav}>
       <div className={navbar.mobile}>
@@ -14,3 +14,5 @@ export const Navbar = () => {
     </div>
   );
 };
+
+export default Navbar;

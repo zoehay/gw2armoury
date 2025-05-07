@@ -3,6 +3,7 @@ import { BagItem } from "../../models/BagItem";
 import { ClientContext } from "../../util/ClientContext";
 import content from "../content.module.css";
 import FilteredInventory from "./FilteredInventory";
+import NoKeyPage from "../ErrorPage/NoKeyPage";
 
 const Inventory = () => {
   let context = useContext(ClientContext);
@@ -21,7 +22,11 @@ const Inventory = () => {
 
   return (
     <div className={content.page}>
-      <FilteredInventory bagItems={bagItems}></FilteredInventory>
+      {bagItems ? (
+        <FilteredInventory bagItems={bagItems}></FilteredInventory>
+      ) : (
+        <NoKeyPage />
+      )}
     </div>
   );
 };

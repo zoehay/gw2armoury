@@ -1,19 +1,34 @@
 import "./App.css";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ManageKeys from "./components/ManageKeys";
 import { ClientProvider } from "./util/ClientContext";
-import content from "./components/content.module.css";
-import { Navbar } from "./components/Navbar/Navbar";
 import Inventory from "./components/Inventory/Inventory";
+import Root from "./components/Root";
+import ErrorPage from "./components/ErrorPage/ErrorPage";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Root />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: "/manageKeys",
+        element: <ManageKeys />,
+      },
+      {
+        path: "/inventory",
+        element: <Inventory />,
+      },
+    ],
+  },
+]);
 
 function App() {
   return (
     <>
       <ClientProvider>
-        <Navbar></Navbar>
-        <div className={content.main}>
-          <Inventory></Inventory>
-          <ManageKeys></ManageKeys>
-        </div>
+        <RouterProvider router={router} />
       </ClientProvider>
     </>
   );

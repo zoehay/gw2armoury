@@ -10,6 +10,7 @@
 
 .group > .name {
     font-weight: bold;
+    color: var(--link)
 }
 
 .group > .contents {
