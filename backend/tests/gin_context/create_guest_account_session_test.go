@@ -1,23 +1,20 @@
-package tests
+package gincontext_test
 
 import (
-	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"github.com/zoehay/gw2armoury/backend/internal/api/handlers"
-	"github.com/zoehay/gw2armoury/backend/internal/api/routes"
+	"github.com/zoehay/gw2armoury/backend/internal/api/models"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
+	"github.com/zoehay/gw2armoury/backend/tests/testutils"
 )
 
 type CreateGuestAccountSessionTestSuite struct {
@@ -33,37 +30,24 @@ func TestCreateGuestAccountSessionSuite(t *testing.T) {
 }
 
 func (s *CreateGuestAccountSessionTestSuite) SetupSuite() {
-	envPath := filepath.Join("../..", ".env")
-	err := godotenv.Load(envPath)
+	router, repository, service, err := testutils.DBRouterSetup()
 	if err != nil {
-		log.Fatal("Error loading .env file:", err)
-	}
-
-	dsn := os.Getenv("TEST_DB_DSN")
-	router, repository, service, err := routes.SetupRouter(dsn, true)
-	if err != nil {
-		log.Fatal("Error setting up router", err)
+		s.T().Errorf("Error setting up router: %v", err)
 	}
 
 	s.Router = router
 	s.Repository = repository
 	s.Service = service
-	s.AccountHandler = handlers.NewAccountHandler(&repository.AccountRepository, &repository.SessionRepository, service.AccountService, service.CharacterService)
+	s.AccountHandler = handlers.NewAccountHandler(&repository.AccountRepository, &repository.SessionRepository, &repository.BagItemRepository, service.AccountService, service.BagItemService)
 
 }
 
 func (s *CreateGuestAccountSessionTestSuite) TearDownSuite() {
-	err := s.Repository.AccountRepository.DB.Exec("DROP TABLE db_accounts cascade;").Error
-	assert.NoError(s.T(), err, "Failed to clear database")
-
-	err = s.Repository.AccountRepository.DB.Exec("DROP TABLE db_sessions cascade;").Error
-	assert.NoError(s.T(), err, "Failed to clear database")
-
-	db, err := s.Repository.AccountRepository.DB.DB()
+	dropTables := []string{"db_accounts", "db_sessions", "db_bag_items"}
+	err := testutils.TearDownDropTables(s.Repository, dropTables)
 	if err != nil {
-		s.T().Fatal(err)
+		s.T().Errorf("Error tearing down suite: %v", err)
 	}
-	db.Close()
 }
 
 func (s *CreateGuestAccountSessionTestSuite) TestCreateGuestWithNewAPIKey() {
@@ -85,19 +69,19 @@ func (s *CreateGuestAccountSessionTestSuite) TestCreateGuestWithNewAPIKey() {
 	// req.URL.RawQuery = q.Encode()
 
 	c.Request = req
-	s.AccountHandler.CreateGuest(c)
+	s.AccountHandler.PostAPIKey(c)
 
-	cookie := w.Result().Cookies()
+	cookie := w.Result().Cookies()[0]
 
-	assert.Equal(s.T(), "sessionID", cookie[0].Name, "Correct cookie name")
+	assert.Equal(s.T(), "sessionID", cookie.Name, "Correct cookie name")
 
-	var response map[string]interface{}
-	err := json.Unmarshal(w.Body.Bytes(), &response)
+	account, err := testutils.UnmarshalToType[models.Account](w)
 	if err != nil {
-		s.T().Fatalf("Failed to unmarshal response: %v", err)
+		s.T().Errorf("Failed to unmarshal response: %v", err)
 	}
 
-	assert.Equal(s.T(), response["SessionID"].(string), cookie[0].Value)
+	fmt.Println(w.Body)
+	assert.Equal(s.T(), *account.SessionID, cookie.Value)
 	assert.Equal(s.T(), 200, w.Code)
 }
 

@@ -1,25 +1,21 @@
-package tests
+package servicemocks_test
 
 import (
-	"encoding/json"
-	"fmt"
-	"log"
-	"os"
-	"path/filepath"
 	"testing"
 
-	"github.com/joho/godotenv"
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	database "github.com/zoehay/gw2armoury/backend/internal/db"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
-	"github.com/zoehay/gw2armoury/backend/internal/gw2_client/providers"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
+	"github.com/zoehay/gw2armoury/backend/tests/testutils"
 )
 
 type CharacterServiceTestSuite struct {
 	suite.Suite
-	CharacterService services.CharacterService
+	Router     *gin.Engine
+	Repository *repositories.Repository
+	Service    *services.Service
 }
 
 func TestCharacterServiceTestSuite(t *testing.T) {
@@ -27,47 +23,30 @@ func TestCharacterServiceTestSuite(t *testing.T) {
 }
 
 func (s *CharacterServiceTestSuite) SetupSuite() {
-	envPath := filepath.Join("../..", ".env")
-	err := godotenv.Load(envPath)
+	router, repository, service, err := testutils.DBRouterSetup()
 	if err != nil {
-		log.Fatal("Error loading .env file:", err)
+		s.T().Errorf("Error setting up router: %v", err)
 	}
 
-	dsn := os.Getenv("TEST_DB_DSN")
-	db, err := database.PostgresInit(dsn)
-	if err != nil {
-		log.Fatal("Error connecting to postgres", err)
-	}
-
-	bagItemRepository := repositories.NewBagItemRepository(db)
-	characterProvider := &providers.CharacterProviderMock{}
-	s.CharacterService = *services.NewCharacterService(&bagItemRepository, characterProvider)
+	s.Router = router
+	s.Repository = repository
+	s.Service = service
 }
 
 func (s *CharacterServiceTestSuite) TearDownSuite() {
-	err := s.CharacterService.BagItemRepository.DB.Exec("DROP TABLE db_bag_items;").Error
-	assert.NoError(s.T(), err, "Failed to clear database")
-
-	db, err := s.CharacterService.BagItemRepository.DB.DB()
+	dropTables := []string{"db_accounts", "db_sessions", "db_bag_items", "db_items"}
+	err := testutils.TearDownDropTables(s.Repository, dropTables)
 	if err != nil {
-		s.T().Fatal(err)
+		s.T().Errorf("Error tearing down suite: %v", err)
 	}
-	db.Close()
 }
 
 func (s *CharacterServiceTestSuite) TestGetAndStoreAllCharacters() {
-	err := s.CharacterService.GetAndStoreAllCharacters("accountid", "apikeystring")
+	err := s.Service.BagItemService.GetAndStoreAllCharacters("accountid", "apikeystring")
 	assert.NoError(s.T(), err, "Failed to get and store items")
 }
 
 func (s *CharacterServiceTestSuite) TestGetBagItemsByCharacterName() {
-	bagItems, err := s.CharacterService.BagItemRepository.GetByCharacterName("Roman Meows")
-	fmt.Println(PrintObject(bagItems[0]))
+	_, err := s.Service.BagItemService.BagItemRepository.GetByCharacterName("Roman Meows")
 	assert.NoError(s.T(), err, "Failed to get item by id")
-
-}
-
-func PrintObject(i interface{}) string {
-	s, _ := json.MarshalIndent(i, "", "\t")
-	return string(s)
 }

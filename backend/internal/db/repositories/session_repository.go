@@ -42,11 +42,6 @@ func (repository *SessionRepository) Update(sessionID string) (*dbmodels.DBSessi
 		return nil, err
 	}
 
-	err = repository.DB.Where("session_id = ?", sessionID).First(&session).Error
-	if err != nil {
-		return nil, err
-	}
-
 	return session, nil
 }
 

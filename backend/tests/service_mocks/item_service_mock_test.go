@@ -1,24 +1,21 @@
-package tests
+package servicemocks_test
 
 import (
-	"fmt"
-	"log"
-	"os"
-	"path/filepath"
 	"testing"
 
-	"github.com/joho/godotenv"
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	database "github.com/zoehay/gw2armoury/backend/internal/db"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
-	providers "github.com/zoehay/gw2armoury/backend/internal/gw2_client/providers"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
+	"github.com/zoehay/gw2armoury/backend/tests/testutils"
 )
 
 type ItemServiceTestSuite struct {
 	suite.Suite
-	ItemService services.ItemService
+	Router     *gin.Engine
+	Repository *repositories.Repository
+	Service    *services.Service
 }
 
 func TestItemServiceTestSuite(t *testing.T) {
@@ -26,28 +23,24 @@ func TestItemServiceTestSuite(t *testing.T) {
 }
 
 func (s *ItemServiceTestSuite) SetupSuite() {
-	envPath := filepath.Join("../..", ".env")
-	err := godotenv.Load(envPath)
+	router, repository, service, err := testutils.DBRouterSetup()
 	if err != nil {
-		log.Fatal("Error loading .env file:", err)
+		s.T().Errorf("Error setting up router: %v", err)
 	}
 
-	dsn := os.Getenv("TEST_DB_DSN")
-	db, err := database.PostgresInit(dsn)
-	if err != nil {
-		log.Fatal("Error connecting to postgres", err)
-	}
+	s.Router = router
+	s.Repository = repository
+	s.Service = service
 
-	itemRepository := repositories.NewItemRepository(db)
-	itemProvider := &providers.ItemProviderMock{}
-	s.ItemService = *services.NewItemService(&itemRepository, itemProvider)
+	err = s.Service.ItemService.ItemRepository.DB.Exec("TRUNCATE TABLE db_items;").Error
+	assert.NoError(s.T(), err, "Failed to clear database")
 }
 
 func (s *ItemServiceTestSuite) TearDownSuite() {
-	err := s.ItemService.ItemRepository.DB.Exec("DROP TABLE db_items;").Error
+	err := s.Service.ItemService.ItemRepository.DB.Exec("DROP TABLE db_items;").Error
 	assert.NoError(s.T(), err, "Failed to clear database")
 
-	db, err := s.ItemService.ItemRepository.DB.DB()
+	db, err := s.Service.ItemService.ItemRepository.DB.DB()
 	if err != nil {
 		s.T().Fatal(err)
 	}
@@ -55,12 +48,13 @@ func (s *ItemServiceTestSuite) TearDownSuite() {
 }
 
 func (s *ItemServiceTestSuite) TestGetAndStoreAllItems() {
-	err := s.ItemService.GetAndStoreAllItems()
+	err := s.Service.ItemService.GetAndStoreAllItems()
 	assert.NoError(s.T(), err, "Failed to get and store items")
 }
 
 func (s *ItemServiceTestSuite) TestGetItemById() {
-	item, err := s.ItemService.ItemRepository.GetById(27952)
-	fmt.Println(PrintObject(item))
+	item, err := s.Service.ItemService.ItemRepository.GetById(27952)
 	assert.NoError(s.T(), err, "Failed to get item by id")
+	assert.Equal(s.T(), "Axiquiotl", item.Name, "Correct item name")
+
 }

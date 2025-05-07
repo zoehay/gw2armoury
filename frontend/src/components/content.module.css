@@ -1,0 +1,10 @@
+.main {
+    box-sizing: content-box;
+    width: 100%;
+}
+
+.page {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 1rem;
+}

@@ -34,8 +34,8 @@ func GetAllCharacters(apiKey string) (*http.Response, error) {
 	return res, err
 }
 
-func GetCharacterNames(apiKey string) (*http.Response, error) {
-	url := baseUrl + "characters?access_token=" + apiKey
+func GetAccount(apiKey string) (*http.Response, error) {
+	url := baseUrl + "account?access_token=" + apiKey
 	res, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -43,8 +43,8 @@ func GetCharacterNames(apiKey string) (*http.Response, error) {
 	return res, err
 }
 
-func GetAccountID(apiKey string) (*http.Response, error) {
-	url := baseUrl + "account?access_token=" + apiKey
+func GetAccountInventory(apiKey string) (*http.Response, error) {
+	url := baseUrl + "account/inventory?v=latest&access_token=" + apiKey
 	res, err := http.Get(url)
 	if err != nil {
 		return nil, err

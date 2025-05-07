@@ -6,9 +6,9 @@ import (
 )
 
 type Service struct {
-	AccountService   *AccountService
-	CharacterService *CharacterService
-	ItemService      *ItemService
+	AccountService *AccountService
+	BagItemService *BagItemService
+	ItemService    *ItemService
 }
 
 func NewService(repository *repositories.Repository, mocks bool) *Service {
@@ -28,12 +28,12 @@ func NewService(repository *repositories.Repository, mocks bool) *Service {
 	}
 
 	accountService := NewAccountService(&repository.AccountRepository, accountProvider)
-	characterService := NewCharacterService(&repository.BagItemRepository, characterProvider)
+	bagItemService := NewBagItemService(&repository.BagItemRepository, characterProvider, accountProvider)
 	itemService := NewItemService(&repository.ItemRepository, itemProvider)
 
 	return &Service{
-		AccountService:   accountService,
-		CharacterService: characterService,
-		ItemService:      itemService,
+		AccountService: accountService,
+		BagItemService: bagItemService,
+		ItemService:    itemService,
 	}
 }

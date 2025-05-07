@@ -1,22 +1,17 @@
-package tests
+package handlerroutes_test
 
 import (
-	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"github.com/zoehay/gw2armoury/backend/internal/api/routes"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
+	"github.com/zoehay/gw2armoury/backend/tests/testutils"
 )
 
 type CreateAccountTestSuite struct {
@@ -31,16 +26,9 @@ func TestCreateAccountTestSuite(t *testing.T) {
 }
 
 func (s *CreateAccountTestSuite) SetupSuite() {
-	envPath := filepath.Join("../..", ".env")
-	err := godotenv.Load(envPath)
+	router, repository, service, err := testutils.DBRouterSetup()
 	if err != nil {
-		log.Fatal("Error loading .env file:", err)
-	}
-
-	dsn := os.Getenv("TEST_DB_DSN")
-	router, repository, service, err := routes.SetupRouter(dsn, true)
-	if err != nil {
-		log.Fatal("Error setting up router", err)
+		s.T().Errorf("Error setting up router: %v", err)
 	}
 
 	s.Router = router
@@ -49,14 +37,11 @@ func (s *CreateAccountTestSuite) SetupSuite() {
 }
 
 func (s *CreateAccountTestSuite) TearDownSuite() {
-	err := s.Repository.AccountRepository.DB.Exec("DROP TABLE db_accounts cascade;").Error
-	assert.NoError(s.T(), err, "Failed to clear database")
-
-	db, err := s.Repository.AccountRepository.DB.DB()
+	dropTables := []string{"db_accounts", "db_sessions", "db_bag_items"}
+	err := testutils.TearDownDropTables(s.Repository, dropTables)
 	if err != nil {
-		s.T().Fatal(err)
+		s.T().Errorf("Error tearing down suite: %v", err)
 	}
-	db.Close()
 }
 
 func (s *CreateAccountTestSuite) TestCreateAccount() {
@@ -66,7 +51,6 @@ func (s *CreateAccountTestSuite) TestCreateAccount() {
 	req, _ := http.NewRequest("POST", "/signup", strings.NewReader(userJson))
 	s.Router.ServeHTTP(w, req)
 
-	fmt.Println(w.Body.String())
 	assert.Equal(s.T(), 200, w.Code)
 }
 

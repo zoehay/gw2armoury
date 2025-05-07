@@ -1,21 +1,18 @@
-package tests
+package handlerroutes_test
 
 import (
-	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"github.com/zoehay/gw2armoury/backend/internal/api/routes"
+	"github.com/zoehay/gw2armoury/backend/internal/api/models"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	"github.com/zoehay/gw2armoury/backend/internal/services"
+	"github.com/zoehay/gw2armoury/backend/tests/testutils"
 )
 
 type BagItemHandlerTestSuite struct {
@@ -31,16 +28,9 @@ func TestBagItemHandlerTestSuite(t *testing.T) {
 }
 
 func (s *BagItemHandlerTestSuite) SetupSuite() {
-	envPath := filepath.Join("../..", ".env")
-	err := godotenv.Load(envPath)
+	router, repository, service, err := testutils.DBRouterSetup()
 	if err != nil {
-		log.Fatal("Error loading .env file:", err)
-	}
-
-	dsn := os.Getenv("TEST_DB_DSN")
-	router, repository, service, err := routes.SetupRouter(dsn, true)
-	if err != nil {
-		log.Fatal("Error setting up router", err)
+		s.T().Errorf("Error setting up router: %v", err)
 	}
 
 	s.Router = router
@@ -59,30 +49,30 @@ func (s *BagItemHandlerTestSuite) SetupSuite() {
 }
 
 func (s *BagItemHandlerTestSuite) TearDownSuite() {
-	err := s.Repository.AccountRepository.DB.Exec("DROP TABLE db_accounts cascade;").Error
-	assert.NoError(s.T(), err, "Failed to clear database")
-
-	err = s.Repository.AccountRepository.DB.Exec("DROP TABLE db_sessions cascade;").Error
-	assert.NoError(s.T(), err, "Failed to clear database")
-
-	err = s.Repository.AccountRepository.DB.Exec("DROP TABLE db_bag_items;").Error
-	assert.NoError(s.T(), err, "Failed to clear database")
-
-	db, err := s.Repository.AccountRepository.DB.DB()
+	dropTables := []string{"db_accounts", "db_sessions", "db_bag_items", "db_items"}
+	err := testutils.TearDownDropTables(s.Repository, dropTables)
 	if err != nil {
-		s.T().Fatal(err)
+		s.T().Errorf("Error tearing down suite: %v", err)
 	}
-	db.Close()
 }
 
 func (s *BagItemHandlerTestSuite) TestGetByAccount() {
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/account/characters/inventory", nil)
+	req, _ := http.NewRequest("GET", "/account/inventory", nil)
 	req.AddCookie(s.Cookie)
 	s.Router.ServeHTTP(w, req)
 
-	//assert multiple character names
+	responseBagItems, err := testutils.UnmarshalToType[[]models.BagItem](w)
+	if err != nil {
+		s.T().Errorf("Failed to unmarshal response: %v", err)
+	}
 	assert.Equal(s.T(), 200, w.Code)
+
+	bagItemsResponseOK := BagItemsResponseOK(responseBagItems)
+	assert.Equal(s.T(), true, bagItemsResponseOK, "BagItem response OK")
+
+	allSameCharacterName := BagItemsAllSameCharacterName(responseBagItems)
+	assert.Equal(s.T(), false, allSameCharacterName, "BagItems should belong to multiple different characters")
 }
 
 func (s *BagItemHandlerTestSuite) TestGetByCharacterName() {
@@ -91,6 +81,35 @@ func (s *BagItemHandlerTestSuite) TestGetByCharacterName() {
 	req.AddCookie(s.Cookie)
 	s.Router.ServeHTTP(w, req)
 
-	//assert correct character name
+	responseBagItems, err := testutils.UnmarshalToType[[]models.BagItem](w)
+	if err != nil {
+		s.T().Errorf("Failed to unmarshal response: %v", err)
+	}
+
+	bagItemsResponseOK := BagItemsResponseOK(responseBagItems)
+	assert.Equal(s.T(), true, bagItemsResponseOK)
+
+	allSameCharacterName := BagItemsAllSameCharacterName(responseBagItems)
+	assert.Equal(s.T(), true, allSameCharacterName)
 	assert.Equal(s.T(), 200, w.Code)
+}
+
+func BagItemsResponseOK(bagItems *[]models.BagItem) bool {
+	if len(*bagItems) == 0 {
+		return false
+	} else {
+		return true
+	}
+}
+
+func BagItemsAllSameCharacterName(bagItems *[]models.BagItem) bool {
+	characterName := (*bagItems)[0].CharacterName
+	for _, bagItem := range *bagItems {
+		if bagItem.CharacterName == characterName {
+			continue
+		} else {
+			return false
+		}
+	}
+	return true
 }
