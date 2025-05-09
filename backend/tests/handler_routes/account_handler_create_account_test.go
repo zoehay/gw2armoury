@@ -52,14 +52,13 @@ func (s *CreateAccountTestSuite) TestCreateAccount() {
 	s.Router.ServeHTTP(w, req)
 
 	assert.Equal(s.T(), 200, w.Code)
-}
 
-func (s *CreateAccountTestSuite) TestFailCreateAccount() {
-	userJson := `{"AccountName":"Name forAccount", "APIKey":"stringthatisapikey"}`
+	userJson2 := `{"AccountName":"Name forAccount", "APIKey":"stringthatisapikey"}`
 
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/signup", strings.NewReader(userJson))
-	s.Router.ServeHTTP(w, req)
+	w2 := httptest.NewRecorder()
+	req2, _ := http.NewRequest("POST", "/signup", strings.NewReader(userJson2))
+	s.Router.ServeHTTP(w2, req2)
 
-	assert.Equal(s.T(), 500, w.Code)
+	assert.Equal(s.T(), 500, w2.Code)
+
 }

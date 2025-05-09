@@ -10,7 +10,7 @@ type GW2Account struct {
 
 func (gw2Account GW2Account) ToAccount() models.Account {
 	return models.Account{
-		AccountID:   *gw2Account.ID,
-		AccountName: gw2Account.Name,
+		AccountID:      *gw2Account.ID,
+		GW2AccountName: gw2Account.Name,
 	}
 }
