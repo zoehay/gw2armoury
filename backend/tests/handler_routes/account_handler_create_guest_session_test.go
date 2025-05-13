@@ -67,7 +67,7 @@ func (s *CreateGuestSessionTestSuite) TestCreateGuestWithNewAPIKey() {
 
 	cookieSessionID := w.Result().Cookies()[0].Value
 
-	assert.Equal(s.T(), dbAccount.SessionID, account.SessionID, "SessionID in db matches returned account")
-	assert.Equal(s.T(), dbAccount.SessionID, &cookieSessionID, "SessionID in db matches returned cookie")
+	assert.Equal(s.T(), dbAccount[0].SessionID, account.SessionID, "SessionID in db matches returned account")
+	assert.Equal(s.T(), dbAccount[0].SessionID, &cookieSessionID, "SessionID in db matches returned cookie")
 
 }

@@ -9,18 +9,26 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --accent-bold-1: #093A3E;
-  --link:#FFFFFF;
-  --link-hover:#EBEBEB;
+  --accent-bold-1: #093a3e;
+  --accent-bold-2: #155c63;
+  --accent-light-1: #d7d1d1;
+  --link: #ffffff;
+  --link-hover: #ebebeb;
 }
 
 a {
   font-weight: 500;
-  color: #FFFFFF;
+  color: #ffffff;
   text-decoration: inherit;
 }
+
 a:hover {
-  color: #EBEBEB;
+  color: #ebebeb;
+}
+
+p {
+  color: #ffffff;
+  text-decoration: inherit;
 }
 
 body {
@@ -39,12 +47,12 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   cursor: pointer;
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #EBEBEB;
+  border-color: #ebebeb;
 }
 button:focus,
 button:focus-visible {

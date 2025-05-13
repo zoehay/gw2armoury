@@ -1,13 +1,38 @@
-import { useContext, useState } from "react";
-import { ClientContext } from "../util/ClientContext";
-import content from "./content.module.css";
+import React, { useContext, useState, useEffect } from "react";
+import { ClientContext } from "../../util/ClientContext";
+import content from "../content.module.css";
+import { Account } from "../../models/Account";
+import { KeyGroup } from "./KeyGroup";
+import managekeys from "./managekeys.module.css";
 
-const ManageKeys = () => {
+export const ManageKeys = () => {
+  let context = useContext(ClientContext);
+  let client = context;
+
+  let [accounts, setAccounts] = useState<Account[]>([]);
+
+  async function fetchData() {
+    // let fetchAccounts: Account[] = await client.getAccount();
+    // setAccounts(fetchAccounts);
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <div className={content.main}>
-      <>Add A Key</>
-
+      <p>Add A Key</p>
       <KeyInput></KeyInput>
+
+      {accounts[0] != null && accounts[0].apiKey != null ? (
+        <>
+          <p>Keys</p>
+          <KeyGroup accounts={accounts}></KeyGroup>
+        </>
+      ) : (
+        <p>No keys</p>
+      )}
     </div>
   );
 };

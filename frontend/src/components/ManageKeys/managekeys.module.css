@@ -1,0 +1,12 @@
+.group {
+  display: block;
+}
+
+.keytile {
+  border: solid;
+  border-color: var(--accent-light-1);
+}
+
+.keytile > .field {
+  display: block;
+}

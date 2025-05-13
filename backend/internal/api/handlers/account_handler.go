@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/zoehay/gw2armoury/backend/internal/api/models"
 	dbmodels "github.com/zoehay/gw2armoury/backend/internal/db/models"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/models"
@@ -32,6 +33,27 @@ func NewAccountHandler(accountRepository repositories.AccountRepositoryInterface
 		AccountService:    accountService,
 		BagItemService:    bagItemService,
 	}
+}
+
+func (handler AccountHandler) GetAccount(c *gin.Context) {
+
+	accountID := c.MustGet("accountID").(string)
+	dbAccounts, err := handler.AccountRepository.GetByID(accountID)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	accounts := make([]models.Account, len(dbAccounts))
+
+	if len(dbAccounts) > 0 {
+		for i := range dbAccounts {
+			accounts[i] = dbAccounts[i].DBAccountToAccount()
+		}
+	}
+
+	c.IndentedJSON(http.StatusOK, accounts)
 }
 
 func (handler AccountHandler) PostAccountRequest(c *gin.Context) {
@@ -78,7 +100,7 @@ func (handler AccountHandler) PostAccountRequest(c *gin.Context) {
 		}
 	}
 
-	c.IndentedJSON(http.StatusOK, account.ToAccount())
+	c.IndentedJSON(http.StatusOK, account.DBAccountToAccount())
 }
 
 func (handler AccountHandler) GenerateOrUpdateAccount(accountRequest AccountRequest, gw2Account gw2models.GW2Account) (*dbmodels.DBAccount, error) {
@@ -95,7 +117,7 @@ func (handler AccountHandler) GenerateOrUpdateAccount(accountRequest AccountRequ
 		Password:       accountRequest.Password,
 	}
 
-	existingAccount, err := handler.AccountRepository.GetByID(*gw2AccountID)
+	existingAccounts, err := handler.AccountRepository.GetByID(*gw2AccountID)
 	if err != nil {
 		// new user
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -108,7 +130,8 @@ func (handler AccountHandler) GenerateOrUpdateAccount(accountRequest AccountRequ
 				return nil, fmt.Errorf("error accessing account db: %s", err)
 			}
 		}
-	} else if existingAccount != nil {
+	} else if len(existingAccounts) > 0 {
+		existingAccount := &existingAccounts[0]
 		// returning user
 		if existingAccount.Password != nil {
 			// existing full account
@@ -183,7 +206,7 @@ func (handler AccountHandler) Login(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, account.ToAccount())
+	c.IndentedJSON(http.StatusOK, account.DBAccountToAccount())
 
 	// refresh account info in db
 

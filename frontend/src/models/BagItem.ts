@@ -1,5 +1,5 @@
 export interface BagItem {
-  characterName: string; 
+  characterName: string;
   name?: string;
   description?: string;
   id: number;
@@ -17,7 +17,7 @@ export interface BagItem {
 }
 
 export interface APIBagItem {
-  character_name: string; 
+  character_name: string;
   name?: string;
   description?: string;
   id: number;
@@ -35,22 +35,21 @@ export interface APIBagItem {
 }
 
 export function APIBagItemToBagItem(apiBagItem: APIBagItem): BagItem {
-return {
-  characterName: apiBagItem.character_name, 
-  name: apiBagItem.name,
-  description: apiBagItem.description,
-  id: apiBagItem.id,
-  icon: apiBagItem.icon,
-  count: apiBagItem.count,
-  charges: apiBagItem.charges,
-  infusions: apiBagItem.infusions,
-  upgrades: apiBagItem.upgrades,
-  skin: apiBagItem.skin,
-  stats: apiBagItem.stats,
-  dyes: apiBagItem.dyes,
-  binding: apiBagItem.binding,
-  boundTo: apiBagItem.bound_to,
-  rarity: apiBagItem.rarity as string,
-}
-
+  return {
+    characterName: apiBagItem.character_name,
+    name: apiBagItem.name,
+    description: apiBagItem.description,
+    id: apiBagItem.id,
+    icon: apiBagItem.icon,
+    count: apiBagItem.count,
+    charges: apiBagItem.charges,
+    infusions: apiBagItem.infusions,
+    upgrades: apiBagItem.upgrades,
+    skin: apiBagItem.skin,
+    stats: apiBagItem.stats,
+    dyes: apiBagItem.dyes,
+    binding: apiBagItem.binding,
+    boundTo: apiBagItem.bound_to,
+    rarity: apiBagItem.rarity as string,
+  };
 }

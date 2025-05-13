@@ -1,5 +1,5 @@
-import Account from "../models/Account";
-import {BagItem, APIBagItem, APIBagItemToBagItem} from "../models/BagItem";
+import { Account, APIAccount, APIAccountToAccount } from "../models/Account";
+import { BagItem, APIBagItem, APIBagItemToBagItem } from "../models/BagItem";
 
 export interface ClientInterface {
   getBagItems(): BagItem[];
@@ -22,7 +22,7 @@ export class Client {
         credentials: "include",
       });
       if (response.ok) {
-        let responseJSON = await response.json();       
+        let responseJSON = await response.json();
         return responseJSON;
       }
     } catch (error) {
@@ -53,8 +53,8 @@ export class Client {
   async getBagItems(): Promise<BagItem[]> {
     let endpoint: string = `${this.baseURL}/account/inventory`;
     let response: unknown = await this.clientGet(endpoint);
-    let apiBagItems = response as APIBagItem[]
-    let bagItems: BagItem[] = apiBagItems.map(APIBagItemToBagItem)
+    let apiBagItems = response as APIBagItem[];
+    let bagItems: BagItem[] = apiBagItems.map(APIBagItemToBagItem);
     if (bagItems) {
       return bagItems;
     } else {
@@ -68,13 +68,27 @@ export class Client {
     });
 
     let endpoint: string = `${this.baseURL}/apikeys`;
-    let response: Response = await this.clientPost(endpoint, body)
+    let response: Response = await this.clientPost(endpoint, body);
     if (response.data) {
       return response.data;
     } else {
       return null;
     }
-  } 
+  }
+
+  async getAccount(): Promise<Account[]> {
+    let endpoint: string = `${this.baseURL}/account/info`;
+    let response: unknown = await this.clientGet(endpoint);
+    let apiAccounts = response as APIAccount[];
+    let accounts: Account[] = apiAccounts.map(APIAccountToAccount);
+    console.log(accounts);
+    if (accounts) {
+      console.log("THEREAREACCOUNTS");
+      return accounts;
+    } else {
+      return [];
+    }
+  }
 }
 
 interface Response {

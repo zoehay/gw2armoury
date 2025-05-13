@@ -17,9 +17,10 @@ type DBAccount struct {
 	Session        *DBSession `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
-func (dbAccount DBAccount) ToAccount() models.Account {
+func (dbAccount DBAccount) DBAccountToAccount() models.Account {
 	return models.Account{
 		AccountID:      dbAccount.AccountID,
+		LastCrawl:      dbAccount.LastCrawl,
 		AccountName:    dbAccount.AccountName,
 		GW2AccountName: dbAccount.GW2AccountName,
 		APIKey:         dbAccount.APIKey,
