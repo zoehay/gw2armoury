@@ -76,17 +76,15 @@ export class Client {
     }
   }
 
-  async getAccount(): Promise<Account[]> {
+  async getAccount(): Promise<Account | null> {
     let endpoint: string = `${this.baseURL}/account/info`;
     let response: unknown = await this.clientGet(endpoint);
-    let apiAccounts = response as APIAccount[];
-    let accounts: Account[] = apiAccounts.map(APIAccountToAccount);
-    console.log(accounts);
-    if (accounts) {
-      console.log("THEREAREACCOUNTS");
-      return accounts;
+    let apiAccount = response as APIAccount;
+    let account: Account = APIAccountToAccount(apiAccount);
+    if (account) {
+      return account;
     } else {
-      return [];
+      return null;
     }
   }
 }

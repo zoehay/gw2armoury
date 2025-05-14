@@ -16,7 +16,7 @@ export const KeyGroup: React.FC<KeyGroupProps> = ({ accounts }) => {
   }
 
   return (
-    <div>
+    <div className={managekeys.keytiles}>
       <div>{keyTiles}</div>
     </div>
   );

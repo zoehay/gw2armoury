@@ -9,7 +9,8 @@ import (
 
 type AccountRepositoryInterface interface {
 	GetBySession(sessionID string) (*dbmodels.DBAccount, error)
-	GetByID(id string) ([]dbmodels.DBAccount, error)
+	GetByID(id string) (*dbmodels.DBAccount, error)
+	// GetByUserID(userID string) ([]*dbmodels.DBAccount, error)
 	GetByName(name string) (*dbmodels.DBAccount, error)
 	Create(account *dbmodels.DBAccount) (*dbmodels.DBAccount, error)
 	UpdateSession(accountID string, session *dbmodels.DBSession) (*dbmodels.DBAccount, error)
@@ -41,17 +42,29 @@ func (repository *AccountRepository) GetBySession(sessionID string) (*dbmodels.D
 
 }
 
-func (repository *AccountRepository) GetByID(id string) ([]dbmodels.DBAccount, error) {
-	var accounts []dbmodels.DBAccount
+func (repository *AccountRepository) GetByID(id string) (*dbmodels.DBAccount, error) {
+	var account dbmodels.DBAccount
 
-	err := repository.DB.Where("account_id = ?", id).Find(&accounts).Error
+	err := repository.DB.Where("account_id = ?", id).First(&account).Error
 	if err != nil {
 		return nil, err
 	}
 
-	return accounts, nil
+	return &account, nil
 
 }
+
+// func (repository *AccountRepository) GetByUserID(id string) ([]dbmodels.DBAccount, error) {
+// 	var accounts []dbmodels.DBAccount
+
+// 	err := repository.DB.Where("user_id = ?", id).Find(&accounts).Error
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	return accounts, nil
+
+// }
 
 func (repository *AccountRepository) GetByName(name string) (*dbmodels.DBAccount, error) {
 	var account dbmodels.DBAccount

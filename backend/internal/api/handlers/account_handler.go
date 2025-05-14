@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zoehay/gw2armoury/backend/internal/api/models"
 	dbmodels "github.com/zoehay/gw2armoury/backend/internal/db/models"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 	gw2models "github.com/zoehay/gw2armoury/backend/internal/gw2_client/models"
@@ -38,22 +37,14 @@ func NewAccountHandler(accountRepository repositories.AccountRepositoryInterface
 func (handler AccountHandler) GetAccount(c *gin.Context) {
 
 	accountID := c.MustGet("accountID").(string)
-	dbAccounts, err := handler.AccountRepository.GetByID(accountID)
+	account, err := handler.AccountRepository.GetByID(accountID)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	accounts := make([]models.Account, len(dbAccounts))
-
-	if len(dbAccounts) > 0 {
-		for i := range dbAccounts {
-			accounts[i] = dbAccounts[i].DBAccountToAccount()
-		}
-	}
-
-	c.IndentedJSON(http.StatusOK, accounts)
+	c.IndentedJSON(http.StatusOK, account.DBAccountToAccount())
 }
 
 func (handler AccountHandler) PostAccountRequest(c *gin.Context) {
@@ -117,7 +108,7 @@ func (handler AccountHandler) GenerateOrUpdateAccount(accountRequest AccountRequ
 		Password:       accountRequest.Password,
 	}
 
-	existingAccounts, err := handler.AccountRepository.GetByID(*gw2AccountID)
+	existingAccount, err := handler.AccountRepository.GetByID(*gw2AccountID)
 	if err != nil {
 		// new user
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -130,9 +121,9 @@ func (handler AccountHandler) GenerateOrUpdateAccount(accountRequest AccountRequ
 				return nil, fmt.Errorf("error accessing account db: %s", err)
 			}
 		}
-	} else if len(existingAccounts) > 0 {
-		existingAccount := &existingAccounts[0]
+	} else {
 		// returning user
+		// TODO replace password with user fkey
 		if existingAccount.Password != nil {
 			// existing full account
 			return nil, fmt.Errorf("error existing account for account id: %s", *gw2AccountID)
@@ -146,10 +137,11 @@ func (handler AccountHandler) GenerateOrUpdateAccount(accountRequest AccountRequ
 				}
 			} else {
 				// existing guest account, no password in request so update api key
-				account, err = handler.AccountRepository.UpdateAPIKey(existingAccount.AccountID, *newAccount.APIKey)
-				if err != nil {
-					return nil, fmt.Errorf("account repository update apikey error: %s", err)
-				}
+				// account, err = handler.AccountRepository.UpdateAPIKey(existingAccount.AccountID, *newAccount.APIKey)
+				// if err != nil {
+				// 	return nil, fmt.Errorf("account repository update apikey error: %s", err)
+				// }
+				account = existingAccount
 			}
 		}
 	}
@@ -237,7 +229,7 @@ func (handler AccountHandler) renewOrGenerateSession(account *dbmodels.DBAccount
 	var session *dbmodels.DBSession
 	var err error
 
-	if account.Session != nil {
+	if account.SessionID != nil {
 		session, err = handler.renewSession(account.Session)
 		if err != nil {
 			return nil, nil, fmt.Errorf("error renewing session for existing account: %w", err)
