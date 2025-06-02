@@ -149,7 +149,9 @@ func (handler AccountHandler) GenerateOrUpdateAccount(accountRequest AccountRequ
 	return account, nil
 }
 
-func (handler AccountHandler) DeleteAPIKey(c *gin.Context) {
+func (handler AccountHandler) Delete(c *gin.Context) {
+	fmt.Println("DELETE key")
+	// use request later for User with multiple Accounts
 	var deleteKeyRequest DeleteKeyRequest
 
 	if err := c.BindJSON(&deleteKeyRequest); err != nil {
@@ -158,9 +160,10 @@ func (handler AccountHandler) DeleteAPIKey(c *gin.Context) {
 	}
 
 	accountID := c.MustGet("accountID").(string)
+	sessionID := c.MustGet("sessionID").(string)
 
-	// delete api key from account
-	err := handler.AccountRepository.DeleteAPIKey(accountID)
+	// delete api key
+	err := handler.AccountRepository.DeleteAccount(accountID)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error deleting api key": err.Error()})
 		return
@@ -170,6 +173,13 @@ func (handler AccountHandler) DeleteAPIKey(c *gin.Context) {
 	err = handler.BagItemRepository.DeleteByAccountID(accountID)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error deleting bag items": err.Error()})
+		return
+	}
+
+	// if no user (only one apikey) delete the session
+	err = handler.SessionRepository.Delete(sessionID)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error session items": err.Error()})
 		return
 	}
 
@@ -230,7 +240,7 @@ func (handler AccountHandler) renewOrGenerateSession(account *dbmodels.DBAccount
 	var err error
 
 	if account.SessionID != nil {
-		session, err = handler.renewSession(account.Session)
+		session, err = handler.SessionRepository.Renew(*account.SessionID)
 		if err != nil {
 			return nil, nil, fmt.Errorf("error renewing session for existing account: %w", err)
 		}
@@ -280,13 +290,13 @@ func (handler AccountHandler) generateNewSession(account *dbmodels.DBAccount) (u
 	return updatedAccount, newSession, nil
 }
 
-func (handler AccountHandler) renewSession(session *dbmodels.DBSession) (updatedSession *dbmodels.DBSession, err error) {
-	updatedSession, err = handler.SessionRepository.Update(session.SessionID)
-	if err != nil {
-		return nil, fmt.Errorf("renewSession error updating session: %s", err)
-	}
-	return updatedSession, nil
-}
+// func (handler AccountHandler) renewSession(sessionID string) (updatedSession *dbmodels.DBSession, err error) {
+// 	updatedSession, err = handler.SessionRepository.Renew(sessionID)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("renewSession error updating session: %s", err)
+// 	}
+// 	return updatedSession, nil
+// }
 
 func (handler AccountHandler) generateSessionID() (sessionID string, err error) {
 	b := make([]byte, 32)

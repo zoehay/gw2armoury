@@ -31,6 +31,10 @@ p {
   text-decoration: inherit;
 }
 
+label {
+  color: #ffffff;
+}
+
 body {
   margin: 0;
 }

@@ -9,7 +9,7 @@ import (
 
 type SessionRepositoryInterface interface {
 	Create(session *dbmodels.DBSession) (*dbmodels.DBSession, error)
-	Update(sessionID string) (*dbmodels.DBSession, error)
+	Renew(sessionID string) (*dbmodels.DBSession, error)
 	Delete(sessionID string) error
 	Get(sessionID string) (*dbmodels.DBSession, error)
 	// Reset(session *repositorymodels.Session) (*repositorymodels.Session, error)
@@ -34,10 +34,15 @@ func (repository *SessionRepository) Create(session *dbmodels.DBSession) (*dbmod
 	return session, nil
 }
 
-func (repository *SessionRepository) Update(sessionID string) (*dbmodels.DBSession, error) {
+func (repository *SessionRepository) Renew(sessionID string) (updatedSession *dbmodels.DBSession, err error) {
 	var session *dbmodels.DBSession
 
-	err := repository.DB.Model(&session).Where("session_id = ?", sessionID).Update("expires", time.Now().Add(120*time.Second)).Error
+	err = repository.DB.Model(&session).Where("session_id = ?", sessionID).Update("expires", time.Now().Add(10*time.Minute)).Error
+	if err != nil {
+		return nil, err
+	}
+
+	err = repository.DB.Where("session_id = ?", sessionID).First(&session).Error
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +59,7 @@ func (repository *SessionRepository) Delete(sessionID string) error {
 
 func (repository *SessionRepository) Get(sessionID string) (*dbmodels.DBSession, error) {
 	var session *dbmodels.DBSession
-	err := repository.DB.Where("session_id = ?", sessionID).Find(&session).Error
+	err := repository.DB.First(&session, "session_id = ?", sessionID).Error
 	if err != nil {
 		return nil, err
 	}

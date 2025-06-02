@@ -26,7 +26,7 @@ export class Client {
         return responseJSON;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 
@@ -46,12 +46,33 @@ export class Client {
         return responseJSON;
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
+    }
+  }
+
+  async clientDelete(endpoint: string, body: any): Promise<any> {
+    try {
+      let response = await fetch(endpoint, {
+        credentials: "include",
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: body,
+      });
+
+      if (response.ok) {
+        let responseJSON = await response.json();
+        return responseJSON;
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 
   async getBagItems(): Promise<BagItem[]> {
     let endpoint: string = `${this.baseURL}/account/inventory`;
+
     let response: unknown = await this.clientGet(endpoint);
     let apiBagItems = response as APIBagItem[];
     let bagItems: BagItem[] = apiBagItems.map(APIBagItemToBagItem);
@@ -66,11 +87,13 @@ export class Client {
     let body = JSON.stringify({
       APIKey: key,
     });
-
     let endpoint: string = `${this.baseURL}/apikeys`;
-    let response: Response = await this.clientPost(endpoint, body);
-    if (response.data) {
-      return response.data;
+
+    let response: unknown = await this.clientPost(endpoint, body);
+    let apiAccount = response as APIAccount;
+    let account: Account = APIAccountToAccount(apiAccount);
+    if (account) {
+      return account;
     } else {
       return null;
     }
@@ -78,6 +101,7 @@ export class Client {
 
   async getAccount(): Promise<Account | null> {
     let endpoint: string = `${this.baseURL}/account/info`;
+
     let response: unknown = await this.clientGet(endpoint);
     let apiAccount = response as APIAccount;
     let account: Account = APIAccountToAccount(apiAccount);
@@ -87,8 +111,19 @@ export class Client {
       return null;
     }
   }
-}
 
-interface Response {
-  data: any;
+  async deleteAPIKey(key: string): Promise<string | null> {
+    let body = JSON.stringify({
+      APIKey: key,
+    });
+    let endpoint: string = `${this.baseURL}/account/delete`;
+
+    let response: unknown = await this.clientDelete(endpoint, body);
+    let deletedKey = response as string;
+    if (deletedKey) {
+      return deletedKey;
+    } else {
+      return null;
+    }
+  }
 }

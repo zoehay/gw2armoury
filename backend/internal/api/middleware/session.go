@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -44,12 +43,15 @@ func UseSession(accountRepository *repositories.AccountRepository, sessionReposi
 		} else {
 			account, err := accountRepository.GetBySession(sessionID)
 			if err != nil {
-				fmt.Println(err.Error())
+				c.IndentedJSON(http.StatusForbidden, gin.H{"error": "no account associated with session"})
+				c.Abort()
+				return
 			}
 
 			c.Set("accountID", account.AccountID)
 			c.Set("accountName", account.AccountName)
 			c.Set("apiKey", account.APIKey)
+			c.Set("sessionID", sessionID)
 			c.Next()
 		}
 

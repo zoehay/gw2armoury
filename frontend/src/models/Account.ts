@@ -1,6 +1,7 @@
 export interface Account {
   accountID: string;
   accountName?: string;
+  gw2AccountName?: string;
   apiKey?: string;
   password?: string;
   sessionID?: string;
@@ -21,6 +22,7 @@ export function APIAccountToAccount(apiAccount: APIAccount): Account {
   return {
     accountID: apiAccount.id,
     accountName: apiAccount.account_name,
+    gw2AccountName: apiAccount.gw2_name,
     apiKey: apiAccount.api_key,
     password: apiAccount.password,
     sessionID: apiAccount.session_id,

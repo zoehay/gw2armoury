@@ -5,8 +5,11 @@
 .keytile {
   border: solid;
   border-color: var(--accent-light-1);
+  display: flex;
+  justify-content: space-around;
 }
 
 .keytile > .field {
-  display: block;
+  color: var(--accent-light-1);
+  display: flex;
 }

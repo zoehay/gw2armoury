@@ -5,13 +5,17 @@ import managekeys from "./managekeys.module.css";
 
 interface KeyGroupProps {
   accounts?: Account[];
+  handleUpdate: React.Dispatch<React.SetStateAction<Account | null>>;
 }
 
-export const KeyGroup: React.FC<KeyGroupProps> = ({ accounts }) => {
+export const KeyGroup: React.FC<KeyGroupProps> = ({
+  accounts,
+  handleUpdate,
+}) => {
   let keyTiles;
   if (accounts) {
     keyTiles = accounts.map((account, index) => (
-      <KeyTile account={account} key={index} />
+      <KeyTile account={account} handleUpdate={handleUpdate} key={index} />
     ));
   }
 

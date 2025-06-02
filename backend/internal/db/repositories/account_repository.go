@@ -18,6 +18,7 @@ type AccountRepositoryInterface interface {
 	Update(existingAccount *dbmodels.DBAccount, updateAccount *dbmodels.DBAccount) (*dbmodels.DBAccount, error)
 	DeleteAPIKey(accountID string) error
 	UpdateAPIKey(accountID string, apiKey string) (*dbmodels.DBAccount, error)
+	DeleteAccount(accountID string) error
 }
 
 type AccountRepository struct {
@@ -151,4 +152,11 @@ func (repository *AccountRepository) UpdateAPIKey(accountID string, apiKey strin
 	}
 
 	return &account, nil
+}
+
+func (repository *AccountRepository) DeleteAccount(accountID string) error {
+	var account dbmodels.DBAccount
+	err := repository.DB.Model(&account).Where("account_id = ?", accountID).Delete(&account).Error
+
+	return err
 }
