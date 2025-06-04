@@ -19,8 +19,14 @@ func NewBagItemHandler(bagItemRepository repositories.BagItemRepositoryInterface
 
 func (BagItemHandler BagItemHandler) GetByCharacter(c *gin.Context) {
 	characterName := c.Params.ByName("charactername")
+	value, exists := c.Get("accountID")
+	if !exists {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "could not find Gin Context accountID"})
+		return
+	}
+	accountID := value.(string)
 
-	items, err := BagItemHandler.BagItemRepository.GetDetailBagItemByCharacterName(characterName)
+	items, err := BagItemHandler.BagItemRepository.GetDetailBagItemByCharacterName(accountID, characterName)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

@@ -4,10 +4,6 @@ import content from "../content.module.css";
 import { Account } from "../../models/Account";
 import { KeyGroup } from "./KeyGroup";
 
-interface KeyInputProps {
-  handleUpdate: React.Dispatch<React.SetStateAction<Account | null>>;
-}
-
 export const ManageKeys = () => {
   // if user show UserKeys else only one account AccountKey
   return (
@@ -48,6 +44,10 @@ const AccountKey = () => {
     </div>
   );
 };
+
+interface KeyInputProps {
+  handleUpdate: React.Dispatch<React.SetStateAction<Account | null>>;
+}
 
 const KeyInput: React.FC<KeyInputProps> = ({ handleUpdate }) => {
   const fieldName = "API Key";

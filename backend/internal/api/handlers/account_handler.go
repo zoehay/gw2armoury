@@ -123,7 +123,7 @@ func (handler AccountHandler) GenerateOrUpdateAccount(accountRequest AccountRequ
 		}
 	} else {
 		// returning user
-		// TODO replace password with user fkey
+		// TODO replace password with user
 		if existingAccount.Password != nil {
 			// existing full account
 			return nil, fmt.Errorf("error existing account for account id: %s", *gw2AccountID)

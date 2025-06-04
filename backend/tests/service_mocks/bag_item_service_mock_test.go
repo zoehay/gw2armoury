@@ -91,7 +91,7 @@ func (s *BagItemAccountServiceTestSuite) TestClearCharacterInventory() {
 	assert.NoError(s.T(), err, "Failed to get account bag items")
 	numberAllBagItems := len(bagItems)
 	fmt.Println(numberAllBagItems)
-	err = s.Service.BagItemService.ClearCharacterInventory("Laura Lesdottir")
+	err = s.Service.BagItemService.ClearCharacterInventory("accountid", "Laura Lesdottir")
 	assert.NoError(s.T(), err, "Failed to clear character inventory")
 	bagItems, err = s.Service.BagItemService.BagItemRepository.GetDetailBagItemByAccountID("accountid")
 	assert.NoError(s.T(), err, "Failed to get account bag items")

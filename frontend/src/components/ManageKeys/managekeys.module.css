@@ -5,8 +5,10 @@
 .keytile {
   border: solid;
   border-color: var(--accent-light-1);
-  display: flex;
-  justify-content: space-around;
+  @media (min-width: 46rem) {
+    display: flex;
+    justify-content: space-around;
+  }
 }
 
 .keytile > .field {
