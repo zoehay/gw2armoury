@@ -69,7 +69,7 @@ func (s *CreateGuestAccountSessionTestSuite) TestCreateGuestWithNewAPIKey() {
 	// req.URL.RawQuery = q.Encode()
 
 	c.Request = req
-	s.AccountHandler.PostAccountRequest(c)
+	s.AccountHandler.HandlePostAccountRequest(c)
 
 	cookie := w.Result().Cookies()[0]
 
