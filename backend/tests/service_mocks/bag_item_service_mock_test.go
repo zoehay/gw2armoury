@@ -35,11 +35,11 @@ func (s *BagItemAccountServiceTestSuite) SetupSuite() {
 }
 
 func (s *BagItemAccountServiceTestSuite) TearDownSuite() {
-	dropTables := []string{"db_accounts", "db_sessions", "db_bag_items", "db_items"}
-	err := testutils.TearDownDropTables(s.Repository, dropTables)
-	if err != nil {
-		s.T().Errorf("Error tearing down suite: %v", err)
-	}
+	// dropTables := []string{"db_accounts", "db_sessions", "db_bag_items", "db_items"}
+	// err := testutils.TearDownDropTables(s.Repository, dropTables)
+	// if err != nil {
+	// 	s.T().Errorf("Error tearing down suite: %v", err)
+	// }
 }
 
 func (s *BagItemAccountServiceTestSuite) TestGetAndStoreAllBagItems() {
@@ -49,7 +49,7 @@ func (s *BagItemAccountServiceTestSuite) TestGetAndStoreAllBagItems() {
 	assert.NoError(s.T(), err, "Failed to get account bag items")
 	numberAllBagItems := len(bagItems)
 	fmt.Println(numberAllBagItems)
-	assert.Equal(s.T(), 48, numberAllBagItems)
+	assert.Equal(s.T(), 70, numberAllBagItems)
 
 }
 
@@ -93,10 +93,12 @@ func (s *BagItemAccountServiceTestSuite) TestClearCharacterInventory() {
 	fmt.Println(numberAllBagItems)
 	err = s.Service.BagItemService.ClearCharacterInventory("accountid", "Laura Lesdottir")
 	assert.NoError(s.T(), err, "Failed to clear character inventory")
+	err = s.Service.BagItemService.ClearCharacterInventory("accountid", "Roman Meows")
+	assert.NoError(s.T(), err, "Failed to clear character inventory")
 	bagItems, err = s.Service.BagItemService.BagItemRepository.GetDetailBagItemByAccountID("accountid")
 	assert.NoError(s.T(), err, "Failed to get account bag items")
 	numberBagItemsWithoutCharacter := len(bagItems)
 	fmt.Println(numberBagItemsWithoutCharacter)
-	assert.Equal(s.T(), 30, (numberAllBagItems - numberBagItemsWithoutCharacter))
+	assert.Equal(s.T(), 67, (numberAllBagItems - numberBagItemsWithoutCharacter))
 
 }

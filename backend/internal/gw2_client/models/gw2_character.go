@@ -1,6 +1,7 @@
 package gw2models
 
 type GW2Character struct {
-	Name string    `json:"name"`
-	Bags *[]GW2Bag `json:"bags"`
+	Name      string        `json:"name"`
+	Bags      *[]GW2Bag     `json:"bags"`
+	Equipment *[]GW2BagItem `json:"equipment"`
 }

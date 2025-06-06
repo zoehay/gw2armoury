@@ -18,6 +18,8 @@ type DBBagItem struct {
 	Dyes          *pq.Int64Array `gorm:"type:integer[]"`
 	Binding       *string
 	BoundTo       *string
+	Slot          *string
+	Location      *string
 }
 
 // func GORMBagItemToBagItem(gormBagItem GORMBagItem) models.BagItem {
