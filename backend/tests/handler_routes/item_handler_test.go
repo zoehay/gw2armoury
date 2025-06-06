@@ -43,7 +43,7 @@ func (s *ItemHandlerTestSuite) SetupSuite() {
 
 func (s *ItemHandlerTestSuite) TearDownSuite() {
 	dropTables := []string{"db_items"}
-	err := testutils.TearDownDropTables(s.Repository, dropTables)
+	err := testutils.TearDownTruncateTables(s.Repository, dropTables)
 	if err != nil {
 		s.T().Errorf("Error tearing down suite: %v", err)
 	}

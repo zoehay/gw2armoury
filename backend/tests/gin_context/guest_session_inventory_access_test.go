@@ -45,7 +45,7 @@ func (s *GuestSessionInventoryAccessTestSuite) SetupSuite() {
 
 func (s *GuestSessionInventoryAccessTestSuite) TearDownSuite() {
 	dropTables := []string{"db_accounts", "db_sessions", "db_bag_items", "db_items"}
-	err := testutils.TearDownDropTables(s.Repository, dropTables)
+	err := testutils.TearDownTruncateTables(s.Repository, dropTables)
 	if err != nil {
 		s.T().Errorf("Error tearing down suite: %v", err)
 	}

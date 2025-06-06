@@ -19,6 +19,8 @@ type DBDetailBagItem struct {
 	Binding       *string                 `json:"binding,omitempty"`
 	BoundTo       *string                 `json:"bound_to,omitempty"`
 	Rarity        *string                 `json:"rarity"`
+	Slot          *string                 `json:"slot"`
+	Location      *string                 `json:"location"`
 }
 
 func (dbIconBagItem DBDetailBagItem) ToBagItem() models.BagItem {
@@ -38,5 +40,7 @@ func (dbIconBagItem DBDetailBagItem) ToBagItem() models.BagItem {
 		Binding:       dbIconBagItem.Binding,
 		BoundTo:       dbIconBagItem.BoundTo,
 		Rarity:        dbIconBagItem.Rarity,
+		Slot:          dbIconBagItem.Slot,
+		Location:      dbIconBagItem.Location,
 	}
 }

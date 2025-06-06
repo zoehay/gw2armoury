@@ -54,9 +54,9 @@ func DBRouterSetup() (*gin.Engine, *repositories.Repository, *services.Service, 
 	return router, repository, service, nil
 }
 
-func TearDownDropTables(repository *repositories.Repository, tables []string) error {
+func TearDownTruncateTables(repository *repositories.Repository, tables []string) error {
 	for _, tableString := range tables {
-		err := repository.AccountRepository.DB.Exec(fmt.Sprintf("DROP TABLE %v cascade;", tableString)).Error
+		err := repository.AccountRepository.DB.Exec(fmt.Sprintf("TRUNCATE TABLE %v cascade;", tableString)).Error
 		if err != nil {
 			return err
 		}

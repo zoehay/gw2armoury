@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"github.com/zoehay/gw2armoury/backend/internal/api/models"
 	dbmodels "github.com/zoehay/gw2armoury/backend/internal/db/models"
 	"gorm.io/gorm"
 )
@@ -14,6 +15,7 @@ type BagItemRepositoryInterface interface {
 	GetIds() ([]int, error)
 	GetDetailBagItemByCharacterName(accountID string, characterName string) ([]dbmodels.DBDetailBagItem, error)
 	GetDetailBagItemByAccountID(accountID string) ([]dbmodels.DBDetailBagItem, error)
+	GetAccountInventory(accountID string) (*models.AccountInventory, error)
 }
 
 type BagItemRepository struct {
@@ -114,4 +116,77 @@ func (repository *BagItemRepository) GetDetailBagItemByAccountID(accountID strin
 
 	return detailBagItems, nil
 
+}
+
+func (repository *BagItemRepository) GetAccountInventory(accountID string) (*models.AccountInventory, error) {
+	var detailBagItems []dbmodels.DBDetailBagItem
+
+	err := repository.DB.Table("db_bag_items").
+		Select("db_bag_items.*, db_items.icon, db_items.name, db_items.description, db_items.rarity").
+		Joins("left join db_items on db_bag_items.bag_item_id = db_items.id").
+		Where("db_bag_items.account_id = ?", accountID).
+		Scan(&detailBagItems).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	characterNameMap := map[string]models.Character{}
+	var sharedInventory []models.BagItem
+	var characters []models.Character
+
+	for i := range detailBagItems {
+		item := detailBagItems[i].ToBagItem()
+		name := item.CharacterName
+
+		if name == "Shared Inventory" {
+			sharedInventory = append(sharedInventory, item)
+		} else {
+			entry, ok := characterNameMap[name]
+			isEquipment := repository.isEquipment(item)
+
+			if ok {
+				if isEquipment {
+					entry.Equipment = append(entry.Equipment, item)
+					characterNameMap[name] = entry
+				} else {
+					entry.Inventory = append(entry.Inventory, item)
+					characterNameMap[name] = entry
+				}
+			} else {
+				newCharacter := &models.Character{
+					Name:      name,
+					Equipment: []models.BagItem{},
+					Inventory: []models.BagItem{},
+				}
+				if isEquipment {
+					newCharacter.Equipment = append(newCharacter.Equipment, item)
+				} else {
+					newCharacter.Inventory = append(newCharacter.Inventory, item)
+				}
+				characterNameMap[name] = *newCharacter
+			}
+		}
+
+	}
+
+	for character := range characterNameMap {
+		characters = append(characters, characterNameMap[character])
+	}
+
+	var accountInventory models.AccountInventory
+	accountInventory.AccountID = accountID
+	accountInventory.SharedInventory = &sharedInventory
+	accountInventory.Characters = &characters
+
+	return &accountInventory, nil
+
+}
+
+func (repository *BagItemRepository) isEquipment(item models.BagItem) bool {
+	if item.Slot != nil && *item.Slot != "" {
+		return true
+	} else {
+		return false
+	}
 }

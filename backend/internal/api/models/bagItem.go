@@ -16,4 +16,6 @@ type BagItem struct {
 	Binding       *string                 `json:"binding,omitempty"`
 	BoundTo       *string                 `json:"bound_to,omitempty"`
 	Rarity        *string                 `json:"rarity"`
+	Slot          *string                 `json:"slot"`
+	Location      *string                 `json:"location"`
 }
