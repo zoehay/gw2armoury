@@ -1,4 +1,9 @@
 import { Account, APIAccount, APIAccountToAccount } from "../models/Account";
+import {
+  AccountInventory,
+  APIAccountInventory,
+  APIAccountInventoryToAccountInventory,
+} from "../models/AccountInventory";
 import { BagItem, APIBagItem, APIBagItemToBagItem } from "../models/BagItem";
 
 export interface ClientInterface {
@@ -81,6 +86,16 @@ export class Client {
     } else {
       return [];
     }
+  }
+
+  async getAccountInventory(): Promise<AccountInventory> {
+    let endpoint: string = `${this.baseURL}/account/accountinventory`;
+
+    let response: unknown = await this.clientGet(endpoint);
+    let apiAccountInventory = response as APIAccountInventory;
+    let accountInventory: Account =
+      APIAccountInventoryToAccountInventory(apiAccountInventory);
+    return accountInventory;
   }
 
   async postAPIKey(key: string): Promise<Account | null> {

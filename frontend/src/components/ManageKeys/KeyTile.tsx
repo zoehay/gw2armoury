@@ -21,7 +21,7 @@ export const KeyTile: React.FC<KeyTileProps> = ({ account, handleUpdate }) => {
       if (deletedAccount) {
         handleUpdate(null);
       }
-    }, 350);
+    }, 2000);
   };
 
   return (

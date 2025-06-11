@@ -1,19 +1,21 @@
 import { useContext, useEffect, useState } from "react";
-import { BagItem } from "../../models/BagItem";
 import { ClientContext } from "../../util/ClientContext";
 import content from "../content.module.css";
-import FilteredInventory from "./FilteredInventory";
 import NoKeyPage from "../ErrorPage/NoKeyPage";
+import { AccountInventory } from "../../models/AccountInventory";
+import InventoryContainer from "./InventoryContainer";
 
 const Inventory = () => {
   let context = useContext(ClientContext);
   let client = context;
 
-  let [bagItems, setBagItems] = useState<BagItem[] | undefined>([]);
+  let [accountInventory, setAccountInventory] = useState<
+    AccountInventory | undefined
+  >();
 
   async function fetchData() {
-    let items: BagItem[] = await client.getBagItems();
-    setBagItems(items);
+    let inventory: AccountInventory = await client.getAccountInventory();
+    setAccountInventory(inventory);
   }
 
   useEffect(() => {
@@ -22,8 +24,10 @@ const Inventory = () => {
 
   return (
     <div className={content.page}>
-      {bagItems ? (
-        <FilteredInventory bagItems={bagItems}></FilteredInventory>
+      {accountInventory ? (
+        <InventoryContainer
+          accountInventory={accountInventory}
+        ></InventoryContainer>
       ) : (
         <NoKeyPage />
       )}
