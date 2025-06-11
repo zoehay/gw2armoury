@@ -5,16 +5,25 @@ import { InventoryTile } from "./InventoryTile";
 
 interface InventoryGroupProps {
   characterName: string;
-  contents?: BagItem[];
+  characterInventory?: BagItem[];
+  equipment?: BagItem[];
 }
 
 const InventoryGroup: React.FC<InventoryGroupProps> = ({
   characterName,
-  contents,
+  equipment,
+  characterInventory,
 }) => {
   let itemTiles;
-  if (contents) {
-    itemTiles = contents.map((item, index) => (
+  if (characterInventory) {
+    itemTiles = characterInventory.map((item, index) => (
+      <InventoryTile bagItem={item} key={index} />
+    ));
+  }
+
+  let equipmentTiles;
+  if (equipment) {
+    equipmentTiles = equipment.map((item, index) => (
       <InventoryTile bagItem={item} key={index} />
     ));
   }
@@ -22,6 +31,7 @@ const InventoryGroup: React.FC<InventoryGroupProps> = ({
   return (
     <div className={inventory.group}>
       <div className={inventory.name}>{characterName}</div>
+      <div className={inventory.contents}>{equipmentTiles}</div>
       <div className={inventory.contents}>{itemTiles}</div>
     </div>
   );

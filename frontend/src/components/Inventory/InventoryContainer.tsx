@@ -1,14 +1,17 @@
 import React from "react";
 import InventoryGroup from "./InventoryGroup";
 import inventory from "./inventory.module.css";
-import { AccountInventory } from "../../models/AccountInventory";
+import { BagItem } from "../../models/BagItem";
+import { Character } from "../../models/Character";
 
 interface AccountInventoryProps {
-  accountInventory: AccountInventory;
+  sharedInventory?: BagItem[] | undefined;
+  characters?: Character[];
 }
 
 const InventoryContainer: React.FC<AccountInventoryProps> = ({
-  accountInventory,
+  sharedInventory,
+  characters,
 }) => {
   // let [searchTerm, setSearchTerm] = useState<string>("");
 
@@ -18,31 +21,28 @@ const InventoryContainer: React.FC<AccountInventoryProps> = ({
   //   }, 1000);
   // };
 
-  let characters: JSX.Element[] = [];
-
-  if (accountInventory.characters) {
-    for (let character of accountInventory.characters) {
-      characters.push(
-        <InventoryGroup
-          characterName={character.name}
-          contents={character.inventory}
-        ></InventoryGroup>
-      );
-    }
-  }
-
   return (
     <>
       {/* <input type="text" onChange={handleChange} /> */}
-      {accountInventory.sharedInventory && (
+      {sharedInventory && (
         <InventoryGroup
           characterName="Shared Inventory"
-          contents={accountInventory.sharedInventory}
+          characterInventory={sharedInventory}
         ></InventoryGroup>
       )}
-      {accountInventory.characters && (
-        <div className={inventory.inventoryGroups}>{characters!}</div>
-      )}
+      <div className={inventory.inventoryGroups}>
+        {characters &&
+          characters.map((character) => {
+            return (
+              <InventoryGroup
+                key={character.name}
+                characterName={character.name}
+                characterInventory={character.inventory}
+                equipment={character.equipment}
+              ></InventoryGroup>
+            );
+          })}
+      </div>
     </>
   );
 };

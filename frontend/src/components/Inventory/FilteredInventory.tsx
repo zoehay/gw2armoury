@@ -40,7 +40,7 @@ const FilteredInventory: React.FC<FilteredInventoryProps> = ({ bagItems }) => {
       characters.push(
         <InventoryGroup
           characterName={key}
-          contents={characterRecord[key]}
+          characterInventory={characterRecord[key]}
           key={key}
         ></InventoryGroup>
       );

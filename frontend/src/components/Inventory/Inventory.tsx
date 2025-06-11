@@ -26,7 +26,8 @@ const Inventory = () => {
     <div className={content.page}>
       {accountInventory ? (
         <InventoryContainer
-          accountInventory={accountInventory}
+          sharedInventory={accountInventory.sharedInventory}
+          characters={accountInventory.characters}
         ></InventoryContainer>
       ) : (
         <NoKeyPage />
