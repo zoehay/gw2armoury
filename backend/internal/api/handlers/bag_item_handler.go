@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/zoehay/gw2armoury/backend/internal/api/models"
+	dbmodels "github.com/zoehay/gw2armoury/backend/internal/db/models"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 )
 
@@ -26,10 +28,15 @@ func (bagItemHandler BagItemHandler) GetByCharacter(c *gin.Context) {
 	}
 	accountID := value.(string)
 
-	items, err := bagItemHandler.BagItemRepository.GetDetailBagItemByCharacterName(accountID, characterName)
+	dbItems, err := bagItemHandler.BagItemRepository.GetDetailBagItemByCharacterName(accountID, characterName)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
+	}
+
+	items := make([]models.BagItem, len(dbItems))
+	for i := range dbItems {
+		items[i] = dbItems[i].ToBagItem()
 	}
 
 	c.IndentedJSON(http.StatusOK, items)
@@ -43,10 +50,15 @@ func (bagItemHandler BagItemHandler) GetByAccount(c *gin.Context) {
 	}
 
 	accountID := value.(string)
-	items, err := bagItemHandler.BagItemRepository.GetDetailBagItemByAccountID(accountID)
+	dbItems, err := bagItemHandler.BagItemRepository.GetDetailBagItemByAccountID(accountID)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
+	}
+
+	items := make([]models.BagItem, len(dbItems))
+	for i := range dbItems {
+		items[i] = dbItems[i].ToBagItem()
 	}
 
 	c.IndentedJSON(http.StatusOK, items)
@@ -60,11 +72,13 @@ func (bagItemHandler BagItemHandler) GetAccountInventory(c *gin.Context) {
 	}
 	accountID := value.(string)
 
-	accountInventory, err := bagItemHandler.BagItemRepository.GetAccountInventory(accountID)
+	detailBagItems, err := bagItemHandler.BagItemRepository.GetDetailBagItemByAccountID(accountID)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error getting account inventory": err.Error()})
 		return
 	}
+
+	accountInventory := dbmodels.DBDetailBagItemsToAccountInventory(detailBagItems, accountID)
 
 	c.IndentedJSON(http.StatusOK, accountInventory)
 }

@@ -45,7 +45,7 @@ func (s *CreateGuestSessionTestSuite) TearDownSuite() {
 	}
 }
 
-func (s *CreateGuestSessionTestSuite) TestCreateGuestWithNewAPIKey() {
+func (s *CreateGuestSessionTestSuite) TestCreateGuestWithNewAPIKeyCreatesSession() {
 	gin.SetMode(gin.TestMode)
 
 	userJson := `{"APIKey":"stringapikey"}`

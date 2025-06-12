@@ -61,12 +61,11 @@ func (s *InventoryHandlerTestSuite) TestGetCharacterInventory() {
 	req, _ := http.NewRequest("GET", "/account/accountinventory", nil)
 	req.AddCookie(s.Cookie)
 	s.Router.ServeHTTP(w, req)
-	testutils.PrintObject(w.Result())
 
-	responseAccountInventory, err := testutils.UnmarshalToType[*models.AccountInventory](w)
+	_, err := testutils.UnmarshalToType[*models.AccountInventory](w)
 	if err != nil {
 		s.T().Errorf("Failed to unmarshal response: %v", err)
 	}
-	testutils.PrintObject(responseAccountInventory)
+
 	assert.Equal(s.T(), 200, w.Code)
 }

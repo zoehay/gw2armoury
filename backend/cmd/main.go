@@ -14,7 +14,7 @@ func main() {
 	dsn := routes.LoadEnvDSN()
 	mocks := false
 	appMode := os.Getenv("APP_ENV")
-	if appMode == "development" {
+	if appMode == "test" {
 		mocks = true
 	}
 

@@ -37,8 +37,11 @@ func (s *ItemServiceTestSuite) SetupSuite() {
 }
 
 func (s *ItemServiceTestSuite) TearDownSuite() {
-	err := s.Service.ItemService.ItemRepository.DB.Exec("DROP TABLE db_items;").Error
-	assert.NoError(s.T(), err, "Failed to clear database")
+	dropTables := []string{"db_items"}
+	err := testutils.TearDownTruncateTables(s.Repository, dropTables)
+	if err != nil {
+		s.T().Errorf("Error tearing down suite: %v", err)
+	}
 
 	db, err := s.Service.ItemService.ItemRepository.DB.DB()
 	if err != nil {

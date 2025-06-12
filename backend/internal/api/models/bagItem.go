@@ -19,3 +19,11 @@ type BagItem struct {
 	Slot          *string                 `json:"slot"`
 	Location      *string                 `json:"location"`
 }
+
+func (item BagItem) IsEquipment() bool {
+	if item.Slot != nil && *item.Slot != "" {
+		return true
+	} else {
+		return false
+	}
+}

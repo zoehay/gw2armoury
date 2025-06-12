@@ -60,7 +60,7 @@ func SetupRouter(dsn string, mocks bool) (*gin.Engine, *repositories.Repository,
 	router.GET("/items/:id", itemHandler.GetItemByID)
 
 	router.POST("/login", accountHandler.Login)
-	router.POST("/signup", accountHandler.HandlePostAccountRequest)
+	router.POST("/signup", accountHandler.HandlePostAccountRequest) //change signup handler with password verification
 	router.POST("/apikeys", accountHandler.HandlePostAccountRequest)
 
 	account := router.Group("/account")

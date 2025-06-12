@@ -23,24 +23,77 @@ type DBDetailBagItem struct {
 	Location      *string                 `json:"location"`
 }
 
-func (dbIconBagItem DBDetailBagItem) ToBagItem() models.BagItem {
+func (dbDetailBagItem DBDetailBagItem) ToBagItem() models.BagItem {
 	return models.BagItem{
-		CharacterName: dbIconBagItem.CharacterName,
-		Name:          dbIconBagItem.Name,
-		Description:   dbIconBagItem.Description,
-		BagItemID:     dbIconBagItem.BagItemID,
-		Icon:          dbIconBagItem.Icon,
-		Count:         dbIconBagItem.Count,
-		Charges:       dbIconBagItem.Charges,
-		Infusions:     dbIconBagItem.Infusions,
-		Upgrades:      dbIconBagItem.Upgrades,
-		Skin:          dbIconBagItem.Skin,
-		Stats:         dbIconBagItem.Stats,
-		Dyes:          dbIconBagItem.Dyes,
-		Binding:       dbIconBagItem.Binding,
-		BoundTo:       dbIconBagItem.BoundTo,
-		Rarity:        dbIconBagItem.Rarity,
-		Slot:          dbIconBagItem.Slot,
-		Location:      dbIconBagItem.Location,
+		CharacterName: dbDetailBagItem.CharacterName,
+		Name:          dbDetailBagItem.Name,
+		Description:   dbDetailBagItem.Description,
+		BagItemID:     dbDetailBagItem.BagItemID,
+		Icon:          dbDetailBagItem.Icon,
+		Count:         dbDetailBagItem.Count,
+		Charges:       dbDetailBagItem.Charges,
+		Infusions:     dbDetailBagItem.Infusions,
+		Upgrades:      dbDetailBagItem.Upgrades,
+		Skin:          dbDetailBagItem.Skin,
+		Stats:         dbDetailBagItem.Stats,
+		Dyes:          dbDetailBagItem.Dyes,
+		Binding:       dbDetailBagItem.Binding,
+		BoundTo:       dbDetailBagItem.BoundTo,
+		Rarity:        dbDetailBagItem.Rarity,
+		Slot:          dbDetailBagItem.Slot,
+		Location:      dbDetailBagItem.Location,
 	}
+}
+
+func DBDetailBagItemsToAccountInventory(dbIconBagItems []DBDetailBagItem, accountID string) models.AccountInventory {
+
+	characterNameMap := map[string]models.Character{}
+	var sharedInventory []models.BagItem
+	var characters []models.Character
+
+	for i := range dbIconBagItems {
+		item := dbIconBagItems[i].ToBagItem()
+		name := item.CharacterName
+
+		if name == "Shared Inventory" {
+			sharedInventory = append(sharedInventory, item)
+		} else {
+			entry, ok := characterNameMap[name]
+			isEquipment := item.IsEquipment()
+
+			if ok {
+				if isEquipment {
+					entry.Equipment = append(entry.Equipment, item)
+					characterNameMap[name] = entry
+				} else {
+					entry.Inventory = append(entry.Inventory, item)
+					characterNameMap[name] = entry
+				}
+			} else {
+				newCharacter := &models.Character{
+					Name:      name,
+					Equipment: []models.BagItem{},
+					Inventory: []models.BagItem{},
+				}
+				if isEquipment {
+					newCharacter.Equipment = append(newCharacter.Equipment, item)
+				} else {
+					newCharacter.Inventory = append(newCharacter.Inventory, item)
+				}
+				characterNameMap[name] = *newCharacter
+			}
+		}
+
+	}
+
+	for character := range characterNameMap {
+		characters = append(characters, characterNameMap[character])
+	}
+
+	var accountInventory models.AccountInventory
+	accountInventory.AccountID = accountID
+	accountInventory.SharedInventory = &sharedInventory
+	accountInventory.Characters = &characters
+
+	return accountInventory
 }

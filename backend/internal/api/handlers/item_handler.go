@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/zoehay/gw2armoury/backend/internal/api/models"
 	"github.com/zoehay/gw2armoury/backend/internal/db/repositories"
 )
 
@@ -19,10 +20,15 @@ func NewItemHandler(itemRepository repositories.ItemRepositoryInterface) *ItemHa
 }
 
 func (itemHandler ItemHandler) GetAllItems(c *gin.Context) {
-	items, err := itemHandler.ItemRepository.GetAll()
+	dbItems, err := itemHandler.ItemRepository.GetAll()
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
+	}
+
+	items := make([]models.Item, len(dbItems))
+	for i := range dbItems {
+		items[i] = dbItems[i].ToItem()
 	}
 
 	c.IndentedJSON(http.StatusOK, items)
@@ -42,5 +48,5 @@ func (itemHandler ItemHandler) GetItemByID(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, item)
+	c.IndentedJSON(http.StatusOK, item.ToItem())
 }
