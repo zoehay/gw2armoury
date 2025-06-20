@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -10,7 +11,7 @@ import (
 )
 
 type ItemServiceInterface interface {
-	GetAndStoreItemsById(ids []int) error
+	GetAndStoreItemsByID(ids []int) error
 	GetAndStoreAllItems() error
 }
 
@@ -26,40 +27,43 @@ func NewItemService(itemRepository *repositories.ItemRepository, itemProvider pr
 	}
 }
 
-func (service *ItemService) GetAndStoreItemsById(ids []int) error {
-	apiItems, err := service.ItemProvider.GetItemsByIds(ids)
+func (service *ItemService) GetAndStoreItemsByID(ids []int) error {
+	apiItems, err := service.ItemProvider.GetItemsByIDs(ids)
 	if err != nil {
 		return fmt.Errorf("service error using provider: %s", err)
 	}
 
+	var errs []error
 	for _, item := range apiItems {
 		dbItem := item.ToDBItem()
 		_, err := service.ItemRepository.Create(&dbItem)
 		if err != nil {
-			return fmt.Errorf("service error using gorm create: %s", err)
+			errs = append(errs, fmt.Errorf("GetAndStoreItemsByID: %s", err))
 		}
 	}
-	return nil
+
+	return errors.Join(errs...)
 }
 
 func (service *ItemService) GetAndStoreAllItems() error {
-	allItemIds, err := service.ItemProvider.GetAllItemIds()
+	allItemIDs, err := service.ItemProvider.GetAllItemIDs()
 
 	if err != nil {
 		return fmt.Errorf("service error getting all itemIds: %s", err)
 	}
 
-	itemIdChunks := SplitArray(allItemIds, 3)
-	fmt.Println(itemIdChunks)
+	itemIDChunks := SplitArray(allItemIDs, 50)
 
-	for _, idChunk := range itemIdChunks {
-		err = service.GetAndStoreItemsById(idChunk)
+	var errs []error
+
+	for _, idChunk := range itemIDChunks {
+		err = service.GetAndStoreItemsByID(idChunk)
 		if err != nil {
-			return fmt.Errorf("service error getting itemId chunk %d: %s", idChunk, err)
+			errs = append(errs, fmt.Errorf("service error getting and storing items in chunk %d: %s", idChunk, err))
 		}
 	}
 
-	return nil
+	return errors.Join(errs...)
 }
 
 func SplitArray(arr []int, chunkSize int) [][]int {
@@ -77,27 +81,27 @@ func SplitArray(arr []int, chunkSize int) [][]int {
 
 }
 
-func (service *ItemService) GetAndStoreEachByIds(itemIds []int) error {
-	apiItems, err := service.ItemProvider.GetItemsByIds(itemIds)
+func (service *ItemService) GetAndStoreEachByIDs(itemIds []int) error {
+	apiItems, err := service.ItemProvider.GetItemsByIDs(itemIds)
 	if err != nil {
 		return fmt.Errorf("provider error requesting items: %s", err)
 	}
 
-	var duplicateKeyErrorIds []int
+	var duplicateKeyErrorIDs []int
 	for _, item := range apiItems {
 		dbItem := item.ToDBItem()
 		_, err := service.ItemRepository.Create(&dbItem)
 		if err != nil {
 			if isDuplicateKeyError(err) {
-				duplicateKeyErrorIds = append(duplicateKeyErrorIds, int(item.ID))
+				duplicateKeyErrorIDs = append(duplicateKeyErrorIDs, int(item.ID))
 			} else {
 				return fmt.Errorf("gorm error adding item id %d: %s", item.ID, err)
 			}
 		}
 	}
 
-	if len(duplicateKeyErrorIds) != 0 {
-		fmt.Printf("skipped adding duplicate values %#v\n", duplicateKeyErrorIds)
+	if len(duplicateKeyErrorIDs) != 0 {
+		fmt.Printf("skipped adding duplicate values %#v\n", duplicateKeyErrorIDs)
 	}
 
 	return nil

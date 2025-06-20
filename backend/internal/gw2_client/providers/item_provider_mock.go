@@ -11,7 +11,7 @@ import (
 
 type ItemProviderMock struct{}
 
-func (itemProvider *ItemProviderMock) GetItemsByIds(intArrIds []int) ([]gw2models.GW2Item, error) {
+func (itemProvider *ItemProviderMock) GetItemsByIDs(intArrIds []int) ([]gw2models.GW2Item, error) {
 	wd, _ := os.Getwd()
 	isTesting := strings.Contains(wd, "test")
 	leadingFilepath := ""
@@ -30,7 +30,7 @@ func (itemProvider *ItemProviderMock) GetItemsByIds(intArrIds []int) ([]gw2model
 	return apiItems, nil
 }
 
-func (itemProvider *ItemProviderMock) GetAllItemIds() ([]int, error) {
+func (itemProvider *ItemProviderMock) GetAllItemIDs() ([]int, error) {
 	return mockAllItemIds, nil
 }
 

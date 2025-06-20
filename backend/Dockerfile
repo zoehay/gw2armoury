@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM golang:1.21 AS build
+FROM golang:1.24 AS build
 
 # Set destination for COPY
 WORKDIR /src
@@ -21,7 +21,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o /backend ./cmd/main.go
 
 # Use light weight image for prod later 
-FROM golang:1.21
+FROM golang:1.24
 
 WORKDIR /
 
@@ -29,6 +29,6 @@ COPY --from=build /backend /backend
 COPY --from=build /src/.env .
 
 EXPOSE 8000
-
+ARG APP_ENV
 # Run
-CMD ["/backend"]
+CMD ["/backend" "APP_ENV=docker-test"]

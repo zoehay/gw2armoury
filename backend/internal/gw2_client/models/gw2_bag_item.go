@@ -2,6 +2,7 @@ package gw2models
 
 import (
 	"github.com/lib/pq"
+	"github.com/zoehay/gw2armoury/backend/internal/api/models"
 	dbmodels "github.com/zoehay/gw2armoury/backend/internal/db/models"
 )
 
@@ -21,7 +22,7 @@ type GW2BagItem struct {
 }
 
 func (gw2BagItem GW2BagItem) ToDBBagItem(accountID string, apiCharacterName *string) dbmodels.DBBagItem {
-	var stats = (*dbmodels.DetailsMap)(gw2BagItem.Stats)
+	var stats = (*models.DetailsMap)(gw2BagItem.Stats)
 	return dbmodels.DBBagItem{
 		AccountID:     accountID,
 		CharacterName: apiCharacterName,
@@ -29,7 +30,7 @@ func (gw2BagItem GW2BagItem) ToDBBagItem(accountID string, apiCharacterName *str
 		Count:         gw2BagItem.Count,
 		Charges:       gw2BagItem.Charges,
 		Infusions:     (*pq.Int64Array)(gw2BagItem.Infusions),
-		Upgrades:      (*pq.Int64Array)(gw2BagItem.Infusions),
+		Upgrades:      (*pq.Int64Array)(gw2BagItem.Upgrades),
 		Skin:          gw2BagItem.Skin,
 		Stats:         stats,
 		Dyes:          (*pq.Int64Array)(gw2BagItem.Infusions),

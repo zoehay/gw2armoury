@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"fmt"
+
 	dbmodels "github.com/zoehay/gw2armoury/backend/internal/db/models"
 	"gorm.io/gorm"
 )
@@ -13,7 +15,7 @@ type BagItemRepositoryInterface interface {
 	DeleteSharedInventory(accountID string) error
 	GetIds() ([]int, error)
 	GetDetailBagItemByCharacterName(accountID string, characterName string) ([]dbmodels.DBDetailBagItem, error)
-	GetDetailBagItemByAccountID(accountID string) ([]dbmodels.DBDetailBagItem, error)
+	GetDetailBagItemByAccountID(accountID string) (detailBagItems []dbmodels.DBDetailBagItem, itemsNotInDB []int64, err error)
 }
 
 type BagItemRepository struct {
@@ -95,23 +97,34 @@ func (repository *BagItemRepository) GetDetailBagItemByCharacterName(accountID s
 
 }
 
-func (repository *BagItemRepository) GetDetailBagItemByAccountID(accountID string) ([]dbmodels.DBDetailBagItem, error) {
-	var detailBagItems []dbmodels.DBDetailBagItem
-
-	err := repository.DB.Table("db_bag_items").
+func (repository *BagItemRepository) GetDetailBagItemByAccountID(accountID string) (detailBagItems []dbmodels.DBDetailBagItem, itemsNotInDB []int64, err error) {
+	err = repository.DB.Table("db_bag_items").
 		Select("db_bag_items.*, db_items.icon, db_items.name, db_items.description, db_items.rarity").
 		Joins("left join db_items on db_bag_items.bag_item_id = db_items.id").
 		Where("db_bag_items.account_id = ?", accountID).
 		Scan(&detailBagItems).Error
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	for i := range detailBagItems {
 		detailBagItems[i].ToBagItem()
+		if repository.ItemNotInDB(detailBagItems[i]) {
+			itemsNotInDB = append(itemsNotInDB, int64(detailBagItems[i].BagItemID))
+		}
 	}
+	fmt.Println("NOT IN DB")
+	fmt.Println(itemsNotInDB)
 
-	return detailBagItems, nil
+	return detailBagItems, itemsNotInDB, nil
 
+}
+
+func (repository *BagItemRepository) ItemNotInDB(item dbmodels.DBDetailBagItem) bool {
+	if item.Name == nil {
+		return true
+	} else {
+		return false
+	}
 }

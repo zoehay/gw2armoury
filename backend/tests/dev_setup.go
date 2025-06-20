@@ -18,7 +18,7 @@ func GetItemsInCharacterBags(itemService *services.ItemService, bagItemRepositor
 		return fmt.Errorf("dev setup more than 500 items, maybe wait")
 	}
 
-	err = itemService.GetAndStoreEachByIds(itemIds)
+	err = itemService.GetAndStoreEachByIDs(itemIds)
 	if err != nil {
 		return fmt.Errorf("dev setup error getting and storing items : %s", err)
 	}

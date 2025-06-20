@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -8,15 +9,16 @@ import (
 )
 
 func main() {
-	// router, _ := SetupRouter(dsn)
-	// router.Run("127.0.0.1:8000")
 
 	dsn := routes.LoadEnvDSN()
 	mocks := false
 	appMode := os.Getenv("APP_ENV")
-	if appMode == "test" {
+	if appMode == "test" || appMode == "docker-test" {
 		mocks = true
 	}
+	fmt.Println("MAIN")
+	fmt.Println(dsn)
+	fmt.Println(mocks)
 
 	router, _, _, err := routes.SetupRouter(dsn, mocks)
 	if err != nil {

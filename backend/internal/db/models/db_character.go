@@ -1,5 +1,7 @@
 package dbmodels
 
+import "github.com/zoehay/gw2armoury/backend/internal/api/models"
+
 type DBCharacter struct {
 	Name       string
 	Race       string
@@ -20,7 +22,7 @@ type DBCharacter struct {
 	// BuildTabs             []*DetailsMap
 	// EquipmentTabsUnlocked int
 	// ActiveEquipmentTab    int
-	Equipment []*DetailsMap
+	Equipment []*models.DetailsMap
 	// EquipmentTabs []*DetailsMap
 	// Recipes []int
 	// Training []string

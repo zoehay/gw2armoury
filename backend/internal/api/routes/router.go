@@ -23,9 +23,14 @@ func LoadEnvDSN() string {
 	appMode := os.Getenv("APP_ENV")
 	dsn := os.Getenv("DB_DSN")
 
-	if appMode == "development" {
+	if appMode == "test" {
 		dsn = os.Getenv("TEST_DB_DSN")
+	} else if appMode == "development" {
+		dsn = os.Getenv("DEV_NO_MOCK_DB_DSN")
 	}
+	// else if appMode == "docker-test" {
+	// 	dsn = os.Getenv("DOCKER_TEST_DB_DSN")
+	// }
 	return dsn
 }
 
@@ -39,7 +44,7 @@ func SetupRouter(dsn string, mocks bool) (*gin.Engine, *repositories.Repository,
 	service := services.NewService(repository, mocks)
 
 	itemHandler := handlers.NewItemHandler(&repository.ItemRepository)
-	bagItemHandler := handlers.NewBagItemHandler(&repository.BagItemRepository)
+	bagItemHandler := handlers.NewBagItemHandler(&repository.BagItemRepository, service.ItemService)
 	accountHandler := handlers.NewAccountHandler(&repository.AccountRepository, &repository.SessionRepository, &repository.BagItemRepository, service.AccountService, service.BagItemService)
 
 	err = db.SeedItems(repository.ItemRepository, *service.ItemService)

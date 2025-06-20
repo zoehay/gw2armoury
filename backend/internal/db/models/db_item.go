@@ -1,11 +1,6 @@
 package dbmodels
 
 import (
-	"database/sql/driver"
-	"encoding/json"
-	"errors"
-	"fmt"
-
 	"github.com/lib/pq"
 	"github.com/zoehay/gw2armoury/backend/internal/api/models"
 )
@@ -24,12 +19,26 @@ type DBItem struct {
 	ID           uint           `gorm:"primaryKey"`
 	ChatLink     string
 	Icon         string
-	UpgradesInto *pq.StringArray `gorm:"type:text[]"`
-	UpgradesFrom *pq.StringArray `gorm:"type:text[]"`
-	Details      *DetailsMap     `gorm:"type:json"`
+	UpgradesInto *models.DetailsMapArray `gorm:"type:json"`
+	UpgradesFrom *models.DetailsMapArray `gorm:"type:json"`
+	Details      *models.DetailsMap      `gorm:"type:json"`
 }
 
 func (dbItem DBItem) ToItem() models.Item {
+	var upgradesInto []map[string]interface{}
+	if dbItem.UpgradesInto != nil {
+		for _, upgrade := range *dbItem.UpgradesInto {
+			upgradesInto = append(upgradesInto, (map[string]interface{})(upgrade))
+		}
+	}
+
+	var upgradesFrom []map[string]interface{}
+	if dbItem.UpgradesFrom != nil {
+		for _, upgrade := range *dbItem.UpgradesFrom {
+			upgradesFrom = append(upgradesFrom, (map[string]interface{})(upgrade))
+		}
+	}
+
 	return models.Item{
 		Name:         dbItem.Name,
 		Type:         dbItem.Name,
@@ -44,33 +53,10 @@ func (dbItem DBItem) ToItem() models.Item {
 		ChatLink:     dbItem.ChatLink,
 		Icon:         dbItem.Icon,
 		Description:  dbItem.Description,
-		UpgradesInto: (*[]string)(dbItem.UpgradesInto),
-		UpgradesFrom: (*[]string)(dbItem.UpgradesFrom),
+		UpgradesInto: &upgradesInto,
+		UpgradesFrom: &upgradesFrom,
 		Details:      (*map[string]interface{})(dbItem.Details),
 	}
-}
-
-type DetailsMap map[string]interface{}
-
-func (detailsMap *DetailsMap) Scan(value interface{}) error {
-	if value == nil {
-		*detailsMap = nil
-		return nil
-	}
-	bytes, ok := value.([]byte)
-	if !ok {
-		return errors.New(fmt.Sprint("Failed to unmarshal JSONB value:", value))
-	}
-	err := json.Unmarshal(bytes, detailsMap)
-	return err
-
-}
-
-func (detailsMap DetailsMap) Value() (driver.Value, error) {
-	if len(detailsMap) == 0 {
-		return nil, nil
-	}
-	return json.Marshal(detailsMap)
 }
 
 // type GormArmorDetails struct {

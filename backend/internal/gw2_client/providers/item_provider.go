@@ -12,13 +12,13 @@ import (
 )
 
 type ItemDataProvider interface {
-	GetItemsByIds(intArrIds []int) ([]gw2models.GW2Item, error)
-	GetAllItemIds() ([]int, error)
+	GetItemsByIDs(intArrIds []int) ([]gw2models.GW2Item, error)
+	GetAllItemIDs() ([]int, error)
 }
 
 type ItemProvider struct{}
 
-func (itemProvider *ItemProvider) GetItemsByIds(intArrIds []int) ([]gw2models.GW2Item, error) {
+func (itemProvider *ItemProvider) GetItemsByIDs(intArrIds []int) ([]gw2models.GW2Item, error) {
 	idString := strings.Join(IntArrToStringArr(intArrIds), ",")
 	res, err := gw2client.GetItemsById(idString)
 
@@ -43,7 +43,7 @@ func (itemProvider *ItemProvider) GetItemsByIds(intArrIds []int) ([]gw2models.GW
 	return result, nil
 }
 
-func (itemProvider *ItemProvider) GetAllItemIds() ([]int, error) {
+func (itemProvider *ItemProvider) GetAllItemIDs() ([]int, error) {
 	res, err := gw2client.GetItemIds()
 
 	if err != nil {
