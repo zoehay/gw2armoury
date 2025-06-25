@@ -45,12 +45,11 @@ func (s *BagItemAccountServiceTestSuite) TearDownSuite() {
 func (s *BagItemAccountServiceTestSuite) TestGetAndStoreAllBagItems() {
 	err := s.Service.BagItemService.GetAndStoreAllBagItems("accountid", "apikeystring")
 	assert.NoError(s.T(), err, "Failed to get and store items")
-	bagItems, _, err := s.Service.BagItemService.BagItemRepository.GetDetailBagItemByAccountID("accountid")
+	bagItems, err := s.Repository.BagItemRepository.GetDetailBagItemByAccountID("accountid")
 	assert.NoError(s.T(), err, "Failed to get account bag items")
 	numberAllBagItems := len(bagItems)
 	fmt.Println(numberAllBagItems)
-	assert.Equal(s.T(), 70, numberAllBagItems)
-
+	assert.Equal(s.T(), 71, numberAllBagItems, "Correct number of items added")
 }
 
 func (s *BagItemAccountServiceTestSuite) TestGetAndStoreSharedInventory() {
@@ -59,7 +58,7 @@ func (s *BagItemAccountServiceTestSuite) TestGetAndStoreSharedInventory() {
 }
 
 func (s *BagItemAccountServiceTestSuite) TestGetBagItemsByAccount() {
-	_, _, err := s.Service.BagItemService.BagItemRepository.GetDetailBagItemByAccountID("accountid")
+	_, err := s.Repository.BagItemRepository.GetDetailBagItemByAccountID("accountid")
 	assert.NoError(s.T(), err, "Failed to get account bag items")
 }
 
@@ -68,17 +67,17 @@ func (s *BagItemAccountServiceTestSuite) TestClearAccountBagItems() {
 	assert.NoError(s.T(), err, "Failed to get and store account inventory")
 	err = s.Service.BagItemService.GetAndStoreAllCharacters("accountid", "apikeystring")
 	assert.NoError(s.T(), err, "Failed to get and store character inventory")
-	bagItems, _, err := s.Service.BagItemService.BagItemRepository.GetDetailBagItemByAccountID("accountid")
+	bagItems, err := s.Repository.BagItemRepository.GetDetailBagItemByAccountID("accountid")
 	assert.NoError(s.T(), err, "Failed to get account bag items")
 	numberAllBagItems := len(bagItems)
 	fmt.Println(numberAllBagItems)
 	err = s.Service.BagItemService.ClearSharedInventory("accountid")
 	assert.NoError(s.T(), err, "Failed to clear account shared inventory")
-	bagItems, _, err = s.Service.BagItemService.BagItemRepository.GetDetailBagItemByAccountID("accountid")
+	bagItems, err = s.Repository.BagItemRepository.GetDetailBagItemByAccountID("accountid")
 	assert.NoError(s.T(), err, "Failed to get account bag items")
 	numberCharacterBagItems := len(bagItems)
 	fmt.Println(numberCharacterBagItems)
-	assert.Equal(s.T(), 3, (numberAllBagItems - numberCharacterBagItems))
+	assert.Equal(s.T(), 4, (numberAllBagItems - numberCharacterBagItems))
 
 }
 
@@ -87,7 +86,7 @@ func (s *BagItemAccountServiceTestSuite) TestClearCharacterInventory() {
 	assert.NoError(s.T(), err, "Failed to get and account inventory")
 	err = s.Service.BagItemService.GetAndStoreAllCharacters("accountid", "apikeystring")
 	assert.NoError(s.T(), err, "Failed to get and store character inventory")
-	bagItems, _, err := s.Service.BagItemService.BagItemRepository.GetDetailBagItemByAccountID("accountid")
+	bagItems, err := s.Repository.BagItemRepository.GetDetailBagItemByAccountID("accountid")
 	assert.NoError(s.T(), err, "Failed to get account bag items")
 	numberAllBagItems := len(bagItems)
 	fmt.Println(numberAllBagItems)
@@ -95,7 +94,7 @@ func (s *BagItemAccountServiceTestSuite) TestClearCharacterInventory() {
 	assert.NoError(s.T(), err, "Failed to clear character inventory")
 	err = s.Service.BagItemService.ClearCharacterInventory("accountid", "Roman Meows")
 	assert.NoError(s.T(), err, "Failed to clear character inventory")
-	bagItems, _, err = s.Service.BagItemService.BagItemRepository.GetDetailBagItemByAccountID("accountid")
+	bagItems, err = s.Repository.BagItemRepository.GetDetailBagItemByAccountID("accountid")
 	assert.NoError(s.T(), err, "Failed to get account bag items")
 	numberBagItemsWithoutCharacter := len(bagItems)
 	fmt.Println(numberBagItemsWithoutCharacter)

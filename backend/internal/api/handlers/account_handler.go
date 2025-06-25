@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -87,8 +86,6 @@ func (handler AccountHandler) HandlePostAccountRequest(c *gin.Context) {
 		}
 	}
 
-	fmt.Println("FINISHED")
-	fmt.Println(account.DBAccountToAccount())
 	c.IndentedJSON(http.StatusOK, account.DBAccountToAccount())
 }
 

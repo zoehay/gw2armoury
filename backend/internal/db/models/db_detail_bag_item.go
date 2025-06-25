@@ -48,14 +48,18 @@ func (dbDetailBagItem DBDetailBagItem) ToBagItem() models.BagItem {
 	}
 }
 
-func DBDetailBagItemsToAccountInventory(dbIconBagItems []DBDetailBagItem, accountID string) models.AccountInventory {
+func DBDetailBagItemsToAccountInventory(dbIconBagItems []DBDetailBagItem, accountID string) (accountInventory models.AccountInventory, itemsNotInDB []int64) {
 
 	characterNameMap := map[string]models.Character{}
 	var sharedInventory []models.BagItem
 	var characters []models.Character
 
-	for i := range dbIconBagItems {
-		item := dbIconBagItems[i].ToBagItem()
+	for _, item := range dbIconBagItems {
+		if ItemNotInDB(item) {
+			itemsNotInDB = append(itemsNotInDB, int64(item.BagItemID))
+		}
+
+		item := item.ToBagItem()
 		name := item.CharacterName
 
 		if name == "Shared Inventory" {
@@ -93,10 +97,17 @@ func DBDetailBagItemsToAccountInventory(dbIconBagItems []DBDetailBagItem, accoun
 		characters = append(characters, characterNameMap[character])
 	}
 
-	var accountInventory models.AccountInventory
 	accountInventory.AccountID = accountID
 	accountInventory.SharedInventory = &sharedInventory
 	accountInventory.Characters = &characters
 
-	return accountInventory
+	return accountInventory, itemsNotInDB
+}
+
+func ItemNotInDB(item DBDetailBagItem) bool {
+	if item.Name == nil {
+		return true
+	} else {
+		return false
+	}
 }

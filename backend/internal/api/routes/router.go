@@ -76,6 +76,7 @@ func SetupRouter(dsn string, mocks bool) (*gin.Engine, *repositories.Repository,
 		account.GET("/characters/:charactername/inventory", bagItemHandler.GetByCharacter)
 		account.DELETE("/delete", accountHandler.Delete)
 		account.GET("/accountinventory", bagItemHandler.GetAccountInventory)
+		account.POST("/searchinventory", bagItemHandler.GetFilteredAccountInventory)
 	}
 
 	return router, repository, service, nil

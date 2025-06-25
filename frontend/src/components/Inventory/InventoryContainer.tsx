@@ -1,29 +1,19 @@
 import React from "react";
+import { AccountInventory } from "../../models/AccountInventory";
 import InventoryGroup from "./InventoryGroup";
 import inventory from "./inventory.module.css";
-import { BagItem } from "../../models/BagItem";
-import { Character } from "../../models/Character";
 
 interface AccountInventoryProps {
-  sharedInventory?: BagItem[] | undefined;
-  characters?: Character[];
+  accountInventory: AccountInventory;
 }
 
 const InventoryContainer: React.FC<AccountInventoryProps> = ({
-  sharedInventory,
-  characters,
+  accountInventory,
 }) => {
-  // let [searchTerm, setSearchTerm] = useState<string>("");
-
-  // const handleChange = (e: { target: { value: string } }) => {
-  //   setTimeout(async () => {
-  //     setSearchTerm(e.target.value);
-  //   }, 1000);
-  // };
+  let { sharedInventory, characters } = accountInventory;
 
   return (
     <>
-      {/* <input type="text" onChange={handleChange} /> */}
       {sharedInventory && (
         <InventoryGroup
           characterName="Shared Inventory"

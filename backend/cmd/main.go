@@ -16,7 +16,6 @@ func main() {
 	if appMode == "test" || appMode == "docker-test" {
 		mocks = true
 	}
-	fmt.Println("MAIN")
 	fmt.Println(dsn)
 	fmt.Println(mocks)
 

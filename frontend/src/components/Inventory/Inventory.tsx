@@ -12,23 +12,57 @@ const Inventory = () => {
   let [accountInventory, setAccountInventory] = useState<
     AccountInventory | undefined
   >();
+  let [searchTerm, setSearchTerm] = useState<string>("");
 
-  async function fetchData() {
+  const fetchData = async () => {
     let inventory: AccountInventory = await client.getAccountInventory();
     setAccountInventory(inventory);
-  }
+  };
 
   useEffect(() => {
     fetchData();
   }, []);
 
+  const handleChange = (e: React.FormEvent<HTMLInputElement>) => {
+    const input = e.currentTarget.value;
+    setSearchTerm(input);
+  };
+
+  const handleSubmit = async (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    if (searchTerm) {
+      const filteredInventory = await client.postInventorySearch(searchTerm);
+      if (!filteredInventory) {
+        console.log("Could not post search");
+      } else {
+        setAccountInventory(filteredInventory);
+      }
+    } else {
+      fetchData();
+    }
+  };
+
   return (
     <div className={content.page}>
       {accountInventory ? (
-        <InventoryContainer
-          sharedInventory={accountInventory.sharedInventory}
-          characters={accountInventory.characters}
-        ></InventoryContainer>
+        <>
+          <form onSubmit={handleSubmit}>
+            <label htmlFor="apikey-input">{`Search`}</label>
+            <div>
+              <input
+                type="search"
+                name="search-input"
+                id="search"
+                value={searchTerm}
+                onChange={handleChange}
+              />
+            </div>
+            <input type="submit" value="Submit" />
+          </form>
+          <InventoryContainer
+            accountInventory={accountInventory}
+          ></InventoryContainer>
+        </>
       ) : (
         <NoKeyPage />
       )}

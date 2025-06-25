@@ -141,4 +141,23 @@ export class Client {
       return null;
     }
   }
+
+  async postInventorySearch(
+    searchTerm: string
+  ): Promise<AccountInventory | null> {
+    let body = JSON.stringify({
+      SearchTerm: searchTerm,
+    });
+    let endpoint: string = `${this.baseURL}/account/searchinventory`;
+
+    let response: unknown = await this.clientPost(endpoint, body);
+    let apiAccountInventory = response as APIAccountInventory;
+    let accountInventory: Account =
+      APIAccountInventoryToAccountInventory(apiAccountInventory);
+    if (accountInventory) {
+      return accountInventory;
+    } else {
+      return null;
+    }
+  }
 }

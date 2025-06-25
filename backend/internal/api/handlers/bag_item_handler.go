@@ -54,7 +54,7 @@ func (bagItemHandler BagItemHandler) GetByAccount(c *gin.Context) {
 	}
 
 	accountID := value.(string)
-	dbItems, itemsNotInDB, err := bagItemHandler.BagItemRepository.GetDetailBagItemByAccountID(accountID)
+	dbItems, err := bagItemHandler.BagItemRepository.GetDetailBagItemByAccountID(accountID)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -64,7 +64,6 @@ func (bagItemHandler BagItemHandler) GetByAccount(c *gin.Context) {
 	for i := range dbItems {
 		items[i] = dbItems[i].ToBagItem()
 	}
-	fmt.Println(itemsNotInDB)
 
 	c.IndentedJSON(http.StatusOK, items)
 }
@@ -77,13 +76,13 @@ func (bagItemHandler BagItemHandler) GetAccountInventory(c *gin.Context) {
 	}
 	accountID := value.(string)
 
-	detailBagItems, itemsNotInDB, err := bagItemHandler.BagItemRepository.GetDetailBagItemByAccountID(accountID)
+	detailBagItems, err := bagItemHandler.BagItemRepository.GetDetailBagItemByAccountID(accountID)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error getting account inventory": err.Error()})
 		return
 	}
 
-	accountInventory := dbmodels.DBDetailBagItemsToAccountInventory(detailBagItems, accountID)
+	accountInventory, itemsNotInDB := dbmodels.DBDetailBagItemsToAccountInventory(detailBagItems, accountID)
 
 	c.IndentedJSON(http.StatusOK, accountInventory)
 
@@ -98,6 +97,33 @@ func (bagItemHandler BagItemHandler) GetAccountInventory(c *gin.Context) {
 		}
 	}
 	fmt.Println(errs)
+}
+
+func (bagItemHandler BagItemHandler) GetFilteredAccountInventory(c *gin.Context) {
+	value, exists := c.Get("accountID")
+	if !exists {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "could not find Gin Context accountID"})
+		return
+	}
+	accountID := value.(string)
+
+	var searchRequest SearchRequest
+	if err := c.BindJSON(&searchRequest); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"request body bind json error": err.Error()})
+		return
+	}
+
+	searchString := fmt.Sprintf("%%%v%%", searchRequest.SearchTerm)
+	detailBagItems, err := bagItemHandler.BagItemRepository.GetDetailBagItemsWithSearch(accountID, searchString)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error getting account inventory": err.Error()})
+		return
+	}
+
+	accountInventory, _ := dbmodels.DBDetailBagItemsToAccountInventory(detailBagItems, accountID)
+
+	c.IndentedJSON(http.StatusOK, accountInventory)
+
 }
 
 func SplitArray(arr []int, chunkSize int) [][]int {
@@ -125,4 +151,8 @@ func removeDuplicates(inputIDs []int64) []int {
 		}
 	}
 	return noDuplicates
+}
+
+type SearchRequest struct {
+	SearchTerm string
 }
